@@ -1,0 +1,74 @@
+import React from 'react';
+import {
+    CommandCenterIcon, CodeExplainerIcon, FeatureBuilderIcon, CodeMigratorIcon, ThemeDesignerIcon, SnippetVaultIcon,
+    UnitTestGeneratorIcon, CommitGeneratorIcon, GitLogAnalyzerIcon, ConcurrencyAnalyzerIcon, RegexSandboxIcon,
+    PromptCraftPadIcon, CodeFormatterIcon, JsonTreeIcon, CssGridEditorIcon, SchemaDesignerIcon, PwaManifestEditorIcon,
+    MarkdownSlidesIcon, ScreenshotToComponentIcon, SvgPathEditorIcon, StyleTransferIcon, CodingChallengeIcon,
+    CodeReviewBotIcon, ChangelogGeneratorIcon, CronJobBuilderIcon,
+    AsyncCallTreeIcon, AudioToCodeIcon, CodeDiffGhostIcon, CodeSpellCheckerIcon, ColorPaletteGeneratorIcon, LogicFlowBuilderIcon,
+    MetaTagEditorIcon, NetworkVisualizerIcon, ResponsiveTesterIcon, SassCompilerIcon, ImageGeneratorIcon, XbrlConverterIcon,
+    DigitalWhiteboardIcon, TypographyLabIcon, AiPullRequestAssistantIcon, ProjectExplorerIcon, ConnectionsIcon
+} from './components/icons.tsx';
+
+export const CHROME_VIEW_IDS = ['features-list'] as const;
+
+export const FEATURE_CATEGORIES = ['Core', 'AI Tools', 'Frontend', 'Testing', 'Database', 'Data', 'Productivity', 'Git', 'Deployment', 'Workflow'] as const;
+export type FeatureCategory = typeof FEATURE_CATEGORIES[number];
+
+export type SlotCategory = FeatureCategory;
+export const SLOTS: SlotCategory[] = ['Core', 'AI Tools', 'Frontend', 'Testing', 'Git', 'Productivity'];
+
+interface RawFeature {
+    id: string;
+    name: string;
+    description: string;
+    icon: React.ReactNode;
+    category: FeatureCategory;
+}
+
+export const RAW_FEATURES: RawFeature[] = [
+    { id: "ai-command-center", name: "AI Command Center", description: "Use natural language to navigate and control the toolkit.", icon: React.createElement(CommandCenterIcon), category: "Core" },
+    { id: "project-explorer", name: "Project Explorer", description: "Manage and edit files from your connected repositories.", icon: React.createElement(ProjectExplorerIcon), category: "Core" },
+    { id: "connections", name: "Connections", description: "Connect to GitHub and other services.", icon: React.createElement(ConnectionsIcon), category: "Core" },
+    { id: "ai-image-generator", name: "AI Image Generator", description: "Generate high-quality images from a text prompt.", icon: React.createElement(ImageGeneratorIcon), category: "AI Tools" },
+    { id: "ai-code-explainer", name: "AI Code Explainer", description: "Get a structured analysis of code, including complexity.", icon: React.createElement(CodeExplainerIcon), category: "AI Tools" },
+    { id: "ai-feature-builder", name: "AI Feature Builder", description: "Generate code, tests, and commit messages.", icon: React.createElement(FeatureBuilderIcon), category: "AI Tools" },
+    { id: "ai-code-migrator", name: "AI Code Migrator", description: "Translate code between languages & frameworks.", icon: React.createElement(CodeMigratorIcon), category: "AI Tools" },
+    { id: "theme-designer", name: "AI Theme Designer", description: "Generate, fine-tune, and export UI color themes from a text description or image.", icon: React.createElement(ThemeDesignerIcon), category: "AI Tools" },
+    { id: "portable-snippet-vault", name: "Snippet Vault", description: "Store, search, tag, and enhance reusable code snippets with AI.", icon: React.createElement(SnippetVaultIcon), category: "Productivity" },
+    { id: "digital-whiteboard", name: "Digital Whiteboard", description: "Organize ideas with interactive sticky notes and get AI-powered summaries.", icon: React.createElement(DigitalWhiteboardIcon), category: "Productivity" },
+    { id: "ai-unit-test-generator", name: "AI Unit Test Generator", description: "Generate unit tests from source code.", icon: React.createElement(UnitTestGeneratorIcon), category: "AI Tools" },
+    { id: "ai-commit-generator", name: "AI Commit Message Generator", description: "Smart, conventional commits via AI.", icon: React.createElement(CommitGeneratorIcon), category: "AI Tools" },
+    { id: "visual-git-tree", name: "Visual Git Tree", description: "Visually trace your git commit history with an interactive graph and an AI-powered summary.", icon: React.createElement(GitLogAnalyzerIcon), category: "Git" },
+    { id: "worker-thread-debugger", name: "AI Concurrency Analyzer", description: "Analyze JS for Web Worker issues like race conditions.", icon: React.createElement(ConcurrencyAnalyzerIcon), category: "Testing" },
+    { id: "regex-sandbox", name: "RegEx Sandbox", description: "Visually test regular expressions, generate them with AI, and inspect match groups.", icon: React.createElement(RegexSandboxIcon), category: "Testing" },
+    { id: "prompt-craft-pad", name: "Prompt Craft Pad", description: "Save, edit, and manage your custom AI prompts with variable testing.", icon: React.createElement(PromptCraftPadIcon), category: "AI Tools" },
+    { id: "linter-formatter", name: "AI Code Formatter", description: "AI-powered, real-time code formatting.", icon: React.createElement(CodeFormatterIcon), category: "Core" },
+    { id: "json-tree-navigator", name: "JSON Tree Navigator", description: "Navigate large JSON objects as a collapsible tree.", icon: React.createElement(JsonTreeIcon), category: "Core" },
+    { id: "xbrl-converter", name: "XBRL Converter", description: "Convert JSON data to a simplified XBRL-like XML format using AI.", icon: React.createElement(XbrlConverterIcon), category: "Data" },
+    { id: "css-grid-editor", name: "CSS Grid Visual Editor", description: "Drag-based layout builder for CSS Grid.", icon: React.createElement(CssGridEditorIcon), category: "Frontend" },
+    { id: "schema-designer", name: "Schema Designer", description: "Visually design a database schema with a drag-and-drop interface and SQL export.", icon: React.createElement(SchemaDesignerIcon), category: "Database" },
+    { id: "pwa-manifest-editor", name: "PWA Manifest Editor", description: "Configure and preview Progressive Web App manifests with a home screen simulator.", icon: React.createElement(PwaManifestEditorIcon), category: "Frontend" },
+    { id: "markdown-slides-generator", name: "Markdown Slides", description: "Turn markdown into a fullscreen presentation with an interactive overlay.", icon: React.createElement(MarkdownSlidesIcon), category: "Productivity" },
+    { id: "screenshot-to-component", name: "Screenshot-to-Component", description: "Turn UI screenshots into functional code via paste or upload.", icon: React.createElement(ScreenshotToComponentIcon), category: "AI Tools" },
+    { id: "typography-lab", name: "Typography Lab", description: "Preview font pairings and get CSS import rules.", icon: React.createElement(TypographyLabIcon), category: "Frontend" },
+    { id: "svg-path-editor", name: "SVG Path Editor", description: "Visually create and manipulate SVG path data with an interactive canvas.", icon: React.createElement(SvgPathEditorIcon), category: "Frontend" },
+    { id: "ai-style-transfer", name: "AI Code Style Transfer", description: "Rewrite code to match a specific style guide.", icon: React.createElement(StyleTransferIcon), category: "AI Tools" },
+    { id: "ai-coding-challenge", name: "AI Coding Challenge Generator", description: "Generate unique coding exercises.", icon: React.createElement(CodingChallengeIcon), category: "AI Tools" },
+    { id: "code-review-bot", name: "AI Code Review Bot", description: "Get an automated code review from an AI.", icon: React.createElement(CodeReviewBotIcon), category: "AI Tools" },
+    { id: "ai-pull-request-assistant", name: "AI Pull Request Assistant", description: "Generate a structured PR summary from code diffs and populate a full template.", icon: React.createElement(AiPullRequestAssistantIcon), category: "AI Tools" },
+    { id: "changelog-generator", name: "AI Changelog Generator", description: "Auto-build changelogs from raw git logs.", icon: React.createElement(ChangelogGeneratorIcon), category: "Git" },
+    { id: "cron-job-builder", name: "AI Cron Job Builder", description: "Visually tool to configure cron jobs, with AI.", icon: React.createElement(CronJobBuilderIcon), category: "Deployment" },
+    { id: "async-call-tree-viewer", name: "Async Call Tree Viewer", description: "Visualize a tree of asynchronous function calls from JSON data.", icon: React.createElement(AsyncCallTreeIcon), category: "Testing" },
+    { id: "audio-to-code", name: "AI Audio-to-Code", description: "Speak your programming ideas and watch them turn into code.", icon: React.createElement(AudioToCodeIcon), category: "AI Tools" },
+    { id: "code-diff-ghost", name: "Code Diff Ghost", description: "Visualize code changes with a 'ghost typing' effect.", icon: React.createElement(CodeDiffGhostIcon), category: "Git" },
+    { id: "code-spell-checker", name: "Code Spell Checker", description: "A spell checker that finds common typos in code.", icon: React.createElement(CodeSpellCheckerIcon), category: "Testing" },
+    { id: "color-palette-generator", name: "AI Color Palette Generator", description: "Pick a base color and let Gemini design a beautiful palette.", icon: React.createElement(ColorPaletteGeneratorIcon), category: "Frontend" },
+    { id: "logic-flow-builder", name: "Logic Flow Builder", description: "A visual tool for building application logic flows.", icon: React.createElement(LogicFlowBuilderIcon), category: "Workflow" },
+    { id: "meta-tag-editor", name: "Meta Tag Editor", description: "Generate SEO/social media meta tags with a live social card preview.", icon: React.createElement(MetaTagEditorIcon), category: "Frontend" },
+    { id: "network-visualizer", name: "Network Visualizer", description: "Inspect network resources with a summary and visual waterfall chart.", icon: React.createElement(NetworkVisualizerIcon), category: "Testing" },
+    { id: "responsive-tester", name: "Responsive Tester", description: "Preview your web pages at different screen sizes and custom resolutions.", icon: React.createElement(ResponsiveTesterIcon), category: "Frontend" },
+    { id: "sass-scss-compiler", name: "SASS/SCSS Compiler", description: "A real-time SASS/SCSS to CSS compiler.", icon: React.createElement(SassCompilerIcon), category: "Frontend" },
+];
+
+export const ALL_FEATURE_IDS = RAW_FEATURES.map(f => f.id);
