@@ -1,6 +1,6 @@
 # DevCore AI Toolkit: A Monument to Laziness and Superiority
 
-Listen up. You've stumbled upon what might be the last developer tool you'll ever need, and frankly, I'm a little sorry for your career prospects. This isn't just another "portfolio project." It's a declaration of war against mediocrity and wasted time. It's a static application, which means it runs entirely in your browser, and it's powered by Gemini. It's faster, smarter, and probably more motivated than your junior dev.
+Listen up. You've stumbled upon what might be the last developer tool you'll ever need, and frankly, I'm a little sorry for your career prospects. This isn't just another "portfolio project." It's a declaration against mediocrity and wasted time. It's a static application, which means it runs entirely in your browser, and it's powered by Gemini. It's faster, smarter, and probably more motivated than your junior dev.
 
 This document will explain what it is, but more importantly, it will explain why its very existence is a testament to what a developer who has truly mastered their craft can build.
 
