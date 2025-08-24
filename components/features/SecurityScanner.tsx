@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { analyzeCodeForVulnerabilities } from '../../services/geminiService.ts';
+import { analyzeCodeForVulnerabilities } from '../../services/aiService.ts';
 import { runStaticScan, SecurityIssue } from '../../services/security/staticAnalysisService.ts';
+import type { SecurityVulnerability } from '../../types.ts';
 import { ShieldCheckIcon, SparklesIcon } from '../icons.tsx';
-import { LoadingSpinner } from '../shared/index.tsx';
+import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 const exampleCode = `function UserProfile({ user }) {
   // TODO: remove this temporary api key
@@ -20,7 +21,7 @@ const exampleCode = `function UserProfile({ user }) {
 export const SecurityScanner: React.FC = () => {
     const [code, setCode] = useState(exampleCode);
     const [localIssues, setLocalIssues] = useState<SecurityIssue[]>([]);
-    const [aiIssues, setAiIssues] = useState<any[]>([]);
+    const [aiIssues, setAiIssues] = useState<SecurityVulnerability[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -86,7 +87,23 @@ export const SecurityScanner: React.FC = () => {
 
                          {aiIssues.length > 0 && <div>
                             <h4 className="font-semibold text-sm mb-1 flex items-center gap-1"><SparklesIcon/> AI-Powered Findings</h4>
-                            {aiIssues.map((issue, i) => <div key={`ai-${i}`} className="p-2 bg-background border rounded mb-2"><p className="font-bold flex items-center gap-2">{issue.vulnerability} <SeverityBadge severity={issue.severity} /></p><p className="text-xs mt-1"><strong>Description:</strong> {issue.description}</p><p className="text-xs mt-1"><strong>Mitigation:</strong> {issue.mitigation}</p></div>)}
+                            {aiIssues.map((issue, i) => (
+                                <details key={`ai-${i}`} className="p-2 bg-background border rounded mb-2">
+                                    <summary className="cursor-pointer font-bold flex items-center gap-2">{issue.vulnerability} <SeverityBadge severity={issue.severity} /></summary>
+                                    <div className="mt-2 pt-2 border-t text-xs space-y-2">
+                                        <p><strong>Description:</strong> {issue.description}</p>
+                                        <p><strong>Mitigation:</strong> {issue.mitigation}</p>
+                                        {issue.exploitSuggestion && (
+                                            <div>
+                                                <strong>Exploit Simulation:</strong>
+                                                <div className="mt-1 p-2 bg-gray-50 rounded">
+                                                     <MarkdownRenderer content={'```bash\n' + issue.exploitSuggestion + '\n```'}/>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </details>
+                            ))}
                         </div>}
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateCiCdConfig } from '../../services/geminiService.ts';
+import { generateCiCdConfig } from '../../services/index.ts';
 import { PaperAirplaneIcon, SparklesIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

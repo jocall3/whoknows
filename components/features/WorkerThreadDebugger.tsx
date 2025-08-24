@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { BugAntIcon, ArrowDownTrayIcon } from '../icons.tsx';
-import { analyzeConcurrencyStream } from '../../services/geminiService.ts';
+import { analyzeConcurrencyStream } from '../../services/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { downloadFile } from '../../services/fileUtils.ts';
 

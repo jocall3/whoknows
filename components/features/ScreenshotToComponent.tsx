@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { generateComponentFromImageStream } from '../../services/geminiService.ts';
+import { generateComponentFromImageStream } from '../../services/index.ts';
 import { PhotoIcon, ArrowDownTrayIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { fileToBase64, blobToDataURL, downloadFile } from '../../services/fileUtils.ts';

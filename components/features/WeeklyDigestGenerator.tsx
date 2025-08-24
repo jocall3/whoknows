@@ -1,6 +1,5 @@
-
 import React, { useState, useCallback } from 'react';
-import { generateWeeklyDigest } from '../../services/geminiService.ts';
+import { generateWeeklyDigest } from '../../services/index.ts';
 import { sendEmail } from '../../services/workspaceService.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
@@ -74,7 +73,7 @@ export const WeeklyDigestGenerator: React.FC = () => {
                         <button onClick={handleGenerate} disabled={isLoading || isSending} className="btn-primary flex items-center justify-center gap-2 py-3">
                             {isLoading ? <LoadingSpinner /> : <><SparklesIcon /> Generate Digest</>}
                         </button>
-                        <button onClick={handleSend} disabled={!emailHtml || isSending || isLoading} className="btn-primary flex items-center justify-center gap-2 py-3 bg-emerald-600">
+                        <button onClick={handleSend} disabled={!emailHtml || isSending || isLoading || !user} className="btn-primary flex items-center justify-center gap-2 py-3 bg-emerald-600">
                            {isSending ? <LoadingSpinner /> : 'Send Email via Gmail'}
                         </button>
                     </div>

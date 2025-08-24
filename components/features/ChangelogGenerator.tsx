@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { generateChangelogFromLogStream } from '../../services/index.ts';
+import { generateChangelogFromLogStream } from '../../services/aiService.ts';
 import { GitBranchIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { MarkdownRenderer } from '../shared/index.tsx';

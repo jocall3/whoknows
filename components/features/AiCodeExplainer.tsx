@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import mermaid from 'mermaid';
-import { explainCodeStructured, generateMermaidJs } from '../../services/geminiService.ts';
+import { explainCodeStructured, generateMermaidJs } from '../../services/index.ts';
 import type { StructuredExplanation } from '../../types.ts';
 import { CpuChipIcon } from '../icons.tsx';
 import { MarkdownRenderer, LoadingSpinner } from '../shared/index.tsx';

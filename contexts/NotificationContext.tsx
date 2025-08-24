@@ -32,19 +32,20 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setNotifications(prev => prev.filter(n => n.id !== id));
     }, 4000);
   }, []);
+  
+  const typeStyles = {
+    success: 'bg-emerald-500 border-emerald-600',
+    error: 'bg-red-500 border-red-600',
+    info: 'bg-sky-500 border-sky-600'
+  };
 
   return (
     <NotificationContext.Provider value={{ addNotification }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-50 space-y-2">
+      <div className="fixed bottom-4 right-4 z-[100] space-y-2 w-full max-w-sm">
         {notifications.map(notification => (
-           <div key={notification.id} role="alert" className="animate-pop-in">
-             <div className="bg-slate-800 text-white font-bold rounded-t px-4 py-2">
-               {notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}
-             </div>
-             <div className="border border-t-0 border-slate-700 bg-slate-700/80 rounded-b px-4 py-3 text-slate-200">
-               <p>{notification.message}</p>
-             </div>
+           <div key={notification.id} role="alert" className={`relative animate-pop-in shadow-lg rounded-lg text-white font-medium p-4 border-b-4 ${typeStyles[notification.type]}`}>
+               {notification.message}
            </div>
         ))}
       </div>

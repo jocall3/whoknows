@@ -1,8 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { generateTerraformConfig } from '../../services/geminiService.ts';
-import * as vaultService from '../../services/vaultService.ts';
-import { useVaultModal } from '../../contexts/VaultModalContext.tsx';
-import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
+import { generateTerraformConfig } from '../../services/index.ts';
 import { CpuChipIcon, SparklesIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
@@ -12,8 +9,6 @@ export const TerraformGenerator: React.FC = () => {
     const [config, setConfig] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { state } = useGlobalState();
-    const { requestUnlock } = useVaultModal();
 
     const handleGenerate = useCallback(async () => {
         if (!description.trim()) {
@@ -24,24 +19,8 @@ export const TerraformGenerator: React.FC = () => {
         setError('');
         setConfig('');
         try {
-            let context = '';
-            if (cloud === 'aws' && state.vaultState.isUnlocked) {
-                 const awsKey = await vaultService.getDecryptedCredential('aws_key');
-                 const awsSecret = await vaultService.getDecryptedCredential('aws_secret');
-                 if(awsKey && awsSecret) {
-                    context = 'Using stored AWS credentials to analyze environment.';
-                    // In a real app, you would make AWS SDK calls here to list S3 buckets, VPCs, etc.
-                    // For this demo, we'll just pass a context message.
-                 }
-            } else if (cloud === 'aws' && !state.vaultState.isUnlocked) {
-                const unlocked = await requestUnlock();
-                if(!unlocked) {
-                    setError('Vault must be unlocked to use AWS context.');
-                    setIsLoading(false);
-                    return;
-                }
-            }
-
+            // Context is stubbed for now but demonstrates future capability
+            const context = 'User might have existing VPCs. Check before creating new ones.';
             const result = await generateTerraformConfig(cloud, description, context);
             setConfig(result);
         } catch (err) {
@@ -49,7 +28,7 @@ export const TerraformGenerator: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [description, cloud, state.vaultState.isUnlocked, requestUnlock]);
+    }, [description, cloud]);
 
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
@@ -64,7 +43,7 @@ export const TerraformGenerator: React.FC = () => {
                             <label className="block text-sm">Cloud Provider</label>
                             <select value={cloud} onChange={e => setCloud(e.target.value as 'aws' | 'gcp')} className="w-full mt-1 p-2 bg-surface border rounded">
                                 <option value="aws">AWS</option>
-                                <option value="gcp" disabled>GCP (coming soon)</option>
+                                <option value="gcp">GCP</option>
                             </select>
                         </div>
                         <div className="md:col-span-2">

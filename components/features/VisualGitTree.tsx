@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { GitBranchIcon, ArrowDownTrayIcon } from '../icons.tsx';
-import { generateChangelogFromLogStream } from '../../services/geminiService.ts';
+import { generateChangelogFromLogStream } from '../../services/aiService.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { downloadFile } from '../../services/fileUtils.ts';
 

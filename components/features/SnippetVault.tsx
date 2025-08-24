@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { LockClosedIcon, SparklesIcon, TrashIcon, ClipboardDocumentIcon, ArrowDownTrayIcon } from '../icons.tsx';
 import { useLocalStorage } from '../../hooks/useLocalStorage.ts';
-import { enhanceSnippetStream, generateTagsForCode } from '../../services/geminiService.ts';
+import { enhanceSnippetStream, generateTagsForCode } from '../../services/aiService.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { downloadFile } from '../../services/fileUtils.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';

@@ -1,5 +1,6 @@
 
-export * from './geminiService.ts';
+
+export * from './aiService.ts';
 export * from './fileUtils.ts';
 export * from './telemetryService.ts';
 export * from './dbService.ts';

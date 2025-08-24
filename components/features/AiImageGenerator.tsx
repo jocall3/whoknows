@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { generateImage, generateImageFromImageAndText } from '../../services/geminiService.ts';
+import { generateImage, generateImageFromImageAndText } from '../../services/aiService.ts';
 import { fileToBase64, blobToDataURL } from '../../services/fileUtils.ts';
 import { ImageGeneratorIcon, SparklesIcon, ArrowDownTrayIcon, XMarkIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';

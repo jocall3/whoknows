@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import type { Feature } from '../../types.ts';
 import { RAW_FEATURES } from '../../constants.ts';
@@ -57,6 +58,10 @@ const componentMap: Record<string, React.FC<any>> = {
     'terraform-generator': lazyWithRetry(() => import('./TerraformGenerator.tsx'), 'TerraformGenerator'),
     'ai-personality-forge': lazyWithRetry(() => import('./AiPersonalityForge.tsx'), 'AiPersonalityForge'),
     'weekly-digest-generator': lazyWithRetry(() => import('./WeeklyDigestGenerator.tsx'), 'WeeklyDigestGenerator'),
+    'one-click-refactor': lazyWithRetry(() => import('./OneClickRefactor.tsx'), 'OneClickRefactor'),
+    'bug-reproducer': lazyWithRetry(() => import('./BugReproducer.tsx'), 'BugReproducer'),
+    'tech-debt-sonar': lazyWithRetry(() => import('./TechDebtSonar.tsx'), 'TechDebtSonar'),
+    'iam-policy-generator': lazyWithRetry(() => import('./IamPolicyGenerator.tsx'), 'IamPolicyGenerator'),
 };
 
 export const ALL_FEATURES: Feature[] = RAW_FEATURES.map(feature => ({

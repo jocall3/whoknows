@@ -1,11 +1,9 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import type { GeneratedFile } from '../../types.ts';
-import { generateFeature, generateFullStackFeature, generateUnitTestsStream, generateCommitMessageStream, generateDockerfile } from '../../services/geminiService.ts';
-import { deployCloudFunction, deployFirestoreRules } from '../../services/gcpService.ts';
+import { generateFeature, generateFullStackFeature, generateUnitTestsStream, generateCommitMessageStream, generateDockerfile } from '../../services/aiService.ts';
 import { saveFile, getAllFiles, clearAllFiles } from '../../services/dbService.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
-import { CpuChipIcon, DocumentTextIcon, BeakerIcon, GitBranchIcon, CloudIcon, PaperAirplaneIcon } from '../icons.tsx';
+import { CpuChipIcon, DocumentTextIcon, BeakerIcon, GitBranchIcon, CloudIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 type SupplementalTab = 'TESTS' | 'COMMIT' | 'DEPLOYMENT' | 'CODE';
@@ -24,9 +22,7 @@ export const AiFeatureBuilder: React.FC = () => {
 
     const [activeTab, setActiveTab] = useState<OutputTab>('CODE');
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isDeploying, setIsDeploying] = useState(false);
     const [error, setError] = useState<string>('');
-    const { addNotification } = useNotification();
     
     useEffect(() => {
         const loadFiles = async () => {
@@ -74,30 +70,6 @@ export const AiFeatureBuilder: React.FC = () => {
             setIsLoading(false);
         }
     }, [prompt, framework, styling, includeBackend]);
-
-    const handleDeploy = async () => {
-        if (!includeBackend || generatedFiles.length === 0) return;
-        setIsDeploying(true);
-        try {
-            const backendFile = generatedFiles.find(f => f.filePath.includes('functions/index.js'));
-            const rulesFile = generatedFiles.find(f => f.filePath.includes('firestore.rules'));
-
-            if (backendFile) {
-                addNotification('Deploying Cloud Function...', 'info');
-                await deployCloudFunction(backendFile.content, 'myGeneratedFunction');
-                addNotification('Cloud Function deployment initiated.', 'success');
-            }
-            if (rulesFile) {
-                addNotification('Deploying Firestore Rules...', 'info');
-                await deployFirestoreRules(rulesFile.content);
-                addNotification('Firestore Rules deployment initiated.', 'success');
-            }
-        } catch(e) {
-            addNotification(e instanceof Error ? e.message : 'Deployment failed', 'error');
-        } finally {
-            setIsDeploying(false);
-        }
-    }
     
     const renderContent = () => {
         if (typeof activeTab === 'string') {
@@ -138,14 +110,9 @@ export const AiFeatureBuilder: React.FC = () => {
                         </div>
                         <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., A user profile card with an avatar, name, and bio." className="w-full p-2 bg-background border border-border rounded-md resize-none text-sm h-20"/>
                          <div className="flex gap-2 mt-2">
-                             <button onClick={handleGenerate} disabled={isLoading || isDeploying} className="btn-primary flex-grow flex items-center justify-center gap-2 px-4 py-2">
+                             <button onClick={handleGenerate} disabled={isLoading} className="btn-primary flex-grow flex items-center justify-center gap-2 px-4 py-2">
                                 {isLoading ? <><LoadingSpinner /> Generating...</> : 'Generate Feature'}
                             </button>
-                            {includeBackend && generatedFiles.length > 0 && (
-                                <button onClick={handleDeploy} disabled={isLoading || isDeploying} className="bg-blue-600 text-white font-bold rounded-md hover:opacity-90 transition-all disabled:opacity-50 shadow-md flex-grow flex items-center justify-center gap-2 px-4 py-2">
-                                    {isDeploying ? <><LoadingSpinner /> Deploying...</> : <><PaperAirplaneIcon/> Deploy to GCP</>}
-                                </button>
-                            )}
                          </div>
                          {error && <p className="text-red-600 text-xs mt-2 text-center">{error}</p>}
                     </div>

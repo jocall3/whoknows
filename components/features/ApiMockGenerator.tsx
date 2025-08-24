@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { generateMockData } from '../../services/geminiService.ts';
+import { generateMockData } from '../../services/aiService.ts';
 import { startMockServer, stopMockServer, setMockRoutes, isMockServerRunning } from '../../services/mocking/mockServer.ts';
 import { saveMockCollection, getAllMockCollections, deleteMockCollection } from '../../services/mocking/db.ts';
 import { ServerStackIcon, SparklesIcon, PlusIcon, TrashIcon } from '../icons.tsx';

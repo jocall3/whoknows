@@ -4,7 +4,7 @@ import { marked } from 'marked';
 import { PhotoIcon } from '../icons.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
-import { summarizeForSlides } from '../../services/geminiService.ts';
+import { summarizeForSlides } from '../../services/index.ts';
 import { createPresentation, addSlide } from '../../services/workspaceService.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 

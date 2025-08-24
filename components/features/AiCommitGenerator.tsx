@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { generateCommitMessageStream } from '../../services/geminiService.ts';
+import { generateCommitMessageStream } from '../../services/index.ts';
 import { downloadFile } from '../../services/fileUtils.ts';
 import { GitBranchIcon, ArrowDownTrayIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';

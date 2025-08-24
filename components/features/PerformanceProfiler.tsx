@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { analyzePerformanceTrace } from '../../services/geminiService.ts';
+import { analyzePerformanceTrace } from '../../services/index.ts';
 import { startTracing, stopTracing, TraceEntry } from '../../services/profiling/performanceService.ts';
 import { parseViteStats, BundleStatsNode } from '../../services/profiling/bundleAnalyzer.ts';
 import { ChartBarIcon, SparklesIcon } from '../icons.tsx';

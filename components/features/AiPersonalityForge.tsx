@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { SparklesIcon, PlusIcon, TrashIcon, ArrowDownTrayIcon, ArrowUpOnSquareIcon } from '../icons.tsx';
 import { useAiPersonalities } from '../../hooks/useAiPersonalities.ts';
 import { formatSystemPromptToString } from '../../utils/promptUtils.ts';
-import { streamContent } from '../../services/geminiService.ts';
+import { streamContent } from '../../services/index.ts';
 import { downloadJson } from '../../services/fileUtils.ts';
 import type { SystemPrompt } from '../../types.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';

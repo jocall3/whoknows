@@ -4,7 +4,7 @@ import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { initializeOctokit } from '../../services/authService.ts';
 import { getUserToken } from '../../services/firebaseService.ts';
 import { getRepos, getRepoTree, getFileContent, commitFiles } from '../../services/githubService.ts';
-import { generateCommitMessageStream } from '../../services/geminiService.ts';
+import { generateCommitMessageStream } from '../../services/index.ts';
 import type { Repo, FileNode } from '../../types.ts';
 import { FolderIcon, DocumentIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';

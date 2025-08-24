@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { convertJsonToXbrlStream } from '../../services/geminiService.ts';
+import { convertJsonToXbrlStream } from '../../services/aiService.ts';
 import { XbrlConverterIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

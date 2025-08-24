@@ -1,4 +1,3 @@
-
 import type React from 'react';
 import { CHROME_VIEW_IDS, FEATURE_CATEGORIES } from './constants.ts';
 
@@ -156,4 +155,19 @@ export interface EncryptedData {
     id: string;
     ciphertext: ArrayBuffer;
     iv: Uint8Array;
+}
+
+// --- New Types for Implemented Features ---
+export interface SecurityVulnerability {
+    vulnerability: string;
+    severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'Informational';
+    description: string;
+    mitigation: string;
+    exploitSuggestion?: string;
+}
+
+export interface CodeSmell {
+    smell: string;
+    line: number;
+    explanation: string;
 }
