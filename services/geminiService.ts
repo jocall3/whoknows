@@ -285,6 +285,26 @@ export const generateWeeklyDigest = (commitLogs: string, telemetryData: object):
     "You are an AI assistant that generates weekly engineering progress reports in HTML format."
 );
 
+export const generateTechnicalSpecFromDiff = (diff: string, summary: StructuredPrSummary): Promise<string> => generateContent(
+    `Generate a comprehensive technical specification document in Markdown format based on the following pull request information.
+
+The spec should include the following sections:
+- **Problem:** A brief description of the issue being addressed.
+- **Solution:** A detailed explanation of the changes made.
+- **Technical Details:** An overview of the implementation, including any new functions, components, or patterns.
+- **Impact:** How this change affects other parts of the application.
+
+**PR Title:** ${summary.title}
+**PR Summary:** ${summary.summary}
+
+**Code Diff:**
+\`\`\`diff
+${diff}
+\`\`\`
+`,
+    "You are an expert programmer who writes excellent, clear, and comprehensive technical specification documents from pull request data."
+);
+
 // --- STRUCTURED JSON ---
 
 export const explainCodeStructured = async (code: string): Promise<StructuredExplanation> => {
@@ -399,7 +419,8 @@ export const generateFullStackFeature = (prompt: string, framework: string, styl
     1. A frontend ${framework} component using ${styling}. File path should be 'Component.tsx'.
     2. A backend Google Cloud Function in Node.js. File path should be 'functions/index.js'. It should be a simple HTTP-triggered function.
     3. Firestore Security Rules that allow public reads but only authenticated writes. File path should be 'firestore.rules'.
-    Ensure the frontend component knows how to call the cloud function.`;
+    Ensure the frontend component knows how to call the cloud function.
+    IMPORTANT: When the user's prompt is about maps, location, addresses, or stores, you MUST prioritize using the Google Maps JavaScript API in the frontend component. Generate a component that accepts an 'apiKey' prop and uses it to load the Maps script.`;
     const userPrompt = `Generate a full-stack feature for: "${prompt}"`;
     const schema = {
         type: Type.ARRAY,

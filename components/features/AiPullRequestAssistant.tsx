@@ -1,9 +1,13 @@
+
 import React, { useState, useMemo, useCallback } from 'react';
 import * as Diff from 'diff';
-import { generatePrSummaryStructured } from '../../services/index.ts';
+import { generatePrSummaryStructured, generateTechnicalSpecFromDiff, downloadFile } from '../../services/index.ts';
+import { createDocument, insertText } from '../../services/workspaceService.ts';
 import type { StructuredPrSummary } from '../../types.ts';
-import { AiPullRequestAssistantIcon } from '../icons.tsx';
+import { AiPullRequestAssistantIcon, DocumentIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
+import { useNotification } from '../../contexts/NotificationContext.tsx';
+import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 
 const exampleBefore = `function Greeter(props) {
   return <h1>Hello, {props.name}!</h1>;
@@ -17,16 +21,15 @@ export const AiPullRequestAssistant: React.FC = () => {
     const [beforeCode, setBeforeCode] = useState<string>(exampleBefore);
     const [afterCode, setAfterCode] = useState<string>(exampleAfter);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isExporting, setIsExporting] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
+    const [summary, setSummary] = useState<StructuredPrSummary | null>(null);
 
-    // Form state
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [fromBranch, setFromBranch] = useState('feature/new-logic');
-    const [toBranch, setToBranch] = useState('main');
-    const [changeType, setChangeType] = useState('feat');
-    const [relatedIssue, setRelatedIssue] = useState('');
-    const [testingSteps, setTestingSteps] = useState('1. \n2. \n3.');
+    const { addNotification } = useNotification();
+    const { state } = useGlobalState();
+    const { user } = state;
+
+    const diff = useMemo(() => Diff.createPatch('component.tsx', beforeCode, afterCode), [beforeCode, afterCode]);
 
     const handleGenerateSummary = useCallback(async () => {
         if (!beforeCode.trim() && !afterCode.trim()) {
@@ -35,33 +38,38 @@ export const AiPullRequestAssistant: React.FC = () => {
         }
         setIsLoading(true);
         setError('');
+        setSummary(null);
         
         try {
-            const diff = Diff.createPatch('component.tsx', beforeCode, afterCode);
             const result: StructuredPrSummary = await generatePrSummaryStructured(diff);
-            setTitle(result.title);
-            setDescription(`${result.summary}\n\n**Key Changes:**\n${result.changes.map(c => `- ${c}`).join('\n')}`);
+            setSummary(result);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
             setError(`Failed to generate summary: ${errorMessage}`);
         } finally {
             setIsLoading(false);
         }
-    }, [beforeCode, afterCode]);
+    }, [diff, beforeCode, afterCode]);
 
-    const markdownPreview = useMemo(() => {
-        return `
-# ${changeType}: ${title}
-${relatedIssue ? `\n**Closes:** ${relatedIssue}\n` : ''}
-**Branch:** \`${fromBranch}\` -> \`${toBranch}\`
-
-## Description
-${description}
-
-## Testing Steps
-${testingSteps}
-        `.trim();
-    }, [title, description, fromBranch, toBranch, changeType, relatedIssue, testingSteps]);
+    const handleExportToDocs = async () => {
+        if (!summary || !user) {
+            addNotification('Please generate a summary first and ensure you are signed in.', 'error');
+            return;
+        }
+        setIsExporting(true);
+        try {
+            const specContent = await generateTechnicalSpecFromDiff(diff, summary);
+            const doc = await createDocument(`Tech Spec: ${summary.title}`);
+            await insertText(doc.documentId, specContent);
+            addNotification('Successfully exported to Google Docs!', 'success');
+            window.open(doc.webViewLink, '_blank');
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+            addNotification(`Failed to export: ${errorMessage}`, 'error');
+        } finally {
+            setIsExporting(false);
+        }
+    };
     
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
@@ -70,7 +78,7 @@ ${testingSteps}
                     <AiPullRequestAssistantIcon />
                     <span className="ml-3">AI Pull Request Assistant</span>
                 </h1>
-                <p className="text-text-secondary mt-1">Generate a PR summary from code changes and populate a full template.</p>
+                <p className="text-text-secondary mt-1">Generate a PR summary from code changes and export a full tech spec.</p>
             </header>
             <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
                 {/* Left side: Inputs and Generator */}
@@ -84,27 +92,40 @@ ${testingSteps}
                         <textarea id="after-code" value={afterCode} onChange={e => setAfterCode(e.target.value)} className="flex-grow p-4 bg-surface border border-border rounded-md resize-none font-mono text-sm" />
                     </div>
                     <button onClick={handleGenerateSummary} disabled={isLoading} className="btn-primary w-full flex items-center justify-center px-6 py-3">
-                        {isLoading ? <LoadingSpinner /> : 'Generate Title & Description'}
+                        {isLoading ? <LoadingSpinner /> : 'Generate Summary'}
                     </button>
                     {error && <p className="text-red-500 text-xs text-center">{error}</p>}
                 </div>
 
-                {/* Right side: Form and Preview */}
+                {/* Right side: Summary and Export */}
                 <div className="flex flex-col gap-4 min-h-0">
-                    <form className="flex flex-col gap-2 overflow-y-auto pr-2 bg-surface border border-border p-4 rounded-lg h-1/2">
-                        <div className="flex gap-2">
-                            <div className="w-1/4"><label className="block text-xs">Type</label><select value={changeType} onChange={e => setChangeType(e.target.value)} className="w-full mt-1 p-1 rounded bg-background border border-border text-sm"><option>feat</option><option>fix</option><option>chore</option><option>docs</option><option>refactor</option></select></div>
-                            <div className="w-3/4"><label className="block text-xs">Title</label><input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full mt-1 p-1 rounded bg-background border border-border text-sm"/></div>
+                    <div className="flex flex-col bg-surface border border-border p-4 rounded-lg flex-grow min-h-0">
+                        <h3 className="text-lg font-bold mb-2">Generated Summary</h3>
+                        <div className="flex-grow overflow-y-auto pr-2 space-y-2">
+                            {summary ? (
+                                <>
+                                    <input type="text" readOnly value={summary.title} className="w-full font-bold p-2 bg-background rounded"/>
+                                    <textarea readOnly value={summary.summary} className="w-full h-24 p-2 bg-background rounded resize-none"/>
+                                    <div>
+                                        <h4 className="font-semibold">Changes:</h4>
+                                        <ul className="list-disc list-inside text-sm">
+                                            {summary.changes.map((c, i) => <li key={i}>{c}</li>)}
+                                        </ul>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-text-secondary h-full flex items-center justify-center">
+                                    {isLoading ? <LoadingSpinner /> : 'PR summary will appear here.'}
+                                </div>
+                            )}
                         </div>
-                        <div><label className="block text-xs">Description</label><textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full mt-1 p-1 rounded bg-background border border-border resize-y h-24 text-sm"/></div>
-                        <div><label className="block text-xs">Testing Steps</label><textarea value={testingSteps} onChange={e => setTestingSteps(e.target.value)} className="w-full mt-1 p-1 rounded bg-background border border-border resize-y h-16 text-sm"/></div>
-                    </form>
-                    <div className="flex flex-col h-1/2">
-                        <div className="flex justify-between items-center mb-2">
-                            <label className="text-sm font-medium text-text-secondary">Markdown Preview</label>
-                            <button onClick={() => navigator.clipboard.writeText(markdownPreview)} className="px-3 py-1 bg-gray-100 text-xs rounded-md hover:bg-gray-200">Copy Markdown</button>
-                        </div>
-                        <div className="relative flex-grow"><pre className="w-full h-full bg-background border border-border p-4 rounded-md text-sm overflow-auto whitespace-pre-wrap">{markdownPreview}</pre></div>
+                         {summary && user && (
+                            <div className="mt-4 pt-4 border-t border-border">
+                                <button onClick={handleExportToDocs} disabled={isExporting} className="w-full btn-primary bg-blue-600 flex items-center justify-center gap-2 py-2">
+                                    {isExporting ? <LoadingSpinner /> : <><DocumentIcon /> Export to Google Docs</>}
+                                </button>
+                            </div>
+                         )}
                     </div>
                 </div>
             </div>
