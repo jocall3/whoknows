@@ -1,154 +1,61 @@
-# 🚫 **DevCore AI Toolkit – What It Does NOT Do**
+# DevCore AI Toolkit
 
-> *Because a truly client-side app has limits—and these are the lines it doesn’t cross.*
+> A supercharged, secure, client-side toolkit for modern developers, powered by Gemini. It runs entirely in your browser, keeping your code, data, and API keys private and secure on your local machine.
 
-This app is **static**, **frontend-only**, and **serverless**. There is no backend, no hosting logic, and no state persistence beyond your browser. Credentials are stored locally and encrypted via WebCrypto (in IndexedDB). It only uses **external APIs**, **directly from the client**.
-
-Here’s the **definitive list** of what it **does not and cannot do**, sorted by domain.
+DevCore is a serverless web application designed to be a powerful assistant in your development workflow. It combines a suite of intelligent tools with a unique, AI-driven command center that can orchestrate actions across your favorite services like Jira, Slack, and GitHub.
 
 ---
 
-### 🧠 AI/ML: Training & Infrastructure
+## ✨ Key Features
 
-* ❌ **Train or fine-tune models** (e.g., TensorFlow, PyTorch, Hugging Face)
-* ❌ **Run custom inference servers** (no server = no hosting models)
-* ❌ **Deploy ML pipelines** (Airflow, Kubeflow? Not here.)
-* ❌ **Use local LLMs** (No WebGPU/ONNX model loading)
-* ❌ **RAG pipelines / Vector DBs** (e.g., Pinecone, Weaviate)
-* ❌ **Use LangChain / Agent toolchains** (no backend agent runners)
-
-> ✅ It **can call hosted AI APIs** (like Gemini) **directly from the browser**, using secure keys stored locally.
+-   **AI Command Center:** The heart of the toolkit. Use natural language (`Ctrl+K`) to navigate, run features, and execute complex, multi-service workflows.
+-   **Workspace Connector Hub:** Connect to Jira, Slack, GitHub, and more. Let the AI execute commands like "create a high-priority Jira ticket and post a summary to the #dev channel in Slack."
+-   **AI Feature Builder:** Generate multi-file components, unit tests, and conventional commit messages from a single, high-level prompt.
+-   **Intelligent Code Tools:** Explain complex code, migrate between languages, review for bugs and security vulnerabilities, and refactor with one click.
+-   **Performance & Auditing:** Profile runtime performance, analyze bundle stats, and audit live websites for accessibility issues with AI-powered advice.
+-   **Visual Editors & Sandboxes:** A suite of focused tools, from a CSS Grid editor and a RegEx sandbox to a PWA Manifest generator, designed to streamline frontend development.
 
 ---
 
-### 🖥️ Backend Logic, APIs & Auth
+## 🏛️ Architecture: Secure & Client-Side
 
-* ❌ No backend microservices (e.g., Express, Flask)
-* ❌ No session storage or cookies
-* ❌ No OAuth flows (e.g., GitHub login via redirect)
-* ❌ No custom API route handlers or REST endpoints
-* ❌ No WebSockets or real-time event servers
-* ❌ No rate limiting or traffic shaping
+DevCore is built on a serverless, client-side architecture. This design choice offers several key advantages:
 
-> ✅ **You must paste in personal API tokens manually.** OAuth integrations are not possible in a fully static setup.
+-   **Privacy First:** Your code, prompts, and sensitive data never leave your browser. All processing happens locally.
+-   **Ultimate Security:** API keys and credentials for services like GitHub or Jira are encrypted with AES-GCM using the Web Crypto API. They are stored securely in your browser's IndexedDB and can only be decrypted with your master password.
+-   **Runs Anywhere:** As a static application, you can deploy it on any CDN (like GitHub Pages or Netlify) or simply run it from your local filesystem. No backend, no databases, no complex setup.
 
 ---
 
-### 🔐 Security & Identity
+## 🚀 Getting Started
 
-* ❌ No Role-Based Access Control (RBAC)
-* ❌ No user auth systems (e.g., Firebase Auth, Auth0)
-* ❌ No secret or environment variable injection at runtime
-* ❌ No CVE scanning or software audits
-
-> ✅ **Secrets are stored client-side only**, encrypted with AES-GCM using a PBKDF2-derived master key.
+1.  **Open the App:** Just open `index.html` in your browser.
+2.  **Set Up Your Vault:** On first use, you'll be prompted to create a master password. This password encrypts and decrypts your credentials locally and is **never** stored.
+3.  **Connect Your Services:** Navigate to the **Workspace Connector Hub** to securely add your API keys for services like GitHub, Jira, and Slack.
+4.  **Use the AI Command Center:** Press `Ctrl+K` (or `Cmd+K`) anywhere to open the command palette and start giving instructions to the AI.
 
 ---
 
-### 🛠 DevOps, Infra & Deployment
+## 🔌 The Workspace Connector Hub
 
-* ❌ No Docker/Docker Compose or containers
-* ❌ No Kubernetes or Helm charts
-* ❌ No CI/CD pipelines (GitHub Actions, Jenkins)
-* ❌ No build/deploy integrations (Vercel, Netlify CLI)
-* ❌ No observability/log aggregation (Datadog, NewRelic)
-* ❌ No runtime configuration management
+This is the core of DevCore's workflow automation. Instead of just being a collection of tools, the Hub turns the app into a true command center.
 
-> ✅ This app is meant to be **deployed statically on any CDN** (e.g., GitHub Pages, Netlify, Cloudflare Pages).
+-   **Connect Once, Use Everywhere:** Securely store your API tokens for essential developer services in the encrypted vault.
+-   **AI-Powered Orchestration:** The AI Command Center can use these connections to perform multi-step actions across different platforms.
+-   **Example Command:** _"A new critical bug was reported. Create a high-priority ticket in Jira, post a summary to the #engineering channel in Slack, and create a new git branch called `hotfix/payment-bug`."_
 
 ---
 
-### 📱 Mobile & Native
+## 🔐 Security & Your Data
 
-* ❌ No React Native, Flutter, Swift, Kotlin support
-* ❌ No mobile-specific build outputs
-* ❌ No access to mobile APIs (Bluetooth, camera, etc.)
-* ❌ No push notification support
+Your privacy is paramount. Here's how your data is handled:
 
----
-
-### 🎨 Multimedia & Creative
-
-* ❌ No audio/video editing
-* ❌ No animation frameworks or rendering engines
-* ❌ No game engine integration (Unity, Godot)
-
-> ✅ You can generate AI images using prompts or references.
+-   **No Server-Side Storage:** All files, settings, and credentials reside exclusively in your browser's IndexedDB.
+-   **End-to-End Encryption (Locally):** Credentials entered into the Vault are encrypted using the Web Crypto API before being stored. The encryption key is derived from your master password and is only held in memory during your session.
+-   **Direct API Calls:** When you use an integrated service, the app makes direct, client-to-service API calls. Your data is not proxied through any intermediary server.
 
 ---
 
-### 📊 Data Science & Analytics
+## 🛠️ Scope & Limitations
 
-* ❌ No Jupyter-like notebooks
-* ❌ No built-in SQL runner or database connectors
-* ❌ No data pipeline orchestration
-* ❌ No CSV/Excel import or dashboards
-
----
-
-### 📅 Project Management & Collaboration
-
-* ❌ No Kanban boards
-* ❌ No issue tracking, tickets, or roadmaps
-* ❌ No team/user management or collaboration tools
-* ❌ No Slack / Discord integration
-
----
-
-### 💸 Payments, Ecommerce, Marketing
-
-* ❌ No Stripe or PayPal integration
-* ❌ No shopping carts or product catalogs
-* ❌ No email campaigns or newsletter systems
-* ❌ No social media post generators
-
----
-
-### 📦 Framework Ecosystems (Server-Dependent)
-
-* ❌ No support for fullstack frameworks (Next.js, Nuxt, Remix, etc.)
-* ❌ No server-side rendering (SSR or SSG)
-* ❌ No backend code generation (NestJS, Laravel)
-
----
-
-### 🧪 Testing Infra
-
-* ❌ No Cypress or Playwright-style E2E tests
-* ❌ No Jest or Mocha integration (does not run tests directly)
-* ❌ No mutation testing or test coverage tools
-
-> ✅ It **generates** unit tests, but **does not run them**.
-
----
-
-## 🔐 🔑 Integration Access – Credential Handling
-
-All third-party integrations are **read-only or write-through via API**, and **require user-provided API keys**, which are:
-
-* **Never sent to a server**
-* **Encrypted locally using WebCrypto**
-* **Stored in IndexedDB**
-* **Accessed only at runtime via user password-derived decryption**
-
-### ✅ Supported Integrations (examples):
-
-| Integration     | Method                      | Where to Store Credentials     |
-| --------------- | --------------------------- | ------------------------------ |
-| Gemini AI       | API Key                     | Vault (Encrypted in IndexedDB) |
-| GitHub          | Personal Access Token (PAT) | Vault                          |
-| OpenAI (opt-in) | API Key                     | Vault                          |
-| Custom API      | Key + URL                   | Vault                          |
-
----
-
-## 📐 Test Plan & Validation Rubric
-
-Use this table to **test** whether the app meets the expectations of its static, secure, local-first architecture.
-
-| Feature / Component               | Test Criteria                                                            | Should Pass? |
-| --------------------------------- | ------------------------------------------------------------------------ | ------------ |
-| Vault encryption                  | API key stored only after encryption via WebCrypto                       | ✅ Yes        |
-| IndexedDB storage                 | Data is stored in browser IndexedDB, not localStorage                    | ✅ Yes        |
-| No server calls (outside API)     | No internal fetch/XHR to own origin unless static assets                 | ✅ Yes        |
-| Secure
+As a client-side application, DevCore has a focused scope. It is designed to be a powerful **assistant** for your development workflow, not a replacement for your primary IDE, backend services, or CI/CD platform. It excels at code generation, analysis, and API-based automation but does not run backend servers, train models, or manage infrastructure.
