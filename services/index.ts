@@ -1,3 +1,4 @@
+
 export * from './geminiService.ts';
 export * from './fileUtils.ts';
 export * from './telemetryService.ts';
@@ -12,3 +13,6 @@ export * from './profiling/performanceService.ts';
 export * from './profiling/bundleAnalyzer.ts';
 export * from './auditing/accessibilityService.ts';
 export * from './security/staticAnalysisService.ts';
+export * from './googleApiService.ts';
+export * from './workspaceService.ts';
+export * from './gcpService.ts';

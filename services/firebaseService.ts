@@ -1,8 +1,9 @@
+
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
-import type { AppUser, GitHubUser } from '../types.ts';
+import type { AppUser } from '../types.ts';
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -19,15 +20,30 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 const provider = new GoogleAuthProvider();
-provider.addScope('profile');
-provider.addScope('email');
+// Request additional scopes for Google Workspace integrations
+provider.addScope('https://www.googleapis.com/auth/presentations');
+provider.addScope('https://www.googleapis.com/auth/drive.file');
+provider.addScope('https://www.googleapis.com/auth/gmail.send');
+
 
 export const signInWithGoogle = async (): Promise<FirebaseUser> => {
     const result = await signInWithPopup(auth, provider);
+
+    // Capture the OAuth access token to use with GAPI
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const accessToken = credential?.accessToken;
+
+    if (accessToken) {
+        // Store it in session storage for gapi to use across the app
+        sessionStorage.setItem('google_access_token', accessToken);
+    }
+
     return result.user;
 };
 
 export const signOutUser = async (): Promise<void> => {
+    // Clear the stored token on sign out
+    sessionStorage.removeItem('google_access_token');
     await signOut(auth);
 };
 

@@ -1,5 +1,6 @@
+
 import { GoogleGenAI, Type, GenerateContentResponse, FunctionDeclaration } from "@google/genai";
-import type { GeneratedFile, StructuredPrSummary, StructuredExplanation, ColorTheme, SemanticColorTheme, StructuredReview } from '../types.ts';
+import type { GeneratedFile, StructuredPrSummary, StructuredExplanation, ColorTheme, SemanticColorTheme, StructuredReview, SlideSummary } from '../types.ts';
 import { logError } from './telemetryService.ts';
 
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -267,6 +268,23 @@ export const generateMermaidJs = (code: string): Promise<string> => generateCont
     "You are an expert in code analysis and can visualize logic flows using Mermaid.js."
 );
 
+export const generateWeeklyDigest = (commitLogs: string, telemetryData: object): Promise<string> => generateContent(
+    `Generate a concise, professional weekly summary email in HTML format based on the following data.
+    
+    Commit Logs:
+    \`\`\`
+    ${commitLogs}
+    \`\`\`
+    
+    Performance Telemetry:
+    \`\`\`json
+    ${JSON.stringify(telemetryData, null, 2)}
+    \`\`\`
+    
+    The email should have sections for "New Features", "Bug Fixes", and "Performance Notes". It should be visually clean and easy to read.`,
+    "You are an AI assistant that generates weekly engineering progress reports in HTML format."
+);
+
 // --- STRUCTURED JSON ---
 
 export const explainCodeStructured = async (code: string): Promise<StructuredExplanation> => {
@@ -368,10 +386,48 @@ export const generatePrSummaryStructured = (diff: string): Promise<StructuredPrS
 };
 
 export const generateFeature = (prompt: string, framework: string, styling: string): Promise<GeneratedFile[]> => {
-    const systemInstruction = `You are an AI that generates complete, production-ready components. Create all necessary files for the requested framework and styling option.`;
+    const systemInstruction = `You are an AI that generates complete, production-ready components. Create all necessary files for the requested framework and styling option.
+    IMPORTANT: When the user's prompt is about maps, location, addresses, or stores, you MUST use the Google Maps JavaScript API. Generate a component that accepts an 'apiKey' prop and uses it to load the Maps script.`;
     const userPrompt = `Generate the files for a ${framework} component using ${styling} for the following feature request: "${prompt}". Make sure to include a .tsx component file.`;
     const schema = { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { filePath: { type: Type.STRING }, content: { type: Type.STRING }, description: { type: Type.STRING } }, required: ["filePath", "content", "description"] } };
     return generateJson(userPrompt, systemInstruction, schema);
+};
+
+export const generateFullStackFeature = (prompt: string, framework: string, styling: string): Promise<GeneratedFile[]> => {
+    const systemInstruction = `You are an AI that generates complete, production-ready full-stack features.
+    You must generate three files:
+    1. A frontend ${framework} component using ${styling}. File path should be 'Component.tsx'.
+    2. A backend Google Cloud Function in Node.js. File path should be 'functions/index.js'. It should be a simple HTTP-triggered function.
+    3. Firestore Security Rules that allow public reads but only authenticated writes. File path should be 'firestore.rules'.
+    Ensure the frontend component knows how to call the cloud function.`;
+    const userPrompt = `Generate a full-stack feature for: "${prompt}"`;
+    const schema = {
+        type: Type.ARRAY,
+        items: {
+            type: Type.OBJECT,
+            properties: {
+                filePath: { type: Type.STRING, enum: ['Component.tsx', 'functions/index.js', 'firestore.rules'] },
+                content: { type: Type.STRING },
+                description: { type: Type.STRING }
+            },
+            required: ["filePath", "content", "description"]
+        }
+    };
+    return generateJson(userPrompt, systemInstruction, schema);
+};
+
+export const summarizeForSlides = (content: string): Promise<SlideSummary> => {
+    const systemInstruction = `You are an expert at summarizing content for presentations. Distill the provided markdown into a concise title and a bulleted list for a slide body. The body must be a single string with each point starting with a hyphen and separated by a newline character.`;
+    const prompt = `Summarize this content for a presentation slide:\n\n${content}`;
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            title: { type: Type.STRING, description: "A short, engaging title for the slide." },
+            body: { type: Type.STRING, description: "A single string containing bullet points, each starting with '-' and separated by '\\n'." }
+        },
+        required: ["title", "body"]
+    };
+    return generateJson(prompt, systemInstruction, schema);
 };
 
 export interface CronParts { minute: string; hour: string; dayOfMonth: string; month: string; dayOfWeek: string; }

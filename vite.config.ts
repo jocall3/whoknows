@@ -1,4 +1,5 @@
 
+
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath } from 'url';
@@ -13,6 +14,7 @@ export default defineConfig(({ mode }) => {
         // The API key is injected into the app during the build process.
         // It's crucial that this variable is set in your deployment environment.
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.GOOGLE_CLIENT_ID': JSON.stringify(env.GOOGLE_CLIENT_ID),
         'process.env.FIREBASE_API_KEY': JSON.stringify(env.FIREBASE_API_KEY),
         'process.env.FIREBASE_AUTH_DOMAIN': JSON.stringify(env.FIREBASE_AUTH_DOMAIN),
         'process.env.FIREBASE_PROJECT_ID': JSON.stringify(env.FIREBASE_PROJECT_ID),

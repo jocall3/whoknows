@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
-import { GithubIcon } from '../icons.tsx';
+import { GithubIcon, MapIcon } from '../icons.tsx';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
-import { signInWithGoogle, signOutUser, saveUserToken, getUserToken } from '../../services/firebaseService.ts';
+import { signInWithGoogle } from '../../services/firebaseService.ts';
 import { validateToken } from '../../services/authService.ts';
-import { initializeOctokit } from '../../services/authService.ts';
+import * as vaultService from '../../services/vaultService.ts';
+import { useVaultModal } from '../../contexts/VaultModalContext.tsx';
 import { LoadingSpinner } from '../shared/LoadingSpinner.tsx';
 import type { GitHubUser } from '../../types.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
@@ -12,15 +14,16 @@ const GitHubConnection: React.FC = () => {
     const { state, dispatch } = useGlobalState();
     const { user, githubUser } = state;
     const { addNotification } = useNotification();
+    const { requestUnlock } = useVaultModal();
     const [tokenInput, setTokenInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
         const checkStoredToken = async () => {
-            if (user && !githubUser) {
+            if (user && !githubUser && state.vaultState.isUnlocked) {
                 setIsLoading(true);
-                const token = await getUserToken(user.uid, 'github_pat');
+                const token = await vaultService.getDecryptedCredential('github_pat');
                 if (token) {
                     try {
                         const githubProfile = await validateToken(token);
@@ -33,18 +36,23 @@ const GitHubConnection: React.FC = () => {
             }
         };
         checkStoredToken();
-    }, [user, githubUser, dispatch, addNotification]);
+    }, [user, githubUser, dispatch, addNotification, state.vaultState.isUnlocked]);
 
     const handleConnectGitHub = async () => {
         if (!user || !tokenInput.trim()) {
             setError('Token is required.');
             return;
         }
+        if (!state.vaultState.isUnlocked) {
+            const unlocked = await requestUnlock();
+            if (!unlocked) return;
+        }
+
         setIsLoading(true);
         setError('');
         try {
             const githubProfile = await validateToken(tokenInput);
-            await saveUserToken(user.uid, 'github_pat', tokenInput);
+            await vaultService.saveCredential('github_pat', tokenInput);
             dispatch({ type: 'SET_GITHUB_USER', payload: githubProfile });
             addNotification('GitHub connected successfully!', 'success');
             setTokenInput('');
@@ -59,7 +67,7 @@ const GitHubConnection: React.FC = () => {
         if (!user) return;
         setIsLoading(true);
         try {
-            await saveUserToken(user.uid, 'github_pat', ''); // Clear the token
+            await vaultService.saveCredential('github_pat', '');
             dispatch({ type: 'SET_GITHUB_USER', payload: null });
             addNotification('GitHub disconnected.', 'info');
         } catch (e) {
@@ -70,7 +78,7 @@ const GitHubConnection: React.FC = () => {
     };
 
     if (!user) {
-        return null; // Don't show GitHub section if not logged in
+        return null;
     }
 
     return (
@@ -98,28 +106,79 @@ const GitHubConnection: React.FC = () => {
                 <div className="mt-4 pt-4 border-t border-border">
                     <label htmlFor="github-pat" className="block text-sm font-medium text-text-secondary mb-1">Personal Access Token (Classic)</label>
                     <div className="flex gap-2">
-                        <input
-                            id="github-pat"
-                            type="password"
-                            value={tokenInput}
-                            onChange={(e) => setTokenInput(e.target.value)}
-                            placeholder="ghp_..."
-                            className="flex-grow p-2 bg-background border border-border rounded-md text-sm"
-                        />
+                        <input id="github-pat" type="password" value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} placeholder="ghp_..." className="flex-grow p-2 bg-background border border-border rounded-md text-sm" />
                          <button onClick={handleConnectGitHub} disabled={isLoading} className="btn-primary px-6 py-2 flex items-center justify-center min-w-[100px]">
                             {isLoading ? <LoadingSpinner /> : 'Connect'}
                         </button>
                     </div>
                     {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
-                    <p className="text-xs text-text-secondary mt-2">
-                        Your token is stored in your private, secure Firestore document. Required scopes: `repo`, `read:user`.
-                    </p>
                 </div>
             )}
         </div>
     );
 };
 
+const GoogleMapsConnection: React.FC = () => {
+    const { state } = useGlobalState();
+    const { user } = state;
+    const { addNotification } = useNotification();
+    const { requestUnlock } = useVaultModal();
+    const [apiKey, setApiKey] = useState('');
+    const [isSaved, setIsSaved] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const checkKey = async () => {
+            if(user && state.vaultState.isUnlocked) {
+                const key = await vaultService.getDecryptedCredential('google_maps_api_key');
+                setIsSaved(!!key);
+            }
+        };
+        checkKey();
+    }, [user, state.vaultState.isUnlocked]);
+
+    const handleSaveKey = async () => {
+        if (!apiKey.trim()) return;
+        if (!state.vaultState.isUnlocked) {
+            const unlocked = await requestUnlock();
+            if (!unlocked) return;
+        }
+        setIsLoading(true);
+        try {
+            await vaultService.saveCredential('google_maps_api_key', apiKey);
+            addNotification('Google Maps API Key saved!', 'success');
+            setIsSaved(true);
+            setApiKey('');
+        } catch(e) {
+            addNotification('Failed to save key.', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    if (!user) return null;
+
+    return (
+        <div className="bg-surface border border-border rounded-lg p-6">
+            <div className="flex items-center gap-4">
+                <div className="w-10 h-10"><MapIcon /></div>
+                <div>
+                    <h3 className="text-lg font-bold text-text-primary">Google Maps Platform</h3>
+                    <p className={`text-sm ${isSaved ? 'text-green-600' : 'text-text-secondary'}`}>{isSaved ? 'API Key is saved in vault' : 'Not Connected'}</p>
+                </div>
+            </div>
+             <div className="mt-4 pt-4 border-t border-border">
+                <label htmlFor="maps-key" className="block text-sm font-medium text-text-secondary mb-1">API Key</label>
+                <div className="flex gap-2">
+                    <input id="maps-key" type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="AIzaSy..." className="flex-grow p-2 bg-background border border-border rounded-md text-sm" />
+                     <button onClick={handleSaveKey} disabled={isLoading} className="btn-primary px-6 py-2 flex items-center justify-center min-w-[100px]">
+                        {isLoading ? <LoadingSpinner /> : 'Save'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 export const Connections: React.FC = () => {
     const { state } = useGlobalState();
@@ -131,7 +190,6 @@ export const Connections: React.FC = () => {
         setIsLoading(true);
         try {
             await signInWithGoogle();
-            // State will be updated by the onAuthStateChanged listener
             addNotification('Signed in successfully!', 'success');
         } catch (error) {
             addNotification('Failed to sign in.', 'error');
@@ -159,6 +217,7 @@ export const Connections: React.FC = () => {
                 ) : (
                     <div className="space-y-6">
                         <GitHubConnection />
+                        <GoogleMapsConnection />
                     </div>
                 )}
             </div>

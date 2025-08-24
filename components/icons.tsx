@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 const IconWrapper: React.FC<{children: React.ReactNode; className?: string}> = ({ children, className }) => (
@@ -56,6 +57,8 @@ export const DocumentTextIcon: React.FC = () => <IconWrapper><svg xmlns="http://
 export const PaintBrushIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></IconWrapper>;
 export const PuzzlePieceIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M14.25 6.087c0-1.036-.84-1.875-1.875-1.875s-1.875.84-1.875 1.875v.563c-1.036 0-1.875.84-1.875 1.875v1.5c0 1.036.84 1.875 1.875 1.875h1.5c1.036 0 1.875-.84 1.875-1.875v-1.5c0-1.036-.84-1.875-1.875-1.875v-.563Zm-4.5 0v.563c-1.036 0-1.875.84-1.875 1.875v1.5c0 1.036.84 1.875 1.875 1.875h1.5c1.036 0 1.875-.84 1.875-1.875v-1.5c0-1.036-.84-1.875-1.875-1.875v-.563a1.875 1.875 0 0 0-3.75 0Z" /></svg></IconWrapper>;
 export const MicrophoneIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m12 4.5v-1.5a6 6 0 0 0-12 0v1.5m12 0v-1.5a6 6 0 0 0-12 0v1.5m6 3.75a3 3 0 0 1-3-3V6.75a3 3 0 0 1 6 0v6a3 3 0 0 1-3 3Z" /></svg></IconWrapper>;
+export const MailIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg></IconWrapper>;
+
 
 // --- From CustomFeatureIcons.tsx ---
 export const CommandCenterIcon: React.FC = () => <IconWrapper><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 9V5l-7 7 7 7v-4.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 14.5V19l7-7-7-7v4.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.4"/></svg></IconWrapper>;

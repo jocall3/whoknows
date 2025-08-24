@@ -1,3 +1,4 @@
+
 import React from 'react';
 import type { Feature } from '../../types.ts';
 import { RAW_FEATURES } from '../../constants.ts';
@@ -21,12 +22,12 @@ const componentMap: Record<string, React.FC<any>> = {
     'schema-designer': lazyWithRetry(() => import('./SchemaDesigner.tsx'), 'SchemaDesigner'),
     'pwa-manifest-editor': lazyWithRetry(() => import('./PwaManifestEditor.tsx'), 'PwaManifestEditor'),
     'markdown-slides-generator': lazyWithRetry(() => import('./MarkdownSlides.tsx'), 'MarkdownSlides'),
-    'screenshot-to-component': lazyWithRetry(() => import('./ScreenshotToComponent.tsx'), 'ScreenRecordingToFeature'),
+    'screenshot-to-component': lazyWithRetry(() => import('./ScreenshotToComponent.tsx'), 'ScreenshotToComponent'),
     'digital-whiteboard': lazyWithRetry(() => import('./DigitalWhiteboard.tsx'), 'DigitalWhiteboard'),
     'theme-designer': lazyWithRetry(() => import('./ThemeDesigner.tsx'), 'ThemeDesigner'),
     'svg-path-editor': lazyWithRetry(() => import('./SvgPathEditor.tsx'), 'SvgPathEditor'),
     'ai-style-transfer': lazyWithRetry(() => import('./AiStyleTransfer.tsx'), 'AiStyleTransfer'),
-    'ai-coding-challenge': lazyWithRetry(() => import('./AiCodingChallenge.tsx'), 'AiCodingChallenge'),
+    'ai-coding-challenge': lazyWithRetry(() => import('../AiCodingChallenge.tsx'), 'AiCodingChallenge'),
     'typography-lab': lazyWithRetry(() => import('./TypographyLab.tsx'), 'TypographyLab'),
     'code-review-bot': lazyWithRetry(() => import('./CodeReviewBot.tsx'), 'CodeReviewBot'),
     'ai-pull-request-assistant': lazyWithRetry(() => import('./AiPullRequestAssistant.tsx'), 'AiPullRequestAssistant'),
@@ -55,6 +56,7 @@ const componentMap: Record<string, React.FC<any>> = {
     'security-scanner': lazyWithRetry(() => import('./SecurityScanner.tsx'), 'SecurityScanner'),
     'terraform-generator': lazyWithRetry(() => import('./TerraformGenerator.tsx'), 'TerraformGenerator'),
     'ai-personality-forge': lazyWithRetry(() => import('./AiPersonalityForge.tsx'), 'AiPersonalityForge'),
+    'weekly-digest-generator': lazyWithRetry(() => import('./WeeklyDigestGenerator.tsx'), 'WeeklyDigestGenerator'),
 };
 
 export const ALL_FEATURES: Feature[] = RAW_FEATURES.map(feature => ({

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { explainCodeStructured } from '../services/index.ts';
+import mermaid from 'mermaid';
+import { explainCodeStructured, generateMermaidJs } from '../services/index.ts';
 import type { StructuredExplanation } from '../types.ts';
 import { CpuChipIcon } from './icons.tsx';
 import { MarkdownRenderer, LoadingSpinner } from './shared/index.tsx';
@@ -15,7 +16,7 @@ const exampleCode = `const bubbleSort = (arr) => {
   return arr;
 };`;
 
-type ExplanationTab = 'summary' | 'lineByLine' | 'complexity' | 'suggestions';
+type ExplanationTab = 'summary' | 'lineByLine' | 'complexity' | 'suggestions' | 'flowchart';
 
 const simpleSyntaxHighlight = (code: string) => {
     const escapedCode = code
@@ -24,20 +25,24 @@ const simpleSyntaxHighlight = (code: string) => {
         .replace(/>/g, '&gt;');
 
     return escapedCode
-        .replace(/\b(const|let|var|function|return|if|for|=>|import|from|export|default)\b/g, '<span class="text-indigo-600 font-semibold">$1</span>')
-        .replace(/(\`|'|")(.*?)(\`|'|")/g, '<span class="text-emerald-700">$1$2$3</span>')
-        .replace(/(\/\/.*)/g, '<span class="text-gray-500 italic">$1</span>')
-        .replace(/(\{|\}|\(|\)|\[|\])/g, '<span class="text-gray-600">$1</span>');
+        .replace(/\b(const|let|var|function|return|if|for|=>|import|from|export|default)\b/g, '<span class="text-indigo-400 font-semibold">$1</span>')
+        .replace(/(\`|'|")(.*?)(\`|'|")/g, '<span class="text-emerald-400">$1$2$3</span>')
+        .replace(/(\/\/.*)/g, '<span class="text-gray-400 italic">$1</span>')
+        .replace(/(\{|\}|\(|\)|\[|\])/g, '<span class="text-gray-400">$1</span>');
 };
+
+mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
 
 export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCode }) => {
     const [code, setCode] = useState<string>(initialCode || exampleCode);
     const [explanation, setExplanation] = useState<StructuredExplanation | null>(null);
+    const [mermaidCode, setMermaidCode] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const [activeTab, setActiveTab] = useState<ExplanationTab>('summary');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const preRef = useRef<HTMLPreElement>(null);
+    const mermaidContainerRef = useRef<HTMLDivElement>(null);
 
     const handleExplain = useCallback(async (codeToExplain: string) => {
         if (!codeToExplain.trim()) {
@@ -47,10 +52,16 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
         setIsLoading(true);
         setError('');
         setExplanation(null);
+        setMermaidCode('');
         setActiveTab('summary');
         try {
-            const result = await explainCodeStructured(codeToExplain);
-            setExplanation(result);
+            const [explanationResult, mermaidResult] = await Promise.all([
+                explainCodeStructured(codeToExplain),
+                generateMermaidJs(codeToExplain)
+            ]);
+            setExplanation(explanationResult);
+            setMermaidCode(mermaidResult.replace(/```mermaid\n|```/g, ''));
+
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
             setError(`Failed to get explanation: ${errorMessage}`);
@@ -65,6 +76,23 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
             handleExplain(initialCode);
         }
     }, [initialCode, handleExplain]);
+
+    useEffect(() => {
+        const renderMermaid = async () => {
+             if (activeTab === 'flowchart' && mermaidCode && mermaidContainerRef.current) {
+                try {
+                    mermaidContainerRef.current.innerHTML = ''; // Clear previous
+                    const { svg } = await mermaid.render(`mermaid-graph-${Date.now()}`, mermaidCode);
+                    mermaidContainerRef.current.innerHTML = svg;
+                } catch (e) {
+                    console.error("Mermaid rendering error:", e);
+                    mermaidContainerRef.current.innerHTML = `<p class="text-red-500">Error rendering flowchart.</p>`;
+                }
+            }
+        }
+        renderMermaid();
+    }, [activeTab, mermaidCode]);
+
 
     const handleScroll = () => {
         if (preRef.current && textareaRef.current) {
@@ -104,6 +132,12 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
                         {explanation.suggestions.map((item, index) => <li key={index}>{item}</li>)}
                     </ul>
                 );
+            case 'flowchart':
+                return (
+                    <div ref={mermaidContainerRef} className="w-full h-full flex items-center justify-center">
+                        <LoadingSpinner />
+                    </div>
+                );
         }
     }
 
@@ -119,7 +153,7 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
                 
                 {/* Left Column: Code Input */}
-                <div className="flex flex-col min-h-0">
+                <div className="flex flex-col min-h-0 md:col-span-1">
                     <label htmlFor="code-input" className="text-sm font-medium text-text-secondary mb-2">Your Code</label>
                     <div className="relative flex-grow bg-surface border border-border rounded-md focus-within:ring-2 focus-within:ring-primary overflow-hidden">
                         <textarea
@@ -151,13 +185,13 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
                 </div>
 
                 {/* Right Column: AI Analysis */}
-                <div className="flex flex-col min-h-0">
+                <div className="flex flex-col min-h-0 md:col-span-1">
                     <label className="text-sm font-medium text-text-secondary mb-2">AI Analysis</label>
                     <div className="relative flex-grow flex flex-col bg-surface border border-border rounded-md overflow-hidden">
                         <div className="flex-shrink-0 flex border-b border-border">
-                           {(['summary', 'lineByLine', 'complexity', 'suggestions'] as ExplanationTab[]).map(tab => (
+                           {(['summary', 'lineByLine', 'complexity', 'suggestions', 'flowchart'] as ExplanationTab[]).map(tab => (
                                <button key={tab} onClick={() => setActiveTab(tab)} disabled={!explanation}
-                                className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${activeTab === tab ? 'bg-background text-primary font-semibold' : 'text-text-secondary hover:bg-gray-100 disabled:text-gray-400'}`}>
+                                className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${activeTab === tab ? 'bg-background text-primary font-semibold' : 'text-text-secondary hover:bg-gray-100 dark:hover:bg-slate-700 disabled:text-gray-400 dark:disabled:text-slate-500'}`}>
                                    {tab.replace(/([A-Z])/g, ' $1')}
                                </button>
                            ))}

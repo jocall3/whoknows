@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
     CommandCenterIcon, CodeExplainerIcon, FeatureBuilderIcon, CodeMigratorIcon, ThemeDesignerIcon, SnippetVaultIcon,
@@ -8,7 +9,8 @@ import {
     AsyncCallTreeIcon, AudioToCodeIcon, CodeDiffGhostIcon, CodeSpellCheckerIcon, ColorPaletteGeneratorIcon, LogicFlowBuilderIcon,
     MetaTagEditorIcon, NetworkVisualizerIcon, ResponsiveTesterIcon, SassCompilerIcon, ImageGeneratorIcon, XbrlConverterIcon,
     DigitalWhiteboardIcon, TypographyLabIcon, AiPullRequestAssistantIcon, ProjectExplorerIcon, ConnectionsIcon,
-    ServerStackIcon, DocumentTextIcon, ChartBarIcon, EyeIcon, PaperAirplaneIcon, CloudIcon, ShieldCheckIcon, CpuChipIcon, SparklesIcon
+    ServerStackIcon, DocumentTextIcon, ChartBarIcon, EyeIcon, PaperAirplaneIcon, CloudIcon, ShieldCheckIcon, CpuChipIcon, SparklesIcon,
+    MailIcon
 } from './components/icons.tsx';
 
 export const CHROME_VIEW_IDS = ['features-list'] as const;
@@ -91,6 +93,7 @@ export const RAW_FEATURES: RawFeature[] = [
     { id: "portable-snippet-vault", name: "Snippet Vault", description: "Store, search, tag, and enhance reusable code snippets with AI.", icon: React.createElement(SnippetVaultIcon), category: "Productivity" },
     { id: "digital-whiteboard", name: "Digital Whiteboard", description: "Organize ideas with interactive sticky notes and get AI-powered summaries.", icon: React.createElement(DigitalWhiteboardIcon), category: "Productivity" },
     { id: "markdown-slides-generator", name: "Markdown Slides", description: "Turn markdown into a fullscreen presentation with an interactive overlay.", icon: React.createElement(MarkdownSlidesIcon), category: "Productivity" },
+    { id: "weekly-digest-generator", name: "Weekly Digest Generator", description: "Generate and send a weekly project summary email via Gmail.", icon: React.createElement(MailIcon), category: "Productivity" },
     
     { id: "schema-designer", name: "Schema Designer", description: "Visually design a database schema with a drag-and-drop interface and SQL export.", icon: React.createElement(SchemaDesignerIcon), category: "Database" },
     { id: "xbrl-converter", name: "XBRL Converter", description: "Convert JSON data to a simplified XBRL-like XML format using AI.", icon: React.createElement(XbrlConverterIcon), category: "Data" },

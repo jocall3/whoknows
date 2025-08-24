@@ -1,6 +1,12 @@
+
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { marked } from 'marked';
 import { PhotoIcon } from '../icons.tsx';
+import { useNotification } from '../../contexts/NotificationContext.tsx';
+import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
+import { summarizeForSlides } from '../../services/geminiService.ts';
+import { createPresentation, addSlide } from '../../services/workspaceService.ts';
+import { LoadingSpinner } from '../shared/index.tsx';
 
 const exampleMarkdown = `# Slide 1: Welcome
 
@@ -30,7 +36,11 @@ export const MarkdownSlides: React.FC = () => {
     const [markdown, setMarkdown] = useState(exampleMarkdown);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [slideHtml, setSlideHtml] = useState<string | TrustedHTML>('');
+    const [isExporting, setIsExporting] = useState(false);
     const presentationRef = useRef<HTMLDivElement>(null);
+    const { addNotification } = useNotification();
+    const { state } = useGlobalState();
+    const { user } = state;
 
     const slides = useMemo(() => markdown.split(/^-{3,}\s*$/m), [markdown]);
 
@@ -48,6 +58,34 @@ export const MarkdownSlides: React.FC = () => {
 
     const handleFullscreen = () => {
         presentationRef.current?.requestFullscreen();
+    };
+
+    const handleExportToSlides = async () => {
+        if (!user) {
+            addNotification('Please sign in with Google to export to Slides.', 'error');
+            return;
+        }
+        setIsExporting(true);
+        try {
+            addNotification('Creating presentation...', 'info');
+            const presentation = await createPresentation(`Presentation from DevCore: ${new Date().toLocaleDateString()}`);
+            addNotification(`Presentation created: ${presentation.presentationId}`, 'success');
+
+            for (let i = 0; i < slides.length; i++) {
+                addNotification(`Processing slide ${i + 1}/${slides.length}...`, 'info');
+                const slideContent = slides[i];
+                const summary = await summarizeForSlides(slideContent);
+                await addSlide(presentation.presentationId, summary);
+            }
+            addNotification('All slides added successfully!', 'success');
+            window.open(presentation.webViewLink, '_blank');
+
+        } catch (e) {
+            console.error(e);
+            addNotification(e instanceof Error ? e.message : 'Failed to export presentation.', 'error');
+        } finally {
+            setIsExporting(false);
+        }
     };
     
     useEffect(() => {
@@ -73,13 +111,16 @@ export const MarkdownSlides: React.FC = () => {
                      <textarea id="md-input" value={markdown} onChange={e => setMarkdown(e.target.value)} className="flex-grow p-4 bg-surface border border-border rounded-md resize-none font-mono text-sm focus:ring-2 focus:ring-primary focus:outline-none"/>
                 </div>
                  <div ref={presentationRef} className="flex flex-col h-full bg-surface fullscreen:bg-background border border-border rounded-md">
-                    <div className="flex-shrink-0 flex justify-end items-center p-2 border-b border-border">
-                        <button onClick={handleFullscreen} className="px-3 py-1 bg-gray-100 rounded-md text-xs hover:bg-gray-200">Fullscreen</button>
+                    <div className="flex-shrink-0 flex justify-end items-center p-2 border-b border-border gap-2">
+                        <button onClick={handleExportToSlides} disabled={isExporting || !user} className="btn-primary text-xs px-3 py-1 flex items-center gap-1 disabled:bg-gray-400">
+                           {isExporting ? <LoadingSpinner/> : 'Export to Google Slides'}
+                        </button>
+                        <button onClick={handleFullscreen} className="px-3 py-1 bg-gray-100 dark:bg-slate-700 rounded-md text-xs hover:bg-gray-200 dark:hover:bg-slate-600">Fullscreen</button>
                     </div>
                     <div className="relative flex-grow flex flex-col justify-center items-center p-8 overflow-y-auto">
                         <div className="prose prose-lg max-w-none w-full" dangerouslySetInnerHTML={{ __html: slideHtml }} />
-                         <button onClick={goToPrev} disabled={currentSlide === 0} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-gray-200/50 rounded-full disabled:opacity-30 hover:bg-gray-300/50">◀</button>
-                         <button onClick={goToNext} disabled={currentSlide === slides.length - 1} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-gray-200/50 rounded-full disabled:opacity-30 hover:bg-gray-300/50">▶</button>
+                         <button onClick={goToPrev} disabled={currentSlide === 0} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-gray-200/50 dark:bg-slate-700/50 rounded-full disabled:opacity-30 hover:bg-gray-300/50 dark:hover:bg-slate-600/50">◀</button>
+                         <button onClick={goToNext} disabled={currentSlide === slides.length - 1} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-gray-200/50 dark:bg-slate-700/50 rounded-full disabled:opacity-30 hover:bg-gray-300/50 dark:hover:bg-slate-600/50">▶</button>
                          <div className="absolute bottom-4 right-4 text-xs bg-black/50 px-2 py-1 rounded-md text-white">
                             {currentSlide + 1} / {slides.length}
                         </div>

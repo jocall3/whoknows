@@ -1,3 +1,4 @@
+
 import type React from 'react';
 import { CHROME_VIEW_IDS, FEATURE_CATEGORIES } from './constants.ts';
 
@@ -112,6 +113,11 @@ export interface SemanticColorTheme {
         textSecondaryOnSurface: { ratio: number; score: string; };
         textOnPrimaryOnPrimary: { ratio: number; score: string; };
     };
+}
+
+export interface SlideSummary {
+    title: string;
+    body: string;
 }
 
 export interface Repo {
