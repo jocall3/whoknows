@@ -8,7 +8,7 @@ import { lazyWithRetry } from '../../services/componentLoader.ts';
 const componentMap: Record<string, React.FC<any>> = {
     'ai-command-center': lazyWithRetry(() => import('./AiCommandCenter.tsx'), 'AiCommandCenter'),
     'project-explorer': lazyWithRetry(() => import('./ProjectExplorer.tsx'), 'ProjectExplorer'),
-    'connections': lazyWithRetry(() => import('./Connections.tsx'), 'Connections'),
+    'workspace-connector-hub': lazyWithRetry(() => import('./WorkspaceConnectorHub.tsx'), 'WorkspaceConnectorHub'),
     'ai-code-explainer': lazyWithRetry(() => import('../AiCodeExplainer.tsx'), 'AiCodeExplainer'),
     'ai-feature-builder': lazyWithRetry(() => import('./AiFeatureBuilder.tsx'), 'AiFeatureBuilder'),
     'regex-sandbox': lazyWithRetry(() => import('./RegexSandbox.tsx'), 'RegexSandbox'),

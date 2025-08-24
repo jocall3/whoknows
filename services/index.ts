@@ -17,3 +17,4 @@ export * from './security/staticAnalysisService.ts';
 export * from './googleApiService.ts';
 export * from './workspaceService.ts';
 export * from './gcpService.ts';
+export * from './workspaceConnectorService.ts';

@@ -15,6 +15,13 @@ export const FEATURE_TAXONOMY: FeatureTaxonomy[] = [
         inputs: "A natural language prompt describing what the user wants to do. Examples: 'explain this code: ...', 'design a theme with space vibes'."
     },
     {
+        id: "workspace-connector-hub",
+        name: "Workspace Connector Hub",
+        description: "A central hub to execute actions on connected third-party services like Jira, Slack, GitHub, Vercel, and more. This is the primary tool for inter-service orchestration. The AI should use the 'runWorkspaceAction' function to interact with it.",
+        category: "Workflow",
+        inputs: "A natural language command describing a sequence of actions. Examples: 'create a jira ticket and post to slack', 'deploy the `dev` branch to vercel', 'summarize the last 5 commits and create a Confluence page'."
+    },
+    {
         id: "ai-code-explainer",
         name: "AI Code Explainer",
         description: "Accepts a code snippet and provides a detailed, structured analysis including summary, line-by-line breakdown, complexity, suggestions, and a visual flowchart.",

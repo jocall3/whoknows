@@ -10,12 +10,11 @@ import { LeftSidebar } from './components/LeftSidebar.tsx';
 import { StatusBar } from './components/StatusBar.tsx';
 import { CommandPalette } from './components/CommandPalette.tsx';
 import { SettingsView } from './components/SettingsView.tsx';
-import { Cog6ToothIcon, HomeIcon, FolderIcon, LinkIcon } from './components/icons.tsx';
+import { Cog6ToothIcon, HomeIcon, FolderIcon, RectangleGroupIcon } from './components/icons.tsx';
 import { AiCommandCenter } from './components/features/AiCommandCenter.tsx';
-import { ProjectExplorer } from './components/features/ProjectExplorer.tsx';
-import { Connections } from './components/features/Connections.tsx';
 import { NotificationProvider } from './contexts/NotificationContext.tsx';
 import { useTheme } from './hooks/useTheme.ts';
+import { VaultProvider } from './components/vault/VaultProvider.tsx';
 
 
 export const LoadingIndicator: React.FC = () => (
@@ -85,25 +84,26 @@ const AppContent: React.FC = () => {
       setCommandPaletteOpen(false);
     }, [dispatch]);
   
-    const sidebarItems: SidebarItem[] = useMemo(() => [
-      { id: 'ai-command-center', label: 'Command Center', icon: <HomeIcon />, view: 'ai-command-center' },
-      { id: 'project-explorer', label: 'Project Explorer', icon: <FolderIcon />, view: 'project-explorer' },
-      ...ALL_FEATURES
-          .filter(feature => !hiddenFeatures.includes(feature.id) && !['ai-command-center', 'project-explorer', 'connections'].includes(feature.id))
-          .map(feature => ({
-              id: feature.id,
-              label: feature.name,
-              icon: feature.icon,
-              view: feature.id as ViewType,
-          })),
-      { id: 'connections', label: 'Connections', icon: <LinkIcon />, view: 'connections' },
-      { id: 'settings', label: 'Settings', icon: <Cog6ToothIcon />, view: 'settings' },
-    ], [hiddenFeatures]);
+    const sidebarItems: SidebarItem[] = useMemo(() => {
+        const coreFeatures = ['ai-command-center', 'project-explorer', 'workspace-connector-hub'];
+        return [
+            { id: 'ai-command-center', label: 'Command Center', icon: <HomeIcon />, view: 'ai-command-center' },
+            { id: 'project-explorer', label: 'Project Explorer', icon: <FolderIcon />, view: 'project-explorer' },
+            { id: 'workspace-connector-hub', label: 'Workspace Hub', icon: <RectangleGroupIcon />, view: 'workspace-connector-hub' },
+            ...ALL_FEATURES
+                .filter(feature => !hiddenFeatures.includes(feature.id) && !coreFeatures.includes(feature.id))
+                .map(feature => ({
+                    id: feature.id,
+                    label: feature.name,
+                    icon: feature.icon,
+                    view: feature.id as ViewType,
+                })),
+            { id: 'settings', label: 'Settings', icon: <Cog6ToothIcon />, view: 'settings' },
+        ];
+    }, [hiddenFeatures]);
   
     const ActiveComponent = useMemo(() => {
         if (activeView === 'settings') return SettingsView;
-        if (activeView === 'project-explorer') return ProjectExplorer;
-        if (activeView === 'connections') return Connections;
         return FEATURES_MAP.get(activeView as string)?.component ?? AiCommandCenter;
     }, [activeView]);
     
@@ -168,8 +168,10 @@ const App: React.FC = () => {
     return (
         <div className="h-screen w-screen font-sans overflow-hidden bg-background">
             <NotificationProvider>
-                {showConsentModal && <LocalStorageConsentModal onAccept={handleAcceptConsent} onDecline={handleDeclineConsent} />}
-                <AppContent />
+                <VaultProvider>
+                    {showConsentModal && <LocalStorageConsentModal onAccept={handleAcceptConsent} onDecline={handleDeclineConsent} />}
+                    <AppContent />
+                </VaultProvider>
             </NotificationProvider>
         </div>
     );

@@ -7,8 +7,9 @@ import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 import { CommandLineIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { ALL_FEATURES } from './index.ts';
+import { executeWorkspaceAction, ACTION_REGISTRY } from '../../services/workspaceConnectorService.ts';
 
-const functionDeclarations: FunctionDeclaration[] = [
+const baseFunctionDeclarations: FunctionDeclaration[] = [
     {
         name: 'navigateTo',
         description: 'Navigates to a specific feature page.',
@@ -55,6 +56,30 @@ const functionDeclarations: FunctionDeclaration[] = [
     }
 ];
 
+// Dynamically add the workspace action
+const functionDeclarations: FunctionDeclaration[] = [
+    ...baseFunctionDeclarations,
+    {
+        name: 'runWorkspaceAction',
+        description: 'Executes a defined action on a connected workspace service like Jira, Slack, or GitHub.',
+        parameters: {
+            type: Type.OBJECT,
+            properties: {
+                 actionId: {
+                    type: Type.STRING,
+                    description: 'The unique identifier for the action to execute.',
+                    enum: [ ...ACTION_REGISTRY.keys() ]
+                },
+                params: {
+                    type: Type.OBJECT,
+                    description: 'An object containing the parameters for the action, matching its required inputs.'
+                }
+            },
+            required: ['actionId', 'params']
+        }
+    }
+]
+
 const knowledgeBase = FEATURE_TAXONOMY.map(f => `- ${f.name} (${f.id}): ${f.description} Inputs: ${f.inputs}`).join('\n');
 
 const ExamplePromptButton: React.FC<{ text: string, onClick: (text: string) => void }> = ({ text, onClick }) => (
@@ -93,6 +118,14 @@ export const AiCommandCenter: React.FC = () => {
                         break;
                     case 'runFeatureWithInput':
                          dispatch({ type: 'SET_VIEW', payload: { view: args.featureId, props: args.props } });
+                        break;
+                    case 'runWorkspaceAction':
+                        try {
+                            const result = await executeWorkspaceAction(args.actionId, args.params);
+                            setLastResponse(`Action '${args.actionId}' executed successfully.\n\nResult: \`\`\`json\n${JSON.stringify(result, null, 2)}\n\`\`\``);
+                        } catch (e) {
+                            setLastResponse(`Action failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
+                        }
                         break;
                     default:
                         setLastResponse(`Unknown command: ${name}`);

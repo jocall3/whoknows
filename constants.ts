@@ -9,9 +9,9 @@ import {
     CodeReviewBotIcon, ChangelogGeneratorIcon, CronJobBuilderIcon,
     AsyncCallTreeIcon, AudioToCodeIcon, CodeDiffGhostIcon, CodeSpellCheckerIcon, ColorPaletteGeneratorIcon, LogicFlowBuilderIcon,
     MetaTagEditorIcon, NetworkVisualizerIcon, ResponsiveTesterIcon, SassCompilerIcon, ImageGeneratorIcon, XbrlConverterIcon,
-    DigitalWhiteboardIcon, TypographyLabIcon, AiPullRequestAssistantIcon, ProjectExplorerIcon, ConnectionsIcon,
+    DigitalWhiteboardIcon, TypographyLabIcon, AiPullRequestAssistantIcon, ProjectExplorerIcon,
     ServerStackIcon, DocumentTextIcon, ChartBarIcon, EyeIcon, PaperAirplaneIcon, CloudIcon, ShieldCheckIcon, CpuChipIcon, SparklesIcon,
-    MailIcon, BugAntIcon, MagnifyingGlassIcon
+    MailIcon, BugAntIcon, MagnifyingGlassIcon, RectangleGroupIcon
 } from './components/icons.tsx';
 
 export const CHROME_VIEW_IDS = ['features-list'] as const;
@@ -52,7 +52,7 @@ export const RAW_FEATURES: RawFeature[] = [
     // --- Existing Features (Re-categorized and Ordered) ---
     { id: "ai-command-center", name: "AI Command Center", description: "Use natural language to navigate and control the toolkit.", icon: React.createElement(CommandCenterIcon), category: "Core" },
     { id: "project-explorer", name: "Project Explorer", description: "Manage and edit files from your connected repositories.", icon: React.createElement(ProjectExplorerIcon), category: "Core" },
-    { id: "connections", name: "Connections", description: "Connect to GitHub and other services.", icon: React.createElement(ConnectionsIcon), category: "Core" },
+    { id: "workspace-connector-hub", name: "Workspace Connector Hub", description: "Connect to services like Jira, Slack & GitHub to orchestrate actions with AI.", icon: React.createElement(RectangleGroupIcon), category: "Workflow" },
     { id: "linter-formatter", name: "AI Code Formatter", description: "AI-powered, real-time code formatting.", icon: React.createElement(CodeFormatterIcon), category: "Core" },
     { id: "json-tree-navigator", name: "JSON Tree Navigator", description: "Navigate large JSON objects as a collapsible tree.", icon: React.createElement(JsonTreeIcon), category: "Core" },
     
