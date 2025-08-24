@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./**/*.{js,ts,jsx,tsx}",
@@ -12,22 +13,24 @@ export default {
         calligraphy: ['"Great Vibes"', 'cursive'],
       },
       colors: {
-        'primary': '#0047AB', // Cobalt Blue
-        'background': '#F5F7FA', // Light silver-blue
-        'surface': '#FFFFFF',
+        'primary': 'var(--color-primary)',
+        'background': 'var(--color-background)',
+        'surface': 'var(--color-surface)',
         'text': {
-          'primary': '#111827', // Gray 900
-          'secondary': '#6B7280', // Gray 500
-          'on-primary': '#FFFFFF',
+          'primary': 'var(--color-text-primary)',
+          'secondary': 'var(--color-text-secondary)',
+          'on-primary': 'var(--color-text-on-primary)',
         },
-        'border': '#E5E7EB', // Gray 200
+        'border': 'var(--color-border)',
         'gold': '#B8860B', // DarkGoldenRod - better for watermark
       },
        boxShadow: {
-        'focus-primary': '0 0 0 3px rgba(0, 71, 171, 0.4)',
+        'focus-primary': '0 0 0 3px rgba(var(--color-primary-rgb), 0.4)',
         'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       },
     },
   },
-  plugins: [],
+  plugins: [
+     require('@tailwindcss/typography'),
+  ],
 }

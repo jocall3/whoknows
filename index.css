@@ -2,12 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #0047AB; /* Cobalt Blue */
+  --color-primary-rgb: 0, 71, 171;
+  --color-background: #F5F7FA; /* Light silver-blue */
+  --color-surface: #FFFFFF;
+  --color-text-primary: #111827; /* Gray 900 */
+  --color-text-secondary: #6B7280; /* Gray 500 */
+  --color-text-on-primary: #FFFFFF;
+  --color-border: #E5E7EB; /* Gray 200 */
+}
+
+.dark {
+  --color-primary: #38bdf8; /* sky-400 */
+  --color-primary-rgb: 56, 189, 248;
+  --color-background: #0f172a; /* slate-900 */
+  --color-surface: #1e293b; /* slate-800 */
+  --color-text-primary: #f8fafc; /* slate-50 */
+  --color-text-secondary: #94a3b8; /* slate-400 */
+  --color-text-on-primary: #0f172a; /* slate-900 */
+  --color-border: #334155; /* slate-700 */
+}
+
 /* Custom global styles */
 body {
+  @apply bg-background text-text-primary transition-colors duration-300;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: linear-gradient(135deg, #FFFFFF 0%, #F5F7FA 100%);
 }
+
+html.dark body {
+    background-image: none;
+}
+
 
 #root {
   position: relative;
@@ -49,13 +76,13 @@ h1 {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  @apply bg-gray-100 dark:bg-slate-800;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-400 rounded;
+  @apply bg-gray-400 dark:bg-slate-600 rounded;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500;
+  @apply bg-gray-500 dark:bg-slate-500;
 }
 
 /* Base transitions for interactive elements */

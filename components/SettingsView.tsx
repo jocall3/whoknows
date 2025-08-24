@@ -1,10 +1,10 @@
 import React from 'react';
 import { useGlobalState } from '../contexts/GlobalStateContext.tsx';
-import * as vaultService from '../services/vaultService.ts';
 import { clearAllFiles } from '../services/dbService.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
+import { useTheme } from '../hooks/useTheme.ts';
 import { ALL_FEATURES } from './features/index.ts';
-import { TrashIcon, LockClosedIcon } from './icons.tsx';
+import { TrashIcon, SunIcon, MoonIcon } from './icons.tsx';
 
 const ToggleSwitch: React.FC<{ checked: boolean, onChange: () => void }> = ({ checked, onChange }) => {
     return (
@@ -12,7 +12,7 @@ const ToggleSwitch: React.FC<{ checked: boolean, onChange: () => void }> = ({ ch
             role="switch"
             aria-checked={checked}
             onClick={onChange}
-            className={`${checked ? 'bg-primary' : 'bg-gray-300'} relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
+            className={`${checked ? 'bg-primary' : 'bg-gray-300 dark:bg-slate-600'} relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
         >
             <span className={`${checked ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`} />
         </button>
@@ -21,25 +21,11 @@ const ToggleSwitch: React.FC<{ checked: boolean, onChange: () => void }> = ({ ch
 
 export const SettingsView: React.FC = () => {
     const { state, dispatch } = useGlobalState();
+    const [themeState, toggleTheme, , clearCustomTheme] = useTheme();
     const [, setSnippets] = useLocalStorage('devcore_snippets', []);
     const [, setNotes] = useLocalStorage('devcore_moodboard', []);
     const [, setDevNotes] = useLocalStorage('devcore_notes', []);
-
-    const handleLockVault = () => {
-        vaultService.lockVault();
-        dispatch({ type: 'SET_VAULT_STATE', payload: { isUnlocked: false } });
-        dispatch({ type: 'LOGOUT_GITHUB' });
-        alert("Vault has been locked.");
-    };
-
-    const handleResetVault = async () => {
-        if (window.confirm("ARE YOU SURE? This will permanently delete your encrypted credentials and master password. This action cannot be undone.")) {
-            await vaultService.resetVault();
-            dispatch({ type: 'SET_VAULT_STATE', payload: { isInitialized: false, isUnlocked: false } });
-            dispatch({ type: 'LOGOUT_GITHUB' });
-            alert("Vault has been reset.");
-        }
-    };
+    const [, setPersonalities] = useLocalStorage('devcore_ai_personalities', []);
 
     const handleClearGeneratedFiles = async () => {
         if (window.confirm("Are you sure you want to delete all AI-generated files? This cannot be undone.")) {
@@ -62,6 +48,13 @@ export const SettingsView: React.FC = () => {
             alert("Notes & Moodboard cleared.");
         }
     };
+    
+    const handleClearPersonalities = () => {
+        if (window.confirm("Are you sure you want to delete all AI Personalities? This cannot be undone.")) {
+            setPersonalities([]);
+            alert("AI Personalities cleared.");
+        }
+    }
 
     return (
         <div className="w-full text-text-primary">
@@ -73,32 +66,32 @@ export const SettingsView: React.FC = () => {
             </header>
 
             <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-4xl mx-auto w-full">
-                {/* Security Section */}
-                {state.vaultState.isInitialized && (
-                    <section>
-                        <h2 className="text-2xl font-bold border-b border-border pb-2 mb-4">Security</h2>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-lg">
-                                <div>
-                                    <p className="font-medium">Lock Vault</p>
-                                    <p className="text-sm text-text-secondary">Ends the current session and requires the Master Password on next use.</p>
-                                </div>
-                                <button onClick={handleLockVault} className="flex items-center gap-2 px-4 py-2 rounded-md bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20 transition-colors">
-                                    <LockClosedIcon /> Lock Now
-                                </button>
-                            </div>
-                            <div className="flex items-center justify-between p-4 bg-surface border border-red-500/20 rounded-lg">
-                                <div>
-                                    <p className="font-medium text-red-700">Reset Vault</p>
-                                    <p className="text-sm text-text-secondary">Permanently deletes all encrypted credentials and your Master Password setup.</p>
-                                </div>
-                                <button onClick={handleResetVault} className="flex items-center gap-2 px-4 py-2 rounded-md bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors">
-                                    <TrashIcon /> Reset Vault
-                                </button>
-                            </div>
+                 {/* Appearance Section */}
+                <section>
+                    <h2 className="text-2xl font-bold border-b border-border pb-2 mb-4">Appearance</h2>
+                    <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-lg">
+                        <div>
+                            <p className="font-medium">Theme</p>
+                            <p className="text-sm text-text-secondary">Switch between light and dark mode.</p>
                         </div>
-                    </section>
-                )}
+                        <div className="flex items-center gap-2">
+                            <SunIcon />
+                            <ToggleSwitch checked={themeState.mode === 'dark'} onChange={toggleTheme} />
+                            <MoonIcon />
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-lg mt-4">
+                        <div>
+                            <p className="font-medium">Custom Theme</p>
+                            <p className="text-sm text-text-secondary">Revert to the default application theme.</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button onClick={clearCustomTheme} disabled={!themeState.customColors} className="px-4 py-2 text-sm rounded-md bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Revert to Default
+                            </button>
+                        </div>
+                    </div>
+                </section>
                 
                  {/* Feature Visibility Section */}
                 <section>
@@ -129,30 +122,39 @@ export const SettingsView: React.FC = () => {
                 <section>
                     <h2 className="text-2xl font-bold border-b border-border pb-2 mb-4">Data Management</h2>
                     <div className="space-y-4">
-                         <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-lg">
+                         <div className="flex items-center justify-between p-4 bg-surface border border-red-500/20 rounded-lg">
                              <div>
-                                <p className="font-medium">Clear Generated Files</p>
+                                <p className="font-medium text-red-700 dark:text-red-400">Clear Generated Files</p>
                                 <p className="text-sm text-text-secondary">Removes all files created by the AI Feature Builder.</p>
                              </div>
                              <button onClick={handleClearGeneratedFiles} className="flex items-center gap-2 px-4 py-2 rounded-md bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors">
                                 <TrashIcon /> Clear
                              </button>
                          </div>
-                         <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-lg">
+                         <div className="flex items-center justify-between p-4 bg-surface border border-red-500/20 rounded-lg">
                              <div>
-                                <p className="font-medium">Clear Snippet Vault</p>
+                                <p className="font-medium text-red-700 dark:text-red-400">Clear Snippet Vault</p>
                                 <p className="text-sm text-text-secondary">Removes all saved code snippets.</p>
                              </div>
                              <button onClick={handleClearSnippets} className="flex items-center gap-2 px-4 py-2 rounded-md bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors">
                                 <TrashIcon /> Clear
                              </button>
                          </div>
-                         <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-lg">
+                         <div className="flex items-center justify-between p-4 bg-surface border border-red-500/20 rounded-lg">
                              <div>
-                                <p className="font-medium">Clear Notes & Moodboard</p>
-                                <p className="text-sm text-text-secondary">Removes all items from Dev Notes and Moodboard.</p>
+                                <p className="font-medium text-red-700 dark:text-red-400">Clear Notes & Whiteboard</p>
+                                <p className="text-sm text-text-secondary">Removes all items from Dev Notes and Digital Whiteboard.</p>
                              </div>
                              <button onClick={handleClearNotes} className="flex items-center gap-2 px-4 py-2 rounded-md bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors">
+                                <TrashIcon /> Clear
+                             </button>
+                         </div>
+                         <div className="flex items-center justify-between p-4 bg-surface border border-red-500/20 rounded-lg">
+                             <div>
+                                <p className="font-medium text-red-700 dark:text-red-400">Clear AI Personalities</p>
+                                <p className="text-sm text-text-secondary">Removes all custom AI personalities.</p>
+                             </div>
+                             <button onClick={handleClearPersonalities} className="flex items-center gap-2 px-4 py-2 rounded-md bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors">
                                 <TrashIcon /> Clear
                              </button>
                          </div>

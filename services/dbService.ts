@@ -2,9 +2,11 @@ import { openDB, DBSchema } from 'idb';
 import type { GeneratedFile, EncryptedData } from '../types.ts';
 
 const DB_NAME = 'devcore-db';
-const DB_VERSION = 2; // Incremented version for schema change
+const DB_VERSION = 2;
 const FILES_STORE_NAME = 'generated-files';
-const VAULT_STORE_NAME = 'vault';
+const VAULT_STORE_NAME = 'vault-data';
+const ENCRYPTED_TOKENS_STORE_NAME = 'encrypted-tokens';
+
 
 interface DevCoreDB extends DBSchema {
   [FILES_STORE_NAME]: {
@@ -16,18 +18,30 @@ interface DevCoreDB extends DBSchema {
     key: string;
     value: any;
   };
+  [ENCRYPTED_TOKENS_STORE_NAME]: {
+    key: string;
+    value: EncryptedData;
+  };
 }
 
 const dbPromise = openDB<DevCoreDB>(DB_NAME, DB_VERSION, {
   upgrade(db, oldVersion) {
-    if (oldVersion < 1) {
-        const store = db.createObjectStore(FILES_STORE_NAME, {
-            keyPath: 'filePath',
-        });
-        store.createIndex('by-filePath', 'filePath');
-    }
-    if (oldVersion < 2) {
-        db.createObjectStore(VAULT_STORE_NAME, { keyPath: 'id' });
+    switch (oldVersion) {
+        case 0: {
+            const store = db.createObjectStore(FILES_STORE_NAME, {
+                keyPath: 'filePath',
+            });
+            store.createIndex('by-filePath', 'filePath');
+        }
+        // fall-through for new installations
+        case 1: {
+            if (!db.objectStoreNames.contains(VAULT_STORE_NAME)) {
+                db.createObjectStore(VAULT_STORE_NAME);
+            }
+            if (!db.objectStoreNames.contains(ENCRYPTED_TOKENS_STORE_NAME)) {
+                db.createObjectStore(ENCRYPTED_TOKENS_STORE_NAME, { keyPath: 'id' });
+            }
+        }
     }
   },
 });
@@ -43,47 +57,48 @@ export const getAllFiles = async (): Promise<GeneratedFile[]> => {
   return db.getAll(FILES_STORE_NAME);
 };
 
+export const getFileByPath = async (filePath: string): Promise<GeneratedFile | undefined> => {
+  const db = await dbPromise;
+  return db.get(FILES_STORE_NAME, filePath);
+};
+
 export const clearAllFiles = async (): Promise<void> => {
   const db = await dbPromise;
   await db.clear(FILES_STORE_NAME);
 };
 
 // --- Vault Store ---
-export const saveVaultData = async (id: string, data: any): Promise<void> => {
-    const db = await dbPromise;
-    await db.put(VAULT_STORE_NAME, { id, value: data });
-}
+export const saveVaultData = async (key: string, value: any): Promise<void> => {
+  const db = await dbPromise;
+  await db.put(VAULT_STORE_NAME, value, key);
+};
 
-export const getVaultData = async (id: string): Promise<any | undefined> => {
-    const db = await dbPromise;
-    const result = await db.get(VAULT_STORE_NAME, id);
-    return result?.value;
-}
+export const getVaultData = async (key: string): Promise<any | undefined> => {
+  const db = await dbPromise;
+  return db.get(VAULT_STORE_NAME, key);
+};
 
+// --- Encrypted Tokens Store ---
 export const saveEncryptedToken = async (data: EncryptedData): Promise<void> => {
-    const db = await dbPromise;
-    await db.put(VAULT_STORE_NAME, data);
+  const db = await dbPromise;
+  await db.put(ENCRYPTED_TOKENS_STORE_NAME, data);
 };
 
 export const getEncryptedToken = async (id: string): Promise<EncryptedData | undefined> => {
-    const db = await dbPromise;
-    return db.get(VAULT_STORE_NAME, id);
+  const db = await dbPromise;
+  return db.get(ENCRYPTED_TOKENS_STORE_NAME, id);
 };
 
 export const getAllEncryptedTokenIds = async (): Promise<string[]> => {
     const db = await dbPromise;
-    const allKeys = await db.getAllKeys(VAULT_STORE_NAME);
-    // Filter out internal vault data like the salt
-    return allKeys.filter(key => key !== 'pbkdf2-salt');
-}
-
-export const clearVault = async (): Promise<void> => {
-    const db = await dbPromise;
-    await db.clear(VAULT_STORE_NAME);
+    return db.getAllKeys(ENCRYPTED_TOKENS_STORE_NAME);
 };
+
 
 // --- Global Actions ---
 export const clearAllData = async (): Promise<void> => {
-    await clearAllFiles();
-    await clearVault();
+    const db = await dbPromise;
+    await db.clear(FILES_STORE_NAME);
+    await db.clear(VAULT_STORE_NAME);
+    await db.clear(ENCRYPTED_TOKENS_STORE_NAME);
 }

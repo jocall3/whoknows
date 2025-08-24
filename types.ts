@@ -1,15 +1,16 @@
 import type React from 'react';
-import { CHROME_VIEW_IDS } from './constants.ts';
+import { CHROME_VIEW_IDS, FEATURE_CATEGORIES } from './constants.ts';
 
 export type ChromeViewType = typeof CHROME_VIEW_IDS[number];
 export type FeatureId = string;
+export type FeatureCategory = typeof FEATURE_CATEGORIES[number];
 
 export interface Feature {
   id: FeatureId;
   name: string;
   description: string;
   icon: React.ReactNode;
-  category: string;
+  category: FeatureCategory;
   component: React.FC<any>;
   aiConfig?: {
     model: string;
@@ -40,7 +41,15 @@ export interface StructuredPrSummary {
     changes: string[];
 }
 
-export interface User {
+export interface AppUser {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  photoURL: string | null;
+  tier: 'free' | 'pro';
+}
+
+export interface GitHubUser {
   login: string;
   id: number;
   avatar_url: string;
@@ -72,9 +81,17 @@ export interface ColorTheme {
     surface: string;
     textPrimary: string;
     textSecondary: string;
+    textOnPrimary: string;
+    border: string;
+}
+
+export interface ThemeState {
+    mode: Theme;
+    customColors: ColorTheme | null;
 }
 
 export interface SemanticColorTheme {
+    mode: 'light' | 'dark';
     palette: {
         primary: { value: string; name: string; };
         secondary: { value: string; name: string; };
@@ -86,11 +103,14 @@ export interface SemanticColorTheme {
         surface: { value: string; name: string; };
         textPrimary: { value: string; name: string; };
         textSecondary: { value: string; name: string; };
+        textOnPrimary: { value: string; name: string; };
+        border: { value: string; name: string; };
     };
     accessibility: {
         primaryOnSurface: { ratio: number; score: string; };
-        textPrimaryOnSurface: { ratio: number; score: string; };
+        textPrimaryOnSurface: { ratio: number; score:string; };
         textSecondaryOnSurface: { ratio: number; score: string; };
+        textOnPrimaryOnPrimary: { ratio: number; score: string; };
     };
 }
 
@@ -103,14 +123,31 @@ export interface Repo {
   description: string | null;
 }
 
-// --- New Vault Types ---
-export interface VaultState {
-    isInitialized: boolean;
-    isUnlocked: boolean;
+// --- Code Review Types ---
+export interface StructuredReviewSuggestion {
+    suggestion: string;
+    codeBlock: string;
+    explanation: string;
 }
 
+export interface StructuredReview {
+    summary: string;
+    suggestions: StructuredReviewSuggestion[];
+}
+
+// --- AI Personality Forge Types ---
+export interface SystemPrompt {
+  id: string;
+  name: string;
+  persona: string;
+  rules: string[];
+  outputFormat: 'json' | 'markdown' | 'text';
+  exampleIO: { input: string; output: string }[];
+}
+
+// --- Vault Types ---
 export interface EncryptedData {
-    id: string; // e.g., 'github_pat'
+    id: string;
     ciphertext: ArrayBuffer;
     iv: Uint8Array;
 }

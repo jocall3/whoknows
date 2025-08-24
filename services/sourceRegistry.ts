@@ -20,11 +20,7 @@ export const sourceFiles: Record<string, string> = {
     "idb": "https://esm.sh/idb@8.0.0",
     "react-colorful": "https://esm.sh/react-colorful@5.6.1",
     "octokit": "https://esm.sh/octokit@4.0.2",
-    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
-    "react/": "https://esm.sh/react@^19.1.1/",
-    "path": "https://esm.sh/path@^0.12.7",
-    "vite": "https://esm.sh/vite@^7.1.2",
-    "url": "https://esm.sh/url@^0.11.4"
+    "axe-core": "https://esm.sh/axe-core@4.9.1"
   }
 }
 </script>
@@ -70,9 +66,10 @@ root.render(
 import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { useGlobalState } from './contexts/GlobalStateContext.tsx';
-import { logEvent, initializeOctokit, validateToken } from './services/index.ts';
+import { logEvent } from './services/telemetryService.ts';
+import * as vaultService from './services/vaultService.ts';
 import { ALL_FEATURES, FEATURES_MAP } from './components/features/index.ts';
-import type { ViewType, FeatureId, SidebarItem } from './types.ts';
+import type { ViewType, SidebarItem } from './types.ts';
 import { ActionManager } from './components/ActionManager.tsx';
 import { LeftSidebar } from './components/LeftSidebar.tsx';
 import { StatusBar } from './components/StatusBar.tsx';
@@ -82,6 +79,7 @@ import { Cog6ToothIcon, HomeIcon, FolderIcon, LinkIcon } from './components/icon
 import { AiCommandCenter } from './components/features/AiCommandCenter.tsx';
 import { ProjectExplorer } from './components/features/ProjectExplorer.tsx';
 import { Connections } from './components/features/Connections.tsx';
+import { VaultProvider } from './components/vault/VaultProvider.tsx';
 
 
 export const LoadingIndicator: React.FC = () => (
@@ -129,100 +127,59 @@ const LocalStorageConsentModal: React.FC<LocalStorageConsentModalProps> = ({ onA
   );
 };
 
-const App: React.FC = () => {
-  const { state, dispatch } = useGlobalState();
-  const { activeView, viewProps, hiddenFeatures, githubToken } = state;
-  const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const [showConsentModal, setShowConsentModal] = useState(false);
-
-  useEffect(() => {
-    try {
-        const consent = localStorage.getItem('devcore_ls_consent');
-        if (!consent) {
-            setShowConsentModal(true);
-        }
-    } catch (e) {
-        console.warn("Could not access localStorage.", e);
-    }
-  }, []);
-
-   useEffect(() => {
-    // On initial load, try to validate the token from local storage
-    if(githubToken) {
-        validateToken(githubToken)
-            .then(user => {
-                initializeOctokit(githubToken);
-                dispatch({ type: 'SET_GITHUB_TOKEN', payload: { token: githubToken, user } });
-            })
-            .catch(() => {
-                // Token is invalid, clear it
-                dispatch({ type: 'SET_GITHUB_TOKEN', payload: { token: null, user: null } });
-            });
-    }
-  }, []); // Run only once on mount
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            setCommandPaletteOpen(isOpen => !isOpen);
-        }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const handleAcceptConsent = () => {
-    try {
-        localStorage.setItem('devcore_ls_consent', 'granted');
-        window.location.reload();
-    } catch (e) {
-        console.error("Could not write to localStorage.", e);
-        setShowConsentModal(false);
-    }
-  };
-
-  const handleDeclineConsent = () => {
-    try {
-        localStorage.setItem('devcore_ls_consent', 'denied');
-    } catch (e) {
-        console.error("Could not write to localStorage.", e);
-    }
-    setShowConsentModal(false);
-  };
-
-  const handleViewChange = useCallback((view: ViewType, props: any = {}) => {
-    dispatch({ type: 'SET_VIEW', payload: { view, props } });
-    logEvent('view_changed', { view });
-    setCommandPaletteOpen(false);
-  }, [dispatch]);
-
-  const sidebarItems: SidebarItem[] = useMemo(() => [
-    { id: 'ai-command-center', label: 'Command Center', icon: <HomeIcon />, view: 'ai-command-center' },
-    { id: 'project-explorer', label: 'Project Explorer', icon: <FolderIcon />, view: 'project-explorer' },
-    ...ALL_FEATURES
-        .filter(feature => !hiddenFeatures.includes(feature.id) && !['ai-command-center', 'project-explorer', 'connections'].includes(feature.id))
-        .map(feature => ({
-            id: feature.id,
-            label: feature.name,
-            icon: feature.icon,
-            view: feature.id as ViewType,
-        })),
-    { id: 'connections', label: 'Connections', icon: <LinkIcon />, view: 'connections' },
-    { id: 'settings', label: 'Settings', icon: <Cog6ToothIcon />, view: 'settings' },
-  ], [hiddenFeatures]);
-
-  const ActiveComponent = useMemo(() => {
-      if (activeView === 'settings') return SettingsView;
-      if (activeView === 'project-explorer') return ProjectExplorer;
-      if (activeView === 'connections') return Connections;
-      // Fallback to command center if no view is matched.
-      return FEATURES_MAP.get(activeView as string)?.component ?? AiCommandCenter;
-  }, [activeView]);
+const AppContent: React.FC = () => {
+    const { state, dispatch } = useGlobalState();
+    const { activeView, viewProps, hiddenFeatures } = state;
+    const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
   
-  return (
-    <div className="h-screen w-screen font-sans overflow-hidden bg-background">
-        {showConsentModal && <LocalStorageConsentModal onAccept={handleAcceptConsent} onDecline={handleDeclineConsent} />}
+    useEffect(() => {
+        const checkVault = async () => {
+            const isInitialized = await vaultService.isVaultInitialized();
+            dispatch({ type: 'SET_VAULT_STATE', payload: { isInitialized } });
+        };
+        checkVault();
+    }, [dispatch]);
+
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+              e.preventDefault();
+              setCommandPaletteOpen(isOpen => !isOpen);
+          }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+  
+    const handleViewChange = useCallback((view: ViewType, props: any = {}) => {
+      dispatch({ type: 'SET_VIEW', payload: { view, props } });
+      logEvent('view_changed', { view });
+      setCommandPaletteOpen(false);
+    }, [dispatch]);
+  
+    const sidebarItems: SidebarItem[] = useMemo(() => [
+      { id: 'ai-command-center', label: 'Command Center', icon: <HomeIcon />, view: 'ai-command-center' },
+      { id: 'project-explorer', label: 'Project Explorer', icon: <FolderIcon />, view: 'project-explorer' },
+      ...ALL_FEATURES
+          .filter(feature => !hiddenFeatures.includes(feature.id) && !['ai-command-center', 'project-explorer', 'connections'].includes(feature.id))
+          .map(feature => ({
+              id: feature.id,
+              label: feature.name,
+              icon: feature.icon,
+              view: feature.id as ViewType,
+          })),
+      { id: 'connections', label: 'Security Vault', icon: <LinkIcon />, view: 'connections' },
+      { id: 'settings', label: 'Settings', icon: <Cog6ToothIcon />, view: 'settings' },
+    ], [hiddenFeatures]);
+  
+    const ActiveComponent = useMemo(() => {
+        if (activeView === 'settings') return SettingsView;
+        if (activeView === 'project-explorer') return ProjectExplorer;
+        if (activeView === 'connections') return Connections;
+        return FEATURES_MAP.get(activeView as string)?.component ?? AiCommandCenter;
+    }, [activeView]);
+    
+    return (
         <div className="relative flex h-full w-full">
             <LeftSidebar items={sidebarItems} activeView={state.activeView} onNavigate={handleViewChange} />
             <div className="flex-1 flex min-w-0">
@@ -242,8 +199,51 @@ const App: React.FC = () => {
             </div>
             <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} onSelect={handleViewChange} />
         </div>
-    </div>
-  );
+    )
+}
+
+
+const App: React.FC = () => {
+    const [showConsentModal, setShowConsentModal] = useState(false);
+
+    useEffect(() => {
+      try {
+          const consent = localStorage.getItem('devcore_ls_consent');
+          if (!consent) {
+              setShowConsentModal(true);
+          }
+      } catch (e) {
+          console.warn("Could not access localStorage.", e);
+      }
+    }, []);
+  
+    const handleAcceptConsent = () => {
+      try {
+          localStorage.setItem('devcore_ls_consent', 'granted');
+          window.location.reload();
+      } catch (e) {
+          console.error("Could not write to localStorage.", e);
+          setShowConsentModal(false);
+      }
+    };
+  
+    const handleDeclineConsent = () => {
+      try {
+          localStorage.setItem('devcore_ls_consent', 'denied');
+      } catch (e) {
+          console.error("Could not write to localStorage.", e);
+      }
+      setShowConsentModal(false);
+    };
+
+    return (
+        <div className="h-screen w-screen font-sans overflow-hidden bg-background">
+            <VaultProvider>
+                {showConsentModal && <LocalStorageConsentModal onAccept={handleAcceptConsent} onDecline={handleDeclineConsent} />}
+                <AppContent />
+            </VaultProvider>
+        </div>
+    );
 };
 
 export default App;

@@ -84,7 +84,7 @@ export const commitFiles = async (
     octokit: Octokit,
     owner: string,
     repo: string,
-    files: { filePath: string; content: string }[],
+    files: { path: string; content: string }[],
     message: string,
     branch: string = 'main'
 ): Promise<string> => {
@@ -117,7 +117,7 @@ export const commitFiles = async (
             const blobs = await Promise.all(blobPromises);
             
             const tree = blobs.map((blob, index) => ({
-                path: files[index].filePath,
+                path: files[index].path,
                 mode: '100644' as const,
                 type: 'blob' as const,
                 sha: blob.data.sha,

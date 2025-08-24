@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ViewType, SidebarItem } from '../types.ts';
 import { useGlobalState } from '../contexts/GlobalStateContext.tsx';
+import { signOutUser } from '../services/firebaseService.ts';
 import { ArrowLeftOnRectangleIcon } from './icons.tsx';
 
 interface LeftSidebarProps {
@@ -21,11 +22,17 @@ const Tooltip: React.FC<{ text: string, children: React.ReactNode }> = ({ text, 
 };
 
 export const LeftSidebar: React.FC<LeftSidebarProps> = ({ items, activeView, onNavigate }) => {
-    const { state, dispatch } = useGlobalState();
-    const { github: githubUser } = state.connections;
+    const { state } = useGlobalState();
+    const { user, githubUser } = state;
 
-    const handleLogout = () => {
-        dispatch({ type: 'LOGOUT_GITHUB' });
+    const handleLogout = async () => {
+        try {
+            await signOutUser();
+            // Global state will be updated by the onAuthStateChanged listener
+        } catch (error) {
+            console.error("Failed to sign out:", error);
+            alert("Failed to sign out. Please try again.");
+        }
     };
 
   return (
@@ -60,12 +67,12 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({ items, activeView, onN
         })}
       </div>
       <div className="mt-auto flex-shrink-0 flex flex-col items-center gap-2">
-         {githubUser && (
-            <Tooltip text={githubUser.name || githubUser.login}>
-                 <img src={githubUser.avatar_url} alt={githubUser.login} className="w-10 h-10 rounded-full border-2 border-border" />
+         {user && (
+            <Tooltip text={user.displayName || 'User'}>
+                 <img src={user.photoURL || undefined} alt={user.displayName || 'User'} className="w-10 h-10 rounded-full border-2 border-border" />
             </Tooltip>
          )}
-         {githubUser && (
+         {user && (
             <Tooltip text="Logout">
                 <button
                 onClick={handleLogout}

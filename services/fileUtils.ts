@@ -81,3 +81,24 @@ export const downloadFile = (content: string, filename: string, mimeType: string
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 };
+
+/**
+ * Generates and triggers a download for a .env formatted file.
+ * @param env A record of key-value pairs for the environment variables.
+ */
+export const downloadEnvFile = (env: Record<string, string>): void => {
+    const content = Object.entries(env)
+        .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+        .join('\n');
+    downloadFile(content, '.env', 'text/plain');
+};
+
+/**
+ * Generates and triggers a download for a JSON file.
+ * @param data The JavaScript object to stringify and download.
+ * @param filename The name of the file.
+ */
+export const downloadJson = (data: object, filename: string): void => {
+    const content = JSON.stringify(data, null, 2);
+    downloadFile(content, filename, 'application/json');
+};

@@ -1,46 +1,45 @@
-
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
-import type { ViewType, User, FileNode, Theme, VaultState } from '../types.ts';
+import type { ViewType, AppUser, GitHubUser, FileNode } from '../types.ts';
+import { onFirebaseAuthChanged } from '../services/firebaseService.ts';
 
 // State shape
 interface GlobalState {
   activeView: ViewType;
   viewProps: any;
-  theme: Theme;
   hiddenFeatures: string[];
-  vaultState: VaultState;
-  connections: {
-      github: User | null;
-  };
+  user: AppUser | null;
+  githubUser: GitHubUser | null;
   projectFiles: FileNode | null;
   selectedRepo: { owner: string; repo: string } | null;
+  vaultState: {
+    isInitialized: boolean;
+    isUnlocked: boolean;
+  };
 }
 
 // Action types
 type Action =
   | { type: 'SET_VIEW'; payload: { view: ViewType, props?: any } }
   | { type: 'TOGGLE_FEATURE_VISIBILITY'; payload: { featureId: string } }
-  | { type: 'SET_VAULT_STATE', payload: Partial<VaultState> }
-  | { type: 'SET_GITHUB_CONNECTION', payload: User | null }
+  | { type: 'SET_APP_USER', payload: AppUser | null }
+  | { type: 'SET_GITHUB_USER', payload: GitHubUser | null }
   | { type: 'LOAD_PROJECT_FILES'; payload: FileNode | null }
   | { type: 'SET_SELECTED_REPO'; payload: { owner: string; repo: string } | null }
-  | { type: 'LOGOUT_GITHUB' };
+  | { type: 'SET_VAULT_STATE'; payload: Partial<{ isInitialized: boolean, isUnlocked: boolean }> };
 
 
 const initialState: GlobalState = {
   activeView: 'ai-command-center',
   viewProps: {},
-  theme: 'light',
   hiddenFeatures: [],
+  user: null,
+  githubUser: null,
+  projectFiles: null,
+  selectedRepo: null,
   vaultState: {
     isInitialized: false,
     isUnlocked: false,
   },
-  connections: {
-      github: null,
-  },
-  projectFiles: null,
-  selectedRepo: null,
 };
 
 const reducer = (state: GlobalState, action: Action): GlobalState => {
@@ -55,31 +54,34 @@ const reducer = (state: GlobalState, action: Action): GlobalState => {
             : [...state.hiddenFeatures, featureId];
         return { ...state, hiddenFeatures: newHiddenFeatures };
     }
-    case 'SET_VAULT_STATE':
+    case 'SET_APP_USER':
+        if (action.payload === null) { // User logged out
+            return {
+                ...state,
+                user: null,
+                githubUser: null,
+                selectedRepo: null,
+                projectFiles: null,
+            }
+        }
+        return { ...state, user: action.payload };
+    case 'SET_GITHUB_USER':
         return {
             ...state,
-            vaultState: { ...state.vaultState, ...action.payload }
-        };
-    case 'SET_GITHUB_CONNECTION': {
-        return {
-            ...state,
-            connections: { ...state.connections, github: action.payload },
-            // Reset repo-specific data if disconnected
+            githubUser: action.payload,
+             // Reset repo-specific data if disconnected
             selectedRepo: action.payload ? state.selectedRepo : null,
             projectFiles: action.payload ? state.projectFiles : null,
-        };
-    }
-    case 'LOGOUT_GITHUB':
-        return {
-            ...state,
-            connections: { ...state.connections, github: null },
-            selectedRepo: null,
-            projectFiles: null,
-        };
+        }
     case 'LOAD_PROJECT_FILES':
       return { ...state, projectFiles: action.payload };
     case 'SET_SELECTED_REPO':
       return { ...state, selectedRepo: action.payload, projectFiles: null }; // Reset files on repo change
+    case 'SET_VAULT_STATE':
+        return {
+            ...state,
+            vaultState: { ...state.vaultState, ...action.payload },
+        };
     default:
       return state;
   }
@@ -118,6 +120,7 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
             // Hydrate state from local storage
             if (storedState.selectedRepo) hydratedState.selectedRepo = storedState.selectedRepo;
             if (storedState.activeView) hydratedState.activeView = storedState.activeView;
+            if (storedState.viewProps) hydratedState.viewProps = storedState.viewProps;
             if (storedState.hiddenFeatures) hydratedState.hiddenFeatures = storedState.hiddenFeatures;
             
             return hydratedState;
@@ -128,6 +131,13 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
 
     useEffect(() => {
+        const unsubscribe = onFirebaseAuthChanged((user) => {
+            dispatch({ type: 'SET_APP_USER', payload: user });
+        });
+        return () => unsubscribe();
+    }, []);
+
+    useEffect(() => {
         if (!canPersist) return;
 
         const handler = setTimeout(() => {
@@ -135,6 +145,7 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 const stateToSave = { 
                     selectedRepo: state.selectedRepo,
                     activeView: state.activeView,
+                    viewProps: state.viewProps,
                     hiddenFeatures: state.hiddenFeatures,
                 };
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));

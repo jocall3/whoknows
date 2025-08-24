@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { reviewCodeStream } from '../../services/index.ts';
+import { useAiPersonalities } from '../../hooks/useAiPersonalities.ts';
+import { formatSystemPromptToString } from '../../utils/promptUtils.ts';
 import { CpuChipIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { MarkdownRenderer } from '../shared/index.tsx';
@@ -21,6 +23,8 @@ export const CodeReviewBot: React.FC = () => {
     const [review, setReview] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
+    const [personalities] = useAiPersonalities();
+    const [selectedPersonalityId, setSelectedPersonalityId] = useState<string>('default');
 
     const handleGenerate = useCallback(async () => {
         if (!code.trim()) {
@@ -30,8 +34,17 @@ export const CodeReviewBot: React.FC = () => {
         setIsLoading(true);
         setError('');
         setReview('');
+
+        let systemInstruction: string | undefined = undefined;
+        if (selectedPersonalityId !== 'default') {
+            const personality = personalities.find(p => p.id === selectedPersonalityId);
+            if (personality) {
+                systemInstruction = formatSystemPromptToString(personality);
+            }
+        }
+
         try {
-            const stream = reviewCodeStream(code);
+            const stream = reviewCodeStream(code, systemInstruction);
             let fullResponse = '';
             for await (const chunk of stream) {
                 fullResponse += chunk;
@@ -43,7 +56,7 @@ export const CodeReviewBot: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [code]);
+    }, [code, selectedPersonalityId, personalities]);
 
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
@@ -65,11 +78,25 @@ export const CodeReviewBot: React.FC = () => {
                         className="flex-grow p-4 bg-surface border border-border rounded-md resize-none font-mono text-sm"
                     />
                 </div>
-                 <div className="flex-shrink-0">
+                 <div className="flex-shrink-0 flex items-center justify-center gap-4">
+                     <div className="w-full max-w-xs">
+                        <label htmlFor="personality-select" className="text-sm font-medium text-text-secondary">Reviewer Personality</label>
+                        <select
+                            id="personality-select"
+                            value={selectedPersonalityId}
+                            onChange={e => setSelectedPersonalityId(e.target.value)}
+                            className="w-full mt-1 p-2 bg-surface border border-border rounded-md text-sm"
+                        >
+                            <option value="default">Default</option>
+                            {personalities.map(p => (
+                                <option key={p.id} value={p.id}>{p.name}</option>
+                            ))}
+                        </select>
+                     </div>
                     <button
                         onClick={handleGenerate}
                         disabled={isLoading}
-                        className="btn-primary w-full max-w-xs mx-auto flex items-center justify-center px-6 py-3"
+                        className="btn-primary self-end h-[42px] w-full max-w-xs flex items-center justify-center px-6 py-3"
                     >
                         {isLoading ? <LoadingSpinner /> : 'Request Review'}
                     </button>

@@ -3,7 +3,6 @@ import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'reac
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { useGlobalState } from './contexts/GlobalStateContext.tsx';
 import { logEvent } from './services/telemetryService.ts';
-import * as vaultService from './services/vaultService.ts';
 import { ALL_FEATURES, FEATURES_MAP } from './components/features/index.ts';
 import type { ViewType, SidebarItem } from './types.ts';
 import { ActionManager } from './components/ActionManager.tsx';
@@ -15,7 +14,8 @@ import { Cog6ToothIcon, HomeIcon, FolderIcon, LinkIcon } from './components/icon
 import { AiCommandCenter } from './components/features/AiCommandCenter.tsx';
 import { ProjectExplorer } from './components/features/ProjectExplorer.tsx';
 import { Connections } from './components/features/Connections.tsx';
-import { VaultProvider } from './components/vault/VaultProvider.tsx';
+import { NotificationProvider } from './contexts/NotificationContext.tsx';
+import { useTheme } from './hooks/useTheme.ts';
 
 
 export const LoadingIndicator: React.FC = () => (
@@ -47,7 +47,7 @@ const LocalStorageConsentModal: React.FC<LocalStorageConsentModalProps> = ({ onA
         <div className="flex justify-center gap-4">
           <button
             onClick={onDecline}
-            className="px-6 py-2 bg-surface border border-border text-text-primary font-bold rounded-md hover:bg-gray-100 transition-colors"
+            className="px-6 py-2 bg-surface border border-border text-text-primary font-bold rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
           >
             Decline
           </button>
@@ -68,14 +68,6 @@ const AppContent: React.FC = () => {
     const { activeView, viewProps, hiddenFeatures } = state;
     const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
   
-    useEffect(() => {
-        const checkVault = async () => {
-            const isInitialized = await vaultService.isVaultInitialized();
-            dispatch({ type: 'SET_VAULT_STATE', payload: { isInitialized } });
-        };
-        checkVault();
-    }, [dispatch]);
-
     useEffect(() => {
       const handleKeyDown = (e: KeyboardEvent) => {
           if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -104,7 +96,7 @@ const AppContent: React.FC = () => {
               icon: feature.icon,
               view: feature.id as ViewType,
           })),
-      { id: 'connections', label: 'Security Vault', icon: <LinkIcon />, view: 'connections' },
+      { id: 'connections', label: 'Connections', icon: <LinkIcon />, view: 'connections' },
       { id: 'settings', label: 'Settings', icon: <Cog6ToothIcon />, view: 'settings' },
     ], [hiddenFeatures]);
   
@@ -120,7 +112,7 @@ const AppContent: React.FC = () => {
             <LeftSidebar items={sidebarItems} activeView={state.activeView} onNavigate={handleViewChange} />
             <div className="flex-1 flex min-w-0">
                 <div className="flex-1 flex flex-col min-w-0">
-                    <main className="relative flex-1 min-w-0 bg-surface/50 overflow-y-auto">
+                    <main className="relative flex-1 min-w-0 bg-surface/50 dark:bg-slate-900/50 overflow-y-auto">
                         <ErrorBoundary>
                             <Suspense fallback={<LoadingIndicator />}>
                                 <div key={activeView} className="fade-in w-full h-full">
@@ -141,6 +133,7 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
     const [showConsentModal, setShowConsentModal] = useState(false);
+    useTheme(); // Initialize theme hook
 
     useEffect(() => {
       try {
@@ -174,10 +167,10 @@ const App: React.FC = () => {
 
     return (
         <div className="h-screen w-screen font-sans overflow-hidden bg-background">
-            <VaultProvider>
+            <NotificationProvider>
                 {showConsentModal && <LocalStorageConsentModal onAccept={handleAcceptConsent} onDecline={handleDeclineConsent} />}
                 <AppContent />
-            </VaultProvider>
+            </NotificationProvider>
         </div>
     );
 };

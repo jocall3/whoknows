@@ -6,7 +6,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import { GlobalStateProvider } from './contexts/GlobalStateContext.tsx';
-import { VaultProvider } from './components/vault/VaultProvider.tsx';
 import './index.css';
 
 const rootElement = document.getElementById('root');

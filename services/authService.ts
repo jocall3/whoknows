@@ -1,5 +1,5 @@
 import { Octokit } from 'octokit';
-import type { User } from '../types.ts';
+import type { GitHubUser as User } from '../types.ts';
 import { logEvent } from './telemetryService.ts';
 
 /**
