@@ -7,7 +7,7 @@ export default {
     "./index.html",
     "./App.tsx",
     "./index.tsx",
-    "./constants.ts",
+    "./constants.tsx",
     "./types.ts",
     "./components/**/*.{js,ts,jsx,tsx}",
     "./contexts/**/*.{js,ts,jsx,tsx}",

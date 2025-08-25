@@ -1,5 +1,5 @@
 import type React from 'react';
-import { CHROME_VIEW_IDS, FEATURE_CATEGORIES } from './constants.ts';
+import { CHROME_VIEW_IDS, FEATURE_CATEGORIES } from './constants.tsx';
 
 export type ChromeViewType = typeof CHROME_VIEW_IDS[number];
 export type FeatureId = string;

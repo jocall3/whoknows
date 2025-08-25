@@ -1,21 +1,18 @@
 
-
 import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { useGlobalState } from './contexts/GlobalStateContext.tsx';
-import { logEvent } from './services/telemetryService.ts';
-import { ALL_FEATURES, FEATURES_MAP } from './components/features/index.ts';
-import type { ViewType, SidebarItem } from './types.ts';
-import { ActionManager } from './components/ActionManager.tsx';
-import { LeftSidebar } from './components/LeftSidebar.tsx';
-import { StatusBar } from './components/StatusBar.tsx';
+import type { ViewType, AppUser, Feature } from './types.ts';
 import { CommandPalette } from './components/CommandPalette.tsx';
-import { SettingsView } from './components/SettingsView.tsx';
-import { Cog6ToothIcon, HomeIcon, FolderIcon, RectangleGroupIcon } from './components/icons.tsx';
-import { AiCommandCenter } from './components/features/AiCommandCenter.tsx';
 import { NotificationProvider } from './contexts/NotificationContext.tsx';
 import { useTheme } from './hooks/useTheme.ts';
 import { VaultProvider } from './components/vault/VaultProvider.tsx';
+import { initGoogleAuth } from './services/googleAuthService.ts';
+
+import { Window } from './components/desktop/Window.tsx';
+import { FeatureDock } from './components/desktop/FeatureDock.tsx';
+import { Taskbar } from './components/desktop/Taskbar.tsx';
+import { FEATURES_MAP } from './components/features/index.ts';
 
 
 export const LoadingIndicator: React.FC = () => (
@@ -63,77 +60,143 @@ const LocalStorageConsentModal: React.FC<LocalStorageConsentModalProps> = ({ onA
   );
 };
 
+interface WindowState {
+  id: string;
+  props?: any;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  zIndex: number;
+  isMinimized: boolean;
+}
+
+const Z_INDEX_BASE = 10;
+
+
 const AppContent: React.FC = () => {
-    const { state, dispatch } = useGlobalState();
-    const { activeView, viewProps, hiddenFeatures } = state;
     const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+    const [windows, setWindows] = useState<Record<string, WindowState>>({});
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const [nextZIndex, setNextZIndex] = useState(Z_INDEX_BASE);
   
     useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-              e.preventDefault();
-              setCommandPaletteOpen(isOpen => !isOpen);
-          }
-      };
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setCommandPaletteOpen(isOpen => !isOpen);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
-  
-    const handleViewChange = useCallback((view: ViewType, props: any = {}) => {
-      dispatch({ type: 'SET_VIEW', payload: { view, props } });
-      logEvent('view_changed', { view });
-      setCommandPaletteOpen(false);
-    }, [dispatch]);
-  
-    const sidebarItems: SidebarItem[] = useMemo(() => {
-        const coreFeatures = ['ai-command-center', 'project-explorer', 'workspace-connector-hub'];
-        return [
-            { id: 'ai-command-center', label: 'Command Center', icon: <HomeIcon />, view: 'ai-command-center' },
-            { id: 'project-explorer', label: 'Project Explorer', icon: <FolderIcon />, view: 'project-explorer' },
-            { id: 'workspace-connector-hub', label: 'Workspace Hub', icon: <RectangleGroupIcon />, view: 'workspace-connector-hub' },
-            ...ALL_FEATURES
-                .filter(feature => !hiddenFeatures.includes(feature.id) && !coreFeatures.includes(feature.id))
-                .map(feature => ({
-                    id: feature.id,
-                    label: feature.name,
-                    icon: feature.icon,
-                    view: feature.id as ViewType,
-                })),
-            { id: 'settings', label: 'Settings', icon: <Cog6ToothIcon />, view: 'settings' },
-        ];
-    }, [hiddenFeatures]);
-  
-    const ActiveComponent = useMemo(() => {
-        if (activeView === 'settings') return SettingsView;
-        return FEATURES_MAP.get(activeView as string)?.component ?? AiCommandCenter;
-    }, [activeView]);
+
+    const openWindow = useCallback((featureId: ViewType, props: any = {}) => {
+        const newZIndex = nextZIndex + 1;
+        setNextZIndex(newZIndex);
+        setActiveId(featureId);
+        setCommandPaletteOpen(false);
+
+        setWindows(prev => {
+            const existingWindow = prev[featureId];
+            if (existingWindow) {
+                return {
+                    ...prev,
+                    [featureId]: {
+                        ...existingWindow,
+                        props: { ...existingWindow.props, ...props },
+                        isMinimized: false,
+                        zIndex: newZIndex,
+                    }
+                };
+            }
+
+            const openWindowsCount = Object.values(prev).filter(w => !w.isMinimized).length;
+            const newWindow: WindowState = {
+                id: featureId,
+                props,
+                position: { x: 100 + openWindowsCount * 30, y: 100 + openWindowsCount * 30 },
+                size: { width: 800, height: 600 },
+                zIndex: newZIndex,
+                isMinimized: false,
+            };
+            return { ...prev, [featureId]: newWindow };
+        });
+    }, [nextZIndex]);
     
+    const closeWindow = (id: string) => {
+        setWindows(prev => {
+            const newState = { ...prev };
+            delete newState[id];
+            return newState;
+        });
+    };
+
+    const minimizeWindow = (id: string) => {
+        setWindows(prev => ({
+            ...prev,
+            [id]: { ...prev[id], isMinimized: true }
+        }));
+        setActiveId(null);
+    };
+
+    const focusWindow = (id: string) => {
+        if (id === activeId && windows[id]?.zIndex === nextZIndex) return;
+        const newZIndex = nextZIndex + 1;
+        setNextZIndex(newZIndex);
+        setActiveId(id);
+        setWindows(prev => ({
+            ...prev,
+            [id]: { ...prev[id], zIndex: newZIndex, isMinimized: false }
+        }));
+    };
+    
+    const updateWindowState = (id: string, updates: Partial<WindowState>) => {
+        setWindows(prev => ({
+            ...prev,
+            [id]: { ...prev[id], ...updates }
+        }));
+    };
+    
+    const openWindows = Object.values(windows).filter(w => !w.isMinimized);
+    const minimizedWindows = Object.values(windows).filter(w => w.isMinimized);
+
     return (
-        <div className="relative flex h-full w-full">
-            <LeftSidebar items={sidebarItems} activeView={state.activeView} onNavigate={handleViewChange} />
-            <div className="flex-1 flex min-w-0">
-                <div className="flex-1 flex flex-col min-w-0">
-                    <main className="relative flex-1 min-w-0 bg-surface/50 dark:bg-slate-900/50 overflow-y-auto">
-                        <ErrorBoundary>
-                            <Suspense fallback={<LoadingIndicator />}>
-                                <div key={activeView} className="fade-in w-full h-full">
-                                    <ActiveComponent {...viewProps} />
-                                </div>
+        <div className="h-full w-full relative overflow-hidden bg-cover bg-center" style={{backgroundImage: 'url(https://source.unsplash.com/random/1920x1080?abstract)'}}>
+            <ErrorBoundary>
+                <FeatureDock onOpen={openWindow} />
+                <main className="w-full h-full">
+                    {openWindows.map(win => {
+                        const feature = FEATURES_MAP.get(win.id);
+                        if (!feature) return null;
+                        return (
+                            <Suspense key={win.id} fallback={<div />}>
+                                <Window
+                                    feature={feature}
+                                    state={win}
+                                    isActive={win.id === activeId}
+                                    onClose={closeWindow}
+                                    onMinimize={minimizeWindow}
+                                    onFocus={focusWindow}
+                                    onUpdate={updateWindowState}
+                                />
                             </Suspense>
-                        </ErrorBoundary>
-                        <ActionManager />
-                    </main>
-                    <StatusBar bgImageStatus="loaded" />
-                </div>
-            </div>
-            <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} onSelect={handleViewChange} />
+                        );
+                    })}
+                </main>
+                <Taskbar
+                    minimizedWindows={minimizedWindows.map(w => FEATURES_MAP.get(w.id)).filter(Boolean) as Feature[]}
+                    onRestore={focusWindow}
+                />
+                <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} onSelect={openWindow} />
+            </ErrorBoundary>
         </div>
-    )
-}
+    );
+};
 
 
 const App: React.FC = () => {
     const [showConsentModal, setShowConsentModal] = useState(false);
+    const { dispatch } = useGlobalState();
     useTheme(); // Initialize theme hook
 
     useEffect(() => {
@@ -146,6 +209,26 @@ const App: React.FC = () => {
           console.warn("Could not access localStorage.", e);
       }
     }, []);
+
+    useEffect(() => {
+        const handleUserChanged = (user: AppUser | null) => {
+            dispatch({ type: 'SET_APP_USER', payload: user });
+        };
+
+        const init = () => {
+            if (window.google) {
+                initGoogleAuth(handleUserChanged);
+            }
+        };
+
+        const gsiScript = document.getElementById('gsi-client');
+        if (window.google) {
+            init();
+        } else if (gsiScript) {
+            gsiScript.addEventListener('load', init);
+            return () => gsiScript.removeEventListener('load', init);
+        }
+    }, [dispatch]);
   
     const handleAcceptConsent = () => {
       try {

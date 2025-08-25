@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ViewType, SidebarItem } from '../types.ts';
 import { useGlobalState } from '../contexts/GlobalStateContext.tsx';
-import { signOutUser } from '../services/firebaseService.ts';
+import { signOutUser } from '../services/googleAuthService.ts';
 import { ArrowLeftOnRectangleIcon } from './icons.tsx';
 
 interface LeftSidebarProps {
@@ -22,13 +22,15 @@ const Tooltip: React.FC<{ text: string, children: React.ReactNode }> = ({ text, 
 };
 
 export const LeftSidebar: React.FC<LeftSidebarProps> = ({ items, activeView, onNavigate }) => {
-    const { state } = useGlobalState();
-    const { user, githubUser } = state;
+    const { state, dispatch } = useGlobalState();
+    const { user } = state;
 
-    const handleLogout = async () => {
+    const handleLogout = () => {
         try {
-            await signOutUser();
-            // Global state will be updated by the onAuthStateChanged listener
+            signOutUser();
+            // The user state will be updated via the callback in the auth service
+            // and an action is dispatched there, but for immediate UI feedback we can also dispatch here.
+            dispatch({ type: 'SET_APP_USER', payload: null });
         } catch (error) {
             console.error("Failed to sign out:", error);
             alert("Failed to sign out. Please try again.");

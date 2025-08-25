@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import * as vaultService from '../../services/vaultService.ts';
-import { LoadingSpinner } from '../shared/LoadingSpinner.tsx';
+import { LoadingSpinner } from '../shared/index.tsx';
 
 interface Props {
     onSuccess: () => void;

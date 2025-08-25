@@ -1,11 +1,15 @@
-import React, { Suspense, useRef, useState } from 'react';
+
+import React, { Suspense, useRef } from 'react';
 import type { Feature } from '../../types.ts';
-import { FEATURES_MAP } from '../features/index.ts';
 import { LoadingIndicator } from '../../App.tsx';
 import { MinimizeIcon, XMarkIcon } from '../icons.tsx';
+import { ALL_FEATURES } from '../features/index.ts';
+
+const featuresMap = new Map(ALL_FEATURES.map(f => [f.id, f]));
 
 interface WindowState {
   id: string;
+  props?: any;
   position: { x: number; y: number };
   size: { width: number; height: number };
   zIndex: number;
@@ -26,7 +30,7 @@ export const Window: React.FC<WindowProps> = ({ feature, state, isActive, onClos
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const initialPos = useRef<{ x: number; y: number } | null>(null);
   
-  const FeatureComponent = FEATURES_MAP.get(feature.id)?.component;
+  const FeatureComponent = featuresMap.get(feature.id)?.component;
 
   const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -53,13 +57,15 @@ export const Window: React.FC<WindowProps> = ({ feature, state, isActive, onClos
   
   return (
     <div
-      className={`absolute bg-slate-800/70 backdrop-blur-md border rounded-lg shadow-2xl shadow-black/50 flex flex-col transition-all duration-100 ${isActive ? 'border-cyan-500/50' : 'border-slate-700/50'}`}
+      className={`absolute bg-surface/70 backdrop-blur-md border rounded-lg shadow-2xl shadow-black/50 flex flex-col transition-all duration-100 ${isActive ? 'border-primary/50' : 'border-slate-700/50'}`}
       style={{
         left: state.position.x,
         top: state.position.y,
         width: state.size.width,
         height: state.size.height,
-        zIndex: state.zIndex
+        zIndex: state.zIndex,
+        minWidth: 400,
+        minHeight: 300,
       }}
       onMouseDown={() => onFocus(feature.id)}
     >
@@ -67,7 +73,7 @@ export const Window: React.FC<WindowProps> = ({ feature, state, isActive, onClos
         className={`flex items-center justify-between h-8 px-2 border-b ${isActive ? 'bg-slate-700/50 border-slate-600' : 'bg-slate-800/50 border-slate-700'} rounded-t-lg cursor-move`}
         onMouseDown={handleDragStart}
       >
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-2 text-xs text-text-primary">
            <div className="w-4 h-4">{feature.icon}</div>
            <span>{feature.name}</span>
         </div>
@@ -76,10 +82,10 @@ export const Window: React.FC<WindowProps> = ({ feature, state, isActive, onClos
           <button onClick={() => onClose(feature.id)} className="p-1 rounded hover:bg-red-500/50"><XMarkIcon className="w-4 h-4"/></button>
         </div>
       </header>
-      <main className="flex-1 overflow-auto bg-slate-800/50 rounded-b-lg">
+      <main className="flex-1 overflow-auto bg-transparent rounded-b-lg">
         {FeatureComponent ? (
           <Suspense fallback={<LoadingIndicator/>}>
-            <FeatureComponent />
+            <FeatureComponent {...state.props} />
           </Suspense>
         ) : (
             <div className="p-4 text-red-400">Error: Component not found for {feature.name}</div>

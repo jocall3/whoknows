@@ -1,6 +1,6 @@
 // services/googleApiService.ts
-const API_KEY = process.env.API_KEY;
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const API_KEY = process.env.GEMINI_API_KEY;
+const CLIENT_ID = "555179712981-36hlicm802genhfo9iq1ufnp1n8cikt9.apps.googleusercontent.com";
 
 declare global { interface Window { gapi: any; } }
 
@@ -28,10 +28,10 @@ export const ensureGapiClient = async (): Promise<boolean> => {
             apiKey: API_KEY,
             clientId: CLIENT_ID,
             discoveryDocs: [
-                "https://slides.googleapis.com/$discovery/rest?version=v1",
                 "https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest",
                 "https://docs.googleapis.com/$discovery/rest?version=v1",
-                "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"
+                "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
+                "https://iam.googleapis.com/$discovery/rest?version=v1"
             ],
         });
 

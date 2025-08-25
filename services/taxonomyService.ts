@@ -139,5 +139,19 @@ export const FEATURE_TAXONOMY: FeatureTaxonomy[] = [
         description: "Perform static analysis on code snippets to find common vulnerabilities and get AI-driven mitigation advice.",
         category: "Security",
         inputs: "A string containing a code snippet."
+    },
+    {
+        id: "gmail-addon-simulator",
+        name: "Gmail Add-on Simulator",
+        description: "A simulation of how this app could use contextual Gmail Add-on scopes to read the current email and compose replies with AI assistance.",
+        category: "Productivity",
+        inputs: "A mock email context. No user input required to launch the simulation."
+    },
+    {
+        id: "iam-policy-visualizer",
+        name: "GCP IAM Policy Visualizer",
+        description: "Visually test what a user can and cannot do across a set of Google Cloud resources.",
+        category: "Cloud",
+        inputs: "A list of full GCP resource names and a list of permission strings to test."
     }
 ];

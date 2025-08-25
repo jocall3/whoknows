@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { initializeOctokit } from '../../services/authService.ts';
-import { getUserToken } from '../../services/firebaseService.ts';
+import { getDecryptedCredential } from '../../services/vaultService.ts';
 import { getRepos, getRepoTree, getFileContent, commitFiles } from '../../services/githubService.ts';
-import { generateCommitMessageStream } from '../../services/index.ts';
-import type { Repo, FileNode } from '../../types.ts';
-import { FolderIcon, DocumentIcon } from '../icons.tsx';
-import { LoadingSpinner } from '../shared/index.tsx';
+import { generateCommitMessageStream, answerProjectQuestion, generateNewFilesForProject } from '../../services/index.ts';
+import type { Repo, FileNode, GeneratedFile } from '../../types.ts';
+import { FolderIcon, DocumentIcon, SparklesIcon, XMarkIcon } from '../icons.tsx';
+import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import * as Diff from 'diff';
 
 const FileTree: React.FC<{ node: FileNode, onFileSelect: (path: string, name: string) => void, activePath: string | null }> = ({ node, onFileSelect, activePath }) => {
@@ -45,6 +45,115 @@ const FileTree: React.FC<{ node: FileNode, onFileSelect: (path: string, name: st
     );
 };
 
+const GeneratedFilesModal: React.FC<{
+    files: GeneratedFile[];
+    onClose: () => void;
+    onCommit: (commitMessage: string) => void;
+    isCommitting: boolean;
+}> = ({ files, onClose, onCommit, isCommitting }) => {
+    const [commitMessage, setCommitMessage] = useState('');
+    const [activeFile, setActiveFile] = useState(files[0]);
+
+    useEffect(() => {
+        const generateMessage = async () => {
+            const diffContext = files.map(f => `File: ${f.filePath}\n\n${f.content}`).join('\n---\n');
+            const stream = generateCommitMessageStream(diffContext);
+            let message = '';
+            for await (const chunk of stream) {
+                message += chunk;
+                setCommitMessage(message);
+            }
+        };
+        generateMessage();
+    }, [files]);
+    
+    return (
+         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onClick={onClose}>
+            <div className="bg-surface rounded-lg shadow-xl w-full max-w-4xl h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                <header className="flex justify-between items-center p-4 border-b">
+                    <h2 className="text-lg font-bold">Generated Files</h2>
+                    <button onClick={onClose}><XMarkIcon/></button>
+                </header>
+                <div className="flex-grow flex min-h-0">
+                    <aside className="w-1/3 border-r p-2 overflow-y-auto">
+                        <ul>
+                            {files.map(f => (
+                                <li key={f.filePath} onClick={() => setActiveFile(f)} className={`p-2 rounded cursor-pointer ${activeFile.filePath === f.filePath ? 'bg-primary/10' : ''}`}>{f.filePath}</li>
+                            ))}
+                        </ul>
+                    </aside>
+                    <main className="w-2/3 overflow-y-auto">
+                        <MarkdownRenderer content={'```\n' + activeFile.content + '\n```'} />
+                    </main>
+                </div>
+                <footer className="p-4 border-t flex gap-4 items-center">
+                    <input type="text" value={commitMessage} onChange={e => setCommitMessage(e.target.value)} placeholder="Commit message..." className="flex-grow p-2 bg-background border rounded"/>
+                    <button onClick={() => onCommit(commitMessage)} disabled={isCommitting} className="btn-primary px-4 py-2 flex items-center justify-center min-w-[120px]">{isCommitting ? <LoadingSpinner/> : 'Commit to Repo'}</button>
+                </footer>
+            </div>
+        </div>
+    )
+}
+
+const AiAssistantPanel: React.FC<{ 
+    projectFiles: FileNode | null;
+    onFilesGenerated: (files: GeneratedFile[]) => void;
+}> = ({ projectFiles, onFilesGenerated }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [tab, setTab] = useState<'ask' | 'generate'>('ask');
+    const [prompt, setPrompt] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [result, setResult] = useState('');
+
+    const handleSubmit = async () => {
+        if (!prompt.trim() || !projectFiles) return;
+        setIsLoading(true);
+        setResult('');
+
+        try {
+            if (tab === 'ask') {
+                const stream = answerProjectQuestion(prompt, projectFiles);
+                let fullResponse = '';
+                for await (const chunk of stream) {
+                    fullResponse += chunk;
+                    setResult(fullResponse);
+                }
+            } else {
+                const files = await generateNewFilesForProject(prompt, projectFiles);
+                onFilesGenerated(files);
+            }
+        } catch (e) {
+            setResult(`Error: ${e instanceof Error ? e.message : 'Unknown error'}`);
+        } finally {
+            setIsLoading(false);
+            setPrompt('');
+        }
+    };
+    
+    return (
+        <div className="flex-shrink-0 bg-surface border-t border-border">
+            <button onClick={() => setIsOpen(!isOpen)} className="w-full p-2 text-left text-sm font-semibold flex items-center justify-between">
+                <span><SparklesIcon/> AI Project Assistant</span>
+                <span>{isOpen ? '▼' : '▲'}</span>
+            </button>
+            {isOpen && (
+                <div className="p-4 border-t">
+                    <div className="flex border-b mb-2">
+                        <button onClick={() => setTab('ask')} className={`px-3 py-1 text-sm ${tab === 'ask' ? 'border-b-2 border-primary' : ''}`}>Ask AI</button>
+                        <button onClick={() => setTab('generate')} className={`px-3 py-1 text-sm ${tab === 'generate' ? 'border-b-2 border-primary' : ''}`}>Generate Files</button>
+                    </div>
+                    {result && tab === 'ask' && <div className="p-2 bg-background rounded mb-2 max-h-48 overflow-y-auto"><MarkdownRenderer content={result} /></div>}
+                    <div className="flex gap-2">
+                        <input value={prompt} onChange={e => setPrompt(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} placeholder={tab === 'ask' ? 'e.g., Where is the auth logic?' : 'e.g., Create a new utility file with a date formatting function.'} className="flex-grow p-2 text-sm bg-background border rounded"/>
+                        <button onClick={handleSubmit} disabled={isLoading} className="btn-primary px-4 py-1 text-sm">{isLoading ? <LoadingSpinner/> : 'Send'}</button>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+};
+
+
 export const ProjectExplorer: React.FC = () => {
     const { state, dispatch } = useGlobalState();
     const { user, githubUser, selectedRepo, projectFiles } = state;
@@ -53,12 +162,13 @@ export const ProjectExplorer: React.FC = () => {
     const [isLoading, setIsLoading] = useState<'repos' | 'tree' | 'file' | 'commit' | null>(null);
     const [error, setError] = useState('');
     const [activeFile, setActiveFile] = useState<{ path: string; name: string; originalContent: string; editedContent: string} | null>(null);
+    const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[] | null>(null);
     
     const getApiClient = useCallback(async () => {
         if (!user) {
             throw new Error("You must be logged in to use the Project Explorer.");
         }
-        const token = await getUserToken(user.uid, 'github_pat');
+        const token = await getDecryptedCredential('github_pat');
         if (!token) {
             throw new Error("GitHub token not found. Please add it on the Connections page.");
         }
@@ -159,6 +269,30 @@ export const ProjectExplorer: React.FC = () => {
             setIsLoading(null);
         }
     };
+
+     const handleCommitGeneratedFiles = async (commitMessage: string) => {
+        if (!generatedFiles || !selectedRepo) return;
+        setIsLoading('commit');
+        try {
+             const octokit = await getApiClient();
+             await commitFiles(
+                octokit,
+                selectedRepo.owner,
+                selectedRepo.repo,
+                generatedFiles.map(f => ({ path: f.filePath, content: f.content })),
+                commitMessage
+             );
+             addNotification(`Successfully committed ${generatedFiles.length} new files!`, 'success');
+             setGeneratedFiles(null);
+             // Reload tree
+             const tree = await getRepoTree(octokit, selectedRepo.owner, selectedRepo.repo);
+             dispatch({ type: 'LOAD_PROJECT_FILES', payload: tree });
+        } catch (err) {
+            addNotification(err instanceof Error ? err.message : 'Failed to commit', 'error');
+        } finally {
+            setIsLoading(null);
+        }
+    };
     
     if (!user) {
         return (
@@ -184,6 +318,7 @@ export const ProjectExplorer: React.FC = () => {
 
     return (
         <div className="h-full flex flex-col text-text-primary">
+            {generatedFiles && <GeneratedFilesModal files={generatedFiles} onClose={() => setGeneratedFiles(null)} onCommit={handleCommitGeneratedFiles} isCommitting={isLoading === 'commit'}/>}
             <header className="p-4 border-b border-border flex-shrink-0">
                 <h1 className="text-xl font-bold flex items-center"><FolderIcon /><span className="ml-3">Project Explorer</span></h1>
                 <div className="mt-2">
@@ -223,6 +358,7 @@ export const ProjectExplorer: React.FC = () => {
                     }
                 </main>
             </div>
+            <AiAssistantPanel projectFiles={projectFiles} onFilesGenerated={setGeneratedFiles} />
         </div>
     );
 };

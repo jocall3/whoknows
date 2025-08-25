@@ -1,4 +1,5 @@
 
+
 import { ensureGapiClient } from './googleApiService.ts';
 import { logError } from './telemetryService.ts';
 import type { SlideSummary } from '../types.ts';
@@ -42,99 +43,6 @@ export const insertText = async (documentId: string, text: string): Promise<void
         });
     } catch (error) {
         logError(error as Error, { service: 'workspaceService', function: 'insertText' });
-        throw error;
-    }
-};
-
-// --- Slides Service ---
-export const createPresentation = async (title: string): Promise<{ presentationId: string; webViewLink: string }> => {
-    try {
-        const isReady = await ensureGapiClient();
-        if (!isReady) throw new Error("Google API client not ready.");
-        
-        const response = await gapi.client.slides.presentations.create({ title });
-        const presentation = response.result;
-        return { presentationId: presentation.presentationId, webViewLink: `https://docs.google.com/presentation/d/${presentation.presentationId}/edit` };
-    } catch (error) {
-        logError(error as Error, { service: 'workspaceService', function: 'createPresentation' });
-        throw error;
-    }
-};
-
-export const addSlide = async (presentationId: string, content: SlideSummary): Promise<void> => {
-    try {
-        const isReady = await ensureGapiClient();
-        if (!isReady) throw new Error("Google API client not ready.");
-        
-        const slideId = `slide_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-        const titleId = `title_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-        const bodyId = `body_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-        
-        const requests = [
-            {
-                createSlide: {
-                    objectId: slideId,
-                    slideLayoutReference: {
-                        predefinedLayout: 'TITLE_AND_BODY'
-                    },
-                    placeholderIdMappings: [
-                        { layoutPlaceholder: { type: 'TITLE' }, objectId: titleId },
-                        { layoutPlaceholder: { type: 'BODY' }, objectId: bodyId }
-                    ]
-                }
-            },
-            {
-                insertText: {
-                    objectId: titleId,
-                    text: content.title
-                }
-            },
-            {
-                insertText: {
-                    objectId: bodyId,
-                    text: content.body
-                }
-            }
-        ];
-
-        await gapi.client.slides.presentations.batchUpdate({
-            presentationId,
-            resource: { requests }
-        });
-    } catch (error) {
-        logError(error as Error, { service: 'workspaceService', function: 'addSlide' });
-        throw error;
-    }
-};
-
-// --- Gmail Service ---
-const createEmail = (to: string, subject: string, message: string): string => {
-    const emailLines = [
-        `Content-Type: text/html; charset="UTF-8"`,
-        `To: ${to}`,
-        `Subject: ${subject}`,
-        '',
-        message
-    ];
-    const email = emailLines.join('\r\n');
-    return btoa(email).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-};
-
-export const sendEmail = async (to: string, subject: string, htmlBody: string): Promise<void> => {
-    try {
-        const isReady = await ensureGapiClient();
-        if (!isReady) throw new Error("Google API client not ready.");
-
-        const rawEmail = createEmail(to, subject, htmlBody);
-
-        await gapi.client.gmail.users.messages.send({
-            userId: 'me',
-            resource: {
-                raw: rawEmail
-            }
-        });
-    } catch (error) {
-        logError(error as Error, { service: 'workspaceService', function: 'sendEmail' });
         throw error;
     }
 };

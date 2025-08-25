@@ -1,8 +1,6 @@
-
-
 import React from 'react';
 import type { Feature } from '../../types.ts';
-import { RAW_FEATURES } from '../../constants.ts';
+import { RAW_FEATURES } from '../../constants.tsx';
 import { lazyWithRetry } from '../../services/componentLoader.ts';
 
 const componentMap: Record<string, React.FC<any>> = {
@@ -62,6 +60,30 @@ const componentMap: Record<string, React.FC<any>> = {
     'bug-reproducer': lazyWithRetry(() => import('./BugReproducer.tsx'), 'BugReproducer'),
     'tech-debt-sonar': lazyWithRetry(() => import('./TechDebtSonar.tsx'), 'TechDebtSonar'),
     'iam-policy-generator': lazyWithRetry(() => import('./IamPolicyGenerator.tsx'), 'IamPolicyGenerator'),
+    'iam-policy-visualizer': lazyWithRetry(() => import('./IamPolicyVisualizer.tsx'), 'IamPolicyVisualizer'),
+    'gmail-addon-simulator': lazyWithRetry(() => import('./GmailAddonSimulator.tsx'), 'GmailAddonSimulator'),
+    
+    // --- Implemented Features ---
+    'api-client-generator': lazyWithRetry(() => import('./ApiClientGenerator.tsx'), 'ApiClientGenerator'),
+    'sql-to-api-generator': lazyWithRetry(() => import('./SqlToApiGenerator.tsx'), 'SqlToApiGenerator'),
+    'blameless-postmortem-generator': lazyWithRetry(() => import('./BlamelessPostmortemGenerator.tsx'), 'BlamelessPostmortemGenerator'),
+    'data-anonymizer': lazyWithRetry(() => import('./DataAnonymizer.tsx'), 'DataAnonymizer'),
+    'a/b-test-assistant': lazyWithRetry(() => import('./ABTestAssistant.tsx'), 'ABTestAssistant'),
+    'i18n-helper': lazyWithRetry(() => import('./I18nHelper.tsx'), 'I18nHelper'),
+    'token-usage-estimator': lazyWithRetry(() => import('./TokenUsageEstimator.tsx'), 'TokenUsageEstimator'),
+    'financial-chart-generator': lazyWithRetry(() => import('./FinancialChartGenerator.tsx'), 'FinancialChartGenerator'),
+    'compliance-report-helper': lazyWithRetry(() => import('./ComplianceReportHelper.tsx'), 'ComplianceReportHelper'),
+    'ecommerce-component-generator': lazyWithRetry(() => import('./EcommerceComponentGenerator.tsx'), 'EcommerceComponentGenerator'),
+    'api-endpoint-tester': lazyWithRetry(() => import('./ApiEndpointTester.tsx'), 'ApiEndpointTester'),
+    'storyboard-generator': lazyWithRetry(() => import('./StoryboardGenerator.tsx'), 'StoryboardGenerator'),
+    'user-persona-generator': lazyWithRetry(() => import('./UserPersonaGenerator.tsx'), 'UserPersonaGenerator'),
+    'competitive-analysis-bot': lazyWithRetry(() => import('./CompetitiveAnalysisBot.tsx'), 'CompetitiveAnalysisBot'),
+    'code-documentation-writer': lazyWithRetry(() => import('./CodeDocumentationWriter.tsx'), 'CodeDocumentationWriter'),
+    'dependency-update-explainer': lazyWithRetry(() => import('./DependencyUpdateExplainer.tsx'), 'DependencyUpdateExplainer'),
+    'ai-video-generator': lazyWithRetry(() => import('./AiVideoGenerator.tsx'), 'AiVideoGenerator'),
+    'cloud-cost-estimator': lazyWithRetry(() => import('./CloudCostEstimator.tsx'), 'CloudCostEstimator'),
+    'smart-logger': lazyWithRetry(() => import('./SmartLogger.tsx'), 'SmartLogger'),
+    'accessibility-annotation': lazyWithRetry(() => import('./AccessibilityAnnotation.tsx'), 'AccessibilityAnnotation'),
 };
 
 export const ALL_FEATURES: Feature[] = RAW_FEATURES.map(feature => ({

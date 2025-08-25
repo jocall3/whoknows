@@ -1,12 +1,16 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+*/
 
 import { GoogleGenAI, Type, GenerateContentResponse, FunctionDeclaration } from "@google/genai";
-import type { GeneratedFile, StructuredPrSummary, StructuredExplanation, ColorTheme, SemanticColorTheme, StructuredReview, SlideSummary, SecurityVulnerability, CodeSmell } from '../types.ts';
+import type { GeneratedFile, StructuredPrSummary, StructuredExplanation, ColorTheme, SemanticColorTheme, StructuredReview, SlideSummary, SecurityVulnerability, CodeSmell, FileNode } from '../types.ts';
 import { logError } from './telemetryService.ts';
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 
 if (!API_KEY) {
-  throw new Error("Gemini API key not found. Please set the API_KEY environment variable.");
+  throw new Error("Gemini API key not found. Please set the GEMINI_API_KEY environment variable.");
 }
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
@@ -234,7 +238,6 @@ export const generateIamPolicyStream = (description: string, platform: 'aws' | '
     "You are a cloud security expert specializing in IAM policies for AWS and GCP."
 );
 
-
 // --- Simple Generate Content ---
 export const generatePipelineCode = (flow: string): Promise<string> => generateContent(`Based on the following described workflow, generate a single asynchronous JavaScript function that orchestrates the steps. Use placeholder functions for the actual tool logic. The workflow is: ${flow}`, "You are an expert software architect who writes clean, asynchronous JavaScript code to orchestrate complex workflows based on a description.", 0.5);
 
@@ -314,6 +317,53 @@ ${diff}
 `,
     "You are an expert programmer who writes excellent, clear, and comprehensive technical specification documents from pull request data."
 );
+
+export const generatePostmortem = (data: { title: string; timeline: string; rootCause: string; impact: string; actionItems: { description: string; assignee: string }[] }): Promise<string> => {
+    const prompt = `Generate a formal, blameless post-mortem document in Markdown format using the following information:
+
+# Incident: ${data.title}
+
+## Timeline
+${data.timeline}
+
+## Root Cause Analysis
+${data.rootCause}
+
+## Business/Customer Impact
+${data.impact}
+
+## Action Items
+${data.actionItems.map(item => `- **${item.description}** (Owner: ${item.assignee})`).join('\n')}
+
+Synthesize this into a professional document with standard sections: Summary, Impact, Root Causes, Lessons Learned, and Action Items.`;
+    return generateContent(prompt, "You are an expert in site reliability engineering and incident management. You write clear, blameless post-mortem reports.");
+};
+
+export const generateDocumentationForFiles = (files: { path: string, content: string }[]): Promise<string> => {
+    const fileContent = files.map(f => `--- FILE: ${f.path} ---\n\`\`\`\n${f.content}\n\`\`\``).join('\n\n');
+    const prompt = `Generate a single, comprehensive Markdown document that summarizes the purpose of each of the following files and details their main functions, classes, or components, including parameters and return values.\n\n${fileContent}`;
+    return generateContent(prompt, "You are a technical writer who creates high-quality documentation from source code.");
+};
+
+export const explainDependencyChanges = (diff: string): Promise<string> => {
+    const prompt = `Analyze the following diff from a package-lock.json file. Identify major version changes, new dependencies, and removed dependencies. Summarize the potential risks, breaking changes, or security implications for any significant updates.\n\nDiff:\n\`\`\`diff\n${diff}\n\`\`\``;
+    return generateContent(prompt, "You are a senior software engineer with expertise in dependency management and security.");
+};
+
+export const analyzeCompetitorUrl = (url: string): Promise<string> => {
+    const prompt = `Based on your training data, what is the likely technology stack (frontend framework, backend language, major libraries) and what are the key user-facing features of a website like ${url}? Provide a summary in Markdown. This is an inference, not a live analysis.`;
+    return generateContent(prompt, "You are a technology analyst who infers website technology stacks and features based on common patterns and public knowledge.");
+};
+
+export const generateChartComponent = (data: { headers: string[], samples: any[][] }, chartType: 'line' | 'bar'): Promise<string> => {
+    const prompt = `Generate a single-file React component using the Recharts library to create a ${chartType} chart. The component should be able to visualize data with the following structure:\n\nHeaders: ${data.headers.join(', ')}\nSample Data Rows:\n${data.samples.map(row => row.join(', ')).join('\n')}\n\nRespond with only the complete, runnable React component code in a markdown block.`;
+    return generateContent(prompt, "You are a data visualization expert and React developer specializing in the Recharts library.");
+};
+
+export const estimateCloudCost = (description: string): Promise<string> => {
+    const prompt = `Act as a cloud cost specialist. Read the following description of a cloud architecture, break it down into billable components (e.g., compute, storage, networking), and provide a rough, non-binding monthly cost estimate in a Markdown table format. Base your estimate on standard public pricing.\n\nArchitecture: "${description}"`;
+    return generateContent(prompt, "You are a cloud cost estimation specialist with deep knowledge of AWS and GCP pricing.");
+};
 
 // --- STRUCTURED JSON ---
 
@@ -447,20 +497,6 @@ export const generateFullStackFeature = (prompt: string, framework: string, styl
     return generateJson(userPrompt, systemInstruction, schema);
 };
 
-export const summarizeForSlides = (content: string): Promise<SlideSummary> => {
-    const systemInstruction = `You are an expert at summarizing content for presentations. Distill the provided markdown into a concise title and a bulleted list for a slide body. The body must be a single string with each point starting with a hyphen and separated by a newline character.`;
-    const prompt = `Summarize this content for a presentation slide:\n\n${content}`;
-    const schema = {
-        type: Type.OBJECT,
-        properties: {
-            title: { type: Type.STRING, description: "A short, engaging title for the slide." },
-            body: { type: Type.STRING, description: "A single string containing bullet points, each starting with '-' and separated by '\\n'." }
-        },
-        required: ["title", "body"]
-    };
-    return generateJson(prompt, systemInstruction, schema);
-};
-
 export interface CronParts { minute: string; hour: string; dayOfMonth: string; month: string; dayOfWeek: string; }
 export const generateCronFromDescription = (description: string): Promise<CronParts> => {
     const systemInstruction = "You are an expert in cron expressions. Convert the user's description into a valid cron expression parts.";
@@ -565,6 +601,72 @@ export const generateTerraformConfig = (cloud: 'aws' | 'gcp', description: strin
     return generateContent(prompt, systemInstruction);
 };
 
+export const generateUserPersona = (description: string): Promise<{ name: string, photoDescription: string, demographics: string, goals: string[], frustrations: string[], techStack: string }> => {
+    const prompt = `Generate a detailed user persona based on the following audience description: "${description}"`;
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            name: { type: Type.STRING },
+            photoDescription: { type: Type.STRING, description: "A simple description for an image generator, e.g., 'A 35-year-old product manager from Berlin'" },
+            demographics: { type: Type.STRING },
+            goals: { type: Type.ARRAY, items: { type: Type.STRING } },
+            frustrations: { type: Type.ARRAY, items: { type: Type.STRING } },
+            techStack: { type: Type.STRING, description: "Their preferred or commonly used technology." }
+        },
+        required: ["name", "photoDescription", "demographics", "goals", "frustrations", "techStack"]
+    };
+    return generateJson(prompt, "You are a UX researcher and product manager who creates detailed user personas.", schema);
+};
+
+export const decomposeUserFlow = (description: string): Promise<{ steps: string[] }> => {
+    const prompt = `Decompose the following user flow description into a sequence of distinct steps or screens. Each step should be a short, descriptive string.\n\nFlow: "${description}"`;
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            steps: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
+            }
+        },
+        required: ["steps"]
+    };
+    return generateJson(prompt, "You are an AI assistant that breaks down user stories into sequential steps for storyboarding.", schema);
+};
+
+export const anonymizeData = (data: string, targets: string[]): Promise<{ anonymizedData: string }> => {
+    const prompt = `Anonymize the following data, replacing the specified fields with realistic but fake data. Maintain the original structure (JSON or CSV). Do not alter fields that are not specified.\n\nFields to anonymize: ${targets.join(', ')}\n\nData:\n\`\`\`\n${data}\n\`\`\``;
+    const schema = { type: Type.OBJECT, properties: { anonymizedData: { type: Type.STRING } }, required: ["anonymizedData"] };
+    return generateJson(prompt, "You are a data privacy expert. You replace sensitive information with fake data while preserving the structure.", schema);
+};
+
+export const extractStringsForI18n = (code: string): Promise<{ i18nJson: Record<string, string>, refactoredCode: string }> => {
+    const prompt = `Analyze the following React component. Extract all user-facing strings into a JSON object in the i18next key-value format. Then, refactor the original component to use a 't' function for internationalization.\n\nCode:\n\`\`\`tsx\n${code}\n\`\`\``;
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            i18nJson: { type: Type.OBJECT, properties: {}, description: "Key-value pairs for i18next." },
+            refactoredCode: { type: Type.STRING, description: "The component code rewritten to use the t() function." }
+        },
+        required: ["i18nJson", "refactoredCode"]
+    };
+    return generateJson(prompt, "You are an expert in internationalization (i18n) for React applications.", schema);
+};
+
+export const generateABTestWrapper = (variantA: string, variantB: string, service: string): Promise<string> => {
+    const prompt = `Create a new React component that conditionally renders one of two component variants based on a feature flag from the "${service}" service. The component should accept a 'flagName' prop. \n\nVariant A Code:\n\`\`\`tsx\n${variantA}\n\`\`\`\n\nVariant B Code:\n\`\`\`tsx\n${variantB}\n\`\`\``;
+    return generateContent(prompt, "You are a software engineer who implements A/B tests using feature flagging services.");
+};
+
+export const addAriaAttributes = (html: string): Promise<string> => {
+    const prompt = `Analyze the following HTML snippet and add the appropriate ARIA roles, states, and properties to improve its accessibility. Return only the modified HTML in a markdown block.\n\nHTML:\n\`\`\`html\n${html}\n\`\`\``;
+    return generateContent(prompt, "You are a web accessibility expert who enhances HTML with ARIA attributes.");
+};
+
+export const insertSmartLogging = (code: string): Promise<string> => {
+    const prompt = `Insert helpful 'console.log' statements into the following code to trace its execution. Log function entries, exits, loop iterations, and conditional branches. Return only the modified code in a markdown block.\n\nCode:\n\`\`\`javascript\n${code}\n\`\`\``;
+    return generateContent(prompt, "You are a debugging expert who instruments code with helpful logging statements.");
+};
+
 
 // --- FUNCTION CALLING ---
 export interface CommandResponse { text: string; functionCalls?: { name: string; args: any; }[]; }
@@ -628,4 +730,60 @@ export const generateMultiComponentFlowFromVideo = async (videoBase64: string, m
     
     const filesSchema = { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { filePath: { type: Type.STRING }, content: { type: Type.STRING }, description: { type: Type.STRING } }, required: ["filePath", "content", "description"] } };
     return generateJson(descriptionPrompt, systemInstruction, filesSchema);
+};
+
+// --- NEW PROJECT EXPLORER FUNCTIONS ---
+
+const stringifyFileTree = (node: FileNode, indent = ''): string => {
+    let result = `${indent}${node.name}\n`;
+    if (node.children) {
+        node.children.forEach(child => {
+            result += stringifyFileTree(child, indent + '  ');
+        });
+    }
+    return result;
+};
+
+
+export const answerProjectQuestion = (prompt: string, fileTree: FileNode) => {
+    const fileStructure = stringifyFileTree(fileTree);
+    const fullPrompt = `Based on the following file structure, answer the user's question.
+
+File Structure:
+\`\`\`
+${fileStructure}
+\`\`\`
+
+Question: ${prompt}
+`;
+    return streamContent(fullPrompt, "You are a helpful AI assistant with expertise in analyzing codebase structures. Provide concise answers based on the file tree provided.");
+};
+
+
+export const generateNewFilesForProject = (prompt: string, fileTree: FileNode): Promise<GeneratedFile[]> => {
+    const fileStructure = stringifyFileTree(fileTree);
+    const systemInstruction = `You are an expert software engineer who generates new files to add to an existing project.
+- You will be given a file structure and a prompt.
+- Your response must be a valid JSON array of objects, where each object represents a file.
+- Each file object must have 'filePath', 'content', and 'description' properties.
+- The 'filePath' must be a valid relative path that makes sense within the existing file structure.
+- The 'content' must be the complete code for the file.
+- Do not generate files that already exist unless the prompt explicitly asks to overwrite.
+- Base your file paths on the existing structure. For example, if there is a 'src/components' directory, new components should go there.`;
+
+    const userPrompt = `Based on the following file structure, generate the necessary new file(s) for the request.\n\nFile Structure:\n\`\`\`\n${fileStructure}\n\`\`\`\n\nRequest: "${prompt}"`;
+    
+    const schema = {
+        type: Type.ARRAY,
+        items: {
+            type: Type.OBJECT,
+            properties: {
+                filePath: { type: Type.STRING, description: "The full relative path of the new file." },
+                content: { type: Type.STRING, description: "The complete code or content for the new file." },
+                description: { type: Type.STRING, description: "A brief description of what this file does." }
+            },
+            required: ["filePath", "content", "description"]
+        }
+    };
+    return generateJson(userPrompt, systemInstruction, schema);
 };

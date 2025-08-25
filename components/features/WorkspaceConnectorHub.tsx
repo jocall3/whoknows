@@ -6,7 +6,7 @@ import { validateToken } from '../../services/authService.ts';
 import { ACTION_REGISTRY, executeWorkspaceAction } from '../../services/workspaceConnectorService.ts';
 import { RectangleGroupIcon, GithubIcon, SparklesIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
-import { signInWithGoogle } from '../../services/firebaseService.ts';
+import { signInWithGoogle } from '../../services/googleAuthService.ts';
 import { useVaultModal } from '../../contexts/VaultModalContext.tsx';
 
 const ServiceConnectionCard: React.FC<{
@@ -185,15 +185,9 @@ export const WorkspaceConnectorHub: React.FC = () => {
         });
     };
 
-    const handleSignIn = async () => {
-        setLoadingStates(s => ({...s, google: true}));
-        try {
-            await signInWithGoogle();
-            addNotification('Signed in successfully!', 'success');
-        } catch (error) {
-            addNotification('Failed to sign in.', 'error');
-        }
-        setLoadingStates(s => ({...s, google: false}));
+    const handleSignIn = () => {
+        signInWithGoogle();
+        // The result is handled by the global callback set in App.tsx
     };
 
     const selectedAction = ACTION_REGISTRY.get(selectedActionId);
@@ -205,8 +199,8 @@ export const WorkspaceConnectorHub: React.FC = () => {
                 <div className="text-center bg-surface p-8 rounded-lg border border-border max-w-md">
                     <h2 className="text-xl font-bold">Sign In Required</h2>
                     <p className="text-text-secondary my-4">Please sign in with your Google account to manage workspace connections.</p>
-                    <button onClick={handleSignIn} disabled={loadingStates.google} className="btn-primary px-6 py-3 flex items-center justify-center gap-2 mx-auto">
-                        {loadingStates.google ? <LoadingSpinner/> : 'Sign in with Google'}
+                    <button onClick={handleSignIn} className="btn-primary px-6 py-3 flex items-center justify-center gap-2 mx-auto">
+                        Sign in with Google
                     </button>
                 </div>
             </div>

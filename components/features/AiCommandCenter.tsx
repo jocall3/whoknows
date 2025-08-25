@@ -6,7 +6,7 @@ import { FEATURE_TAXONOMY } from '../../services/taxonomyService.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 import { CommandLineIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
-import { ALL_FEATURES } from './index.ts';
+import { ALL_FEATURE_IDS } from '../../constants.tsx';
 import { executeWorkspaceAction, ACTION_REGISTRY } from '../../services/workspaceConnectorService.ts';
 
 const baseFunctionDeclarations: FunctionDeclaration[] = [
@@ -19,7 +19,7 @@ const baseFunctionDeclarations: FunctionDeclaration[] = [
                 featureId: { 
                     type: Type.STRING, 
                     description: 'The ID of the feature to navigate to.',
-                    enum: ALL_FEATURES.map(f => f.id)
+                    enum: ALL_FEATURE_IDS
                 },
             },
             required: ['featureId'],
@@ -34,7 +34,7 @@ const baseFunctionDeclarations: FunctionDeclaration[] = [
                  featureId: { 
                     type: Type.STRING, 
                     description: 'The ID of the feature to run.',
-                    enum: ALL_FEATURES.map(f => f.id)
+                    enum: ALL_FEATURE_IDS
                 },
                 props: {
                     type: Type.OBJECT,

@@ -35,10 +35,17 @@ export const getRepoTree = async (octokit: Octokit, owner: string, repo: string)
         try {
             const { data: repoData } = await octokit.request('GET /repos/{owner}/{repo}', { owner, repo });
             const defaultBranch = repoData.default_branch;
+            
             const { data: branch } = await octokit.request('GET /repos/{owner}/{repo}/branches/{branch}', { owner, repo, branch: defaultBranch });
-            const treeSha = branch.commit.commit.tree.sha;
+            const commitSha = branch.commit.sha;
+            
+            const { data: commitData } = await octokit.request('GET /repos/{owner}/{repo}/git/commits/{commit_sha}', { owner, repo, commit_sha: commitSha });
+            const treeSha = commitData.tree.sha;
+
             const { data: treeData } = await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', { owner, repo, tree_sha: treeSha, recursive: 'true' });
+            
             const root: FileNode = { name: repo, type: 'folder', path: '', children: [] };
+            
             treeData.tree.forEach((item: any) => {
                 if (!item.path) return;
                 const pathParts = item.path.split('/');
@@ -48,7 +55,8 @@ export const getRepoTree = async (octokit: Octokit, owner: string, repo: string)
                     let childNode = currentNode.children.find(child => child.name === part);
                     if (!childNode) {
                         const isLastPart = index === pathParts.length - 1;
-                        childNode = { name: part, path: item.path, type: isLastPart ? (item.type === 'tree' ? 'folder' : 'file') : 'folder' };
+                        const currentPath = pathParts.slice(0, index + 1).join('/');
+                        childNode = { name: part, path: currentPath, type: isLastPart ? (item.type === 'tree' ? 'folder' : 'file') : 'folder' };
                          if (childNode.type === 'folder') { childNode.children = []; }
                         currentNode.children.push(childNode);
                     }

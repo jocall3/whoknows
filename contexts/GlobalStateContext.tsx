@@ -1,6 +1,5 @@
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
 import type { ViewType, AppUser, GitHubUser, FileNode } from '../types.ts';
-import { onFirebaseAuthChanged } from '../services/firebaseService.ts';
 
 // State shape
 interface GlobalState {
@@ -129,13 +128,6 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
             return initial;
         }
     });
-
-    useEffect(() => {
-        const unsubscribe = onFirebaseAuthChanged((user) => {
-            dispatch({ type: 'SET_APP_USER', payload: user });
-        });
-        return () => unsubscribe();
-    }, []);
 
     useEffect(() => {
         if (!canPersist) return;

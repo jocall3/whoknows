@@ -1,3 +1,7 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+*/
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import mermaid from 'mermaid';
 import { explainCodeStructured, generateMermaidJs } from '../services/index.ts';
@@ -37,12 +41,12 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
     const [code, setCode] = useState<string>(initialCode || exampleCode);
     const [explanation, setExplanation] = useState<StructuredExplanation | null>(null);
     const [mermaidCode, setMermaidCode] = useState<string>('');
+    const [mermaidSvg, setMermaidSvg] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const [activeTab, setActiveTab] = useState<ExplanationTab>('summary');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const preRef = useRef<HTMLPreElement>(null);
-    const mermaidContainerRef = useRef<HTMLDivElement>(null);
 
     const handleExplain = useCallback(async (codeToExplain: string) => {
         if (!codeToExplain.trim()) {
@@ -53,6 +57,7 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
         setError('');
         setExplanation(null);
         setMermaidCode('');
+        setMermaidSvg(null);
         setActiveTab('summary');
         try {
             const [explanationResult, mermaidResult] = await Promise.all([
@@ -79,19 +84,20 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
 
     useEffect(() => {
         const renderMermaid = async () => {
-             if (activeTab === 'flowchart' && mermaidCode && mermaidContainerRef.current) {
+             if (activeTab === 'flowchart' && mermaidCode && !mermaidSvg) {
                 try {
-                    mermaidContainerRef.current.innerHTML = ''; // Clear previous
+                    const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'neutral';
+                    mermaid.initialize({ startOnLoad: false, theme, securityLevel: 'loose' });
                     const { svg } = await mermaid.render(`mermaid-graph-${Date.now()}`, mermaidCode);
-                    mermaidContainerRef.current.innerHTML = svg;
+                    setMermaidSvg(svg);
                 } catch (e) {
                     console.error("Mermaid rendering error:", e);
-                    mermaidContainerRef.current.innerHTML = `<p class="text-red-500">Error rendering flowchart.</p>`;
+                    setMermaidSvg(`<p class="text-red-500 p-4">Error rendering flowchart. The diagram syntax may be invalid.</p>`);
                 }
             }
         }
         renderMermaid();
-    }, [activeTab, mermaidCode]);
+    }, [activeTab, mermaidCode, mermaidSvg]);
 
 
     const handleScroll = () => {
@@ -133,10 +139,17 @@ export const AiCodeExplainer: React.FC<{ initialCode?: string }> = ({ initialCod
                     </ul>
                 );
             case 'flowchart':
+                if (!mermaidCode) {
+                    return <div className="text-text-secondary h-full flex items-center justify-center">Could not generate a flowchart for this code.</div>;
+                }
+                if (!mermaidSvg) {
+                    return <div className="w-full h-full flex items-center justify-center"><LoadingSpinner /></div>;
+                }
                 return (
-                    <div ref={mermaidContainerRef} className="w-full h-full flex items-center justify-center">
-                        <LoadingSpinner />
-                    </div>
+                    <div
+                        className="w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full"
+                        dangerouslySetInnerHTML={{ __html: mermaidSvg }}
+                    />
                 );
         }
     }
