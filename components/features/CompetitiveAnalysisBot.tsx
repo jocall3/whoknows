@@ -41,8 +41,9 @@ export const CompetitiveAnalysisBot: React.FC = () => {
                 <strong>Note:</strong> This is a simulation. The AI uses its training data to infer information about the site and does not perform a live scrape.
             </p>
             <div className="flex-grow p-4 bg-background border rounded overflow-auto">
-                {isLoading && <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>}
-                {analysis && <MarkdownRenderer content={analysis} />}
+                {isLoading ? <div className="flex justify-center items-center h-full"><LoadingSpinner /></div> : (
+                    analysis && <MarkdownRenderer content={analysis} />
+                )}
             </div>
         </div>
     );

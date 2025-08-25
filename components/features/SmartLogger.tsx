@@ -12,7 +12,7 @@ const exampleCode = `function processData(data) {
   return results.map(item => ({ ...item, processed: true }));
 }`;
 
-const DiffViewer: React.FC<{ oldCode: string, newCode: string }> = ({ oldCode, newCode }) => {
+const DiffViewer: React.FC<{ oldCode: string, newCode: string }> = React.memo(({ oldCode, newCode }) => {
     const diff = Diff.diffLines(oldCode, newCode);
     return (
         <pre className="whitespace-pre-wrap font-mono text-xs">
@@ -22,7 +22,7 @@ const DiffViewer: React.FC<{ oldCode: string, newCode: string }> = ({ oldCode, n
             })}
         </pre>
     );
-};
+});
 
 export const SmartLogger: React.FC = () => {
     const [code, setCode] = useState(exampleCode);

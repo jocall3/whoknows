@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import * as Diff from 'diff';
 import { addAriaAttributes } from '../../services/aiService.ts';
 import { EyeIcon } from '../icons.tsx';
-import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
+import { LoadingSpinner } from '../shared/index.tsx';
 
 const exampleHtml = `<div class="menu">
   <div>Menu Item 1</div>
@@ -10,7 +10,7 @@ const exampleHtml = `<div class="menu">
   <div>Menu Item 3</div>
 </div>`;
 
-const DiffViewer: React.FC<{ oldCode: string, newCode: string }> = ({ oldCode, newCode }) => {
+const DiffViewer: React.FC<{ oldCode: string, newCode: string }> = React.memo(({ oldCode, newCode }) => {
     const diff = Diff.diffLines(oldCode, newCode);
     return (
         <pre className="whitespace-pre-wrap font-mono text-xs">
@@ -20,7 +20,7 @@ const DiffViewer: React.FC<{ oldCode: string, newCode: string }> = ({ oldCode, n
             })}
         </pre>
     );
-};
+});
 
 export const AccessibilityAnnotation: React.FC = () => {
     const [html, setHtml] = useState(exampleHtml);

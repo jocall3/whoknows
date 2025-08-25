@@ -57,9 +57,12 @@ export const ABTestAssistant: React.FC = () => {
                 <div className="flex flex-col">
                     <label className="text-sm font-medium mb-2">Generated Wrapper Component</label>
                     <div className="flex-grow p-1 bg-background border rounded overflow-auto">
-                        {isLoading && <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>}
-                        {error && <p className="text-red-500 p-4">{error}</p>}
-                        {generatedCode && <MarkdownRenderer content={generatedCode} />}
+                        {isLoading ? <div className="flex justify-center items-center h-full"><LoadingSpinner /></div> : (
+                            <>
+                                {error && <p className="text-red-500 p-4">{error}</p>}
+                                {generatedCode && <MarkdownRenderer content={generatedCode} />}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

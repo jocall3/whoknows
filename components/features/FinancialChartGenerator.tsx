@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { generateChartComponent } from '../../services/aiService.ts';
-import { ChartBarIcon, SparklesIcon } from '../icons.tsx';
+import { ChartBarIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
@@ -53,8 +53,9 @@ export const FinancialChartGenerator: React.FC = () => {
                 <div className="flex flex-col">
                     <label className="text-sm font-medium mb-2">Generated React Component (using Recharts)</label>
                     <div className="flex-grow p-1 bg-background border rounded overflow-auto">
-                        {isLoading && <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>}
-                        {generatedCode && <MarkdownRenderer content={generatedCode} />}
+                        {isLoading ? <div className="flex justify-center items-center h-full"><LoadingSpinner /></div> : (
+                            generatedCode && <MarkdownRenderer content={generatedCode} />
+                        )}
                     </div>
                 </div>
             </div>

@@ -17,9 +17,9 @@
     "marked": "^13.0.2",
     "mermaid": "^10.9.1",
     "octokit": "^4.0.2",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-colorful": "^5.6.1",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
@@ -27,12 +27,12 @@
     "@types/jszip": "^3.4.1",
     "@types/marked": "^6.0.0",
     "@types/node": "^20.14.9",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.5.2",
-    "vite": "^7.1.2"
+    "vite": "^7.1.3"
   }
 }

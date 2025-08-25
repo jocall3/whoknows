@@ -171,3 +171,11 @@ export interface CodeSmell {
     line: number;
     explanation: string;
 }
+
+export interface CustomFeature {
+    id: string;
+    name: string;
+    description: string;
+    icon: string; // Name of the icon component
+    code: string;
+}

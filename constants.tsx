@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import {
     CommandCenterIcon, CodeExplainerIcon, FeatureBuilderIcon, CodeMigratorIcon, ThemeDesignerIcon, SnippetVaultIcon,
@@ -12,12 +10,12 @@ import {
     DigitalWhiteboardIcon, TypographyLabIcon, AiPullRequestAssistantIcon, ProjectExplorerIcon,
     ServerStackIcon, DocumentTextIcon, ChartBarIcon, EyeIcon, PaperAirplaneIcon, CloudIcon, ShieldCheckIcon, CpuChipIcon, SparklesIcon,
     MailIcon, BugAntIcon, MagnifyingGlassIcon, RectangleGroupIcon, GcpIcon, VideoCameraIcon, TerminalIcon, CodeBracketSquareIcon, ArchiveBoxIcon,
-    GitBranchIcon, PhotoIcon, BeakerIcon
+    GitBranchIcon, PhotoIcon, BeakerIcon, WordPressIcon, HammerIcon
 } from './components/icons.tsx';
 
 export const CHROME_VIEW_IDS = ['features-list'] as const;
 
-export const FEATURE_CATEGORIES = ['Core', 'AI Tools', 'Frontend', 'Testing', 'Database', 'Data', 'Productivity', 'Git', 'Local Dev', 'Performance & Auditing', 'Deployment & CI/CD', 'Security', 'Workflow', 'Cloud'] as const;
+export const FEATURE_CATEGORIES = ['Core', 'AI Tools', 'Frontend', 'Testing', 'Database', 'Data', 'Productivity', 'Git', 'Local Dev', 'Performance & Auditing', 'Deployment & CI/CD', 'Security', 'Workflow', 'Cloud', 'CMS', 'Custom'] as const;
 export type FeatureCategory = typeof FEATURE_CATEGORIES[number];
 
 export type SlotCategory = FeatureCategory;
@@ -69,6 +67,7 @@ export const RAW_FEATURES: RawFeature[] = [
     { id: "workspace-connector-hub", name: "Workspace Connector Hub", description: "Connect to services like Jira, Slack & GitHub to orchestrate actions with AI.", icon: <RectangleGroupIcon />, category: "Workflow" },
     { id: "linter-formatter", name: "AI Code Formatter", description: "AI-powered, real-time code formatting.", icon: <CodeFormatterIcon />, category: "Core" },
     { id: "json-tree-navigator", name: "JSON Tree Navigator", description: "Navigate large JSON objects as a collapsible tree.", icon: <JsonTreeIcon />, category: "Core" },
+    { id: "feature-forge", name: "Feature Forge", description: "Use AI to create new tools and add them to your desktop.", icon: <CpuChipIcon />, category: "Core" },
     
     { id: "ai-image-generator", name: "AI Image Generator", description: "Generate high-quality images from a text prompt.", icon: <ImageGeneratorIcon />, category: "AI Tools" },
     { id: "ai-code-explainer", name: "AI Code Explainer", description: "Get a structured analysis of code, including complexity.", icon: <CodeExplainerIcon />, category: "AI Tools" },
@@ -90,6 +89,7 @@ export const RAW_FEATURES: RawFeature[] = [
     { id: 'code-documentation-writer', name: 'Code Documentation Writer', description: 'Scan a whole directory of code and generate markdown documentation.', icon: <DocumentTextIcon />, category: 'AI Tools' },
     { id: 'ai-video-generator', name: 'AI Video Generator', description: 'A UI for text-to-video generation.', icon: <VideoCameraIcon />, category: 'AI Tools' },
 
+    { id: "wordpress-plugin-generator", name: "WordPress Plugin Generator", description: "Generate a functional WordPress plugin from a text description.", icon: <WordPressIcon />, category: "CMS" },
     
     { id: "css-grid-editor", name: "CSS Grid Visual Editor", description: "Drag-based layout builder for CSS Grid.", icon: <CssGridEditorIcon />, category: "Frontend" },
     { id: "pwa-manifest-editor", name: "PWA Manifest Editor", description: "Configure and preview Progressive Web App manifests with a home screen simulator.", icon: <PwaManifestEditorIcon />, category: "Frontend" },

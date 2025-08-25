@@ -39,10 +39,13 @@ export const CloudCostEstimator: React.FC = () => {
                 <div className="flex flex-col flex-grow min-h-0 mt-4">
                     <label className="text-sm font-medium mb-2">AI-Generated Estimate</label>
                     <div className="flex-grow p-4 bg-background border rounded overflow-auto">
-                        {isLoading && <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>}
-                        {estimate && <MarkdownRenderer content={estimate} />}
-                        {!isLoading && estimate && (
-                            <p className="text-xs text-yellow-600 mt-4"><strong>Disclaimer:</strong> This is a rough, non-binding estimate based on public pricing data and should not be used for official budgeting.</p>
+                        {isLoading ? <div className="flex justify-center items-center h-full"><LoadingSpinner /></div> : (
+                            estimate && (
+                                <>
+                                    <MarkdownRenderer content={estimate} />
+                                    <p className="text-xs text-yellow-600 mt-4"><strong>Disclaimer:</strong> This is a rough, non-binding estimate based on public pricing data and should not be used for official budgeting.</p>
+                                </>
+                            )
                         )}
                     </div>
                 </div>

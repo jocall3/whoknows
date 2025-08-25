@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { anonymizeData } from '../../services/aiService.ts';
-import { ShieldCheckIcon, SparklesIcon } from '../icons.tsx';
+import { ShieldCheckIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
@@ -12,7 +12,7 @@ const exampleJson = `[
 export const DataAnonymizer: React.FC = () => {
     const [data, setData] = useState(exampleJson);
     const [anonymizedData, setAnonymizedData] = useState('');
-    const [targets, setTargets] = useState({ name: true, email: true, ip_address: true });
+    const [targets, setTargets] = useState({ name: true, email: true, ip_address: true, phone: true });
     const [isLoading, setIsLoading] = useState(false);
     const { addNotification } = useNotification();
 
@@ -55,8 +55,8 @@ export const DataAnonymizer: React.FC = () => {
                         <label className="text-sm font-medium mb-2">Fields to Anonymize</label>
                         <div className="flex flex-wrap gap-2">
                             {Object.keys(targets).map(key => (
-                                <label key={key} className="flex items-center gap-2 p-2 bg-surface border rounded-md text-sm">
-                                    <input type="checkbox" checked={targets[key as keyof typeof targets]} onChange={() => handleTargetChange(key)} />
+                                <label key={key} className="flex items-center gap-2 p-2 bg-surface border rounded-md text-sm cursor-pointer">
+                                    <input type="checkbox" checked={targets[key as keyof typeof targets]} onChange={() => handleTargetChange(key)} className="rounded text-primary focus:ring-primary" />
                                     {key}
                                 </label>
                             ))}
@@ -67,7 +67,7 @@ export const DataAnonymizer: React.FC = () => {
                 <div className="flex flex-col">
                     <label className="text-sm font-medium mb-2">Anonymized Data</label>
                     <div className="flex-grow p-2 bg-background border rounded overflow-auto">
-                        {isLoading ? <div className="flex justify-center items-center h-full"><LoadingSpinner /></div> : <pre className="font-mono text-xs">{anonymizedData}</pre>}
+                        {isLoading ? <div className="flex justify-center items-center h-full"><LoadingSpinner /></div> : <pre className="font-mono text-xs whitespace-pre-wrap">{anonymizedData}</pre>}
                     </div>
                 </div>
             </div>

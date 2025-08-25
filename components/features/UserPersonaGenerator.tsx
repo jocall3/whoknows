@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { generateUserPersona, generateImage } from '../../services/aiService.ts';
-import { DocumentIcon, SparklesIcon } from '../icons.tsx';
+import { DocumentTextIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
@@ -37,7 +37,7 @@ export const UserPersonaGenerator: React.FC = () => {
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
             <header className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center"><DocumentIcon /><span className="ml-3">User Persona Generator</span></h1>
+                <h1 className="text-3xl font-bold flex items-center"><DocumentTextIcon /><span className="ml-3">User Persona Generator</span></h1>
                 <p className="text-text-secondary mt-1">Create detailed user personas from a brief description of a target audience.</p>
             </header>
             <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">

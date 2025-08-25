@@ -17,7 +17,7 @@ const FileTreeSelector: React.FC<{ node: FileNode, selectedPaths: Set<string>, o
     if (node.type === 'file') {
         return (
             <div className="flex items-center space-x-2 pl-4 py-1">
-                <input type="checkbox" checked={isSelected} onChange={handleToggle} />
+                <input type="checkbox" checked={isSelected} onChange={handleToggle} className="w-4 h-4 rounded text-primary focus:ring-primary" />
                 <DocumentTextIcon />
                 <span>{node.name}</span>
             </div>
@@ -27,7 +27,7 @@ const FileTreeSelector: React.FC<{ node: FileNode, selectedPaths: Set<string>, o
     return (
         <div>
             <div className="flex items-center space-x-2 py-1">
-                <input type="checkbox" checked={isSelected} onChange={handleToggle} />
+                <input type="checkbox" checked={isSelected} onChange={handleToggle} className="w-4 h-4 rounded text-primary focus:ring-primary"/>
                 <button onClick={() => setIsOpen(!isOpen)} className={`transform transition-transform ${isOpen ? 'rotate-90' : ''}`}>▶</button>
                 <FolderIcon />
                 <span className="font-semibold">{node.name}</span>
@@ -58,10 +58,17 @@ export const CodeDocumentationWriter: React.FC = () => {
         setIsLoading(true);
         setDocumentation('');
         try {
-            // This is a simplified fetcher. In a real app, this would need to get content from the GitHubService
-            // or wherever the file content is stored. Here we assume it's pre-loaded or mock it.
-            const filesToDocument = Array.from(selectedPaths).map(path => ({ path, content: `// Content for ${path}`}));
+            // This is a simplified fetcher. In a real app, this would get content from the GitHubService
+            const filesToDocument = Array.from(selectedPaths)
+                .filter(path => path) // Filter out root path
+                .map(path => ({ path, content: `// Mock content for ${path}`}));
             
+            if (filesToDocument.length === 0) {
+                 addNotification('Please select specific files or sub-directories.', 'info');
+                 setIsLoading(false);
+                 return;
+            }
+
             const result = await generateDocumentationForFiles(filesToDocument);
             setDocumentation(result);
             addNotification('Documentation generated!', 'success');
@@ -73,7 +80,7 @@ export const CodeDocumentationWriter: React.FC = () => {
     };
     
     const getAllChildPaths = (node: FileNode): string[] => {
-        let paths = [node.path];
+        let paths = node.type === 'file' ? [node.path] : [];
         if (node.children) {
             paths = paths.concat(...node.children.map(getAllChildPaths));
         }
@@ -98,7 +105,7 @@ export const CodeDocumentationWriter: React.FC = () => {
         let pathsToToggle: string[] = [path];
         if (isFolder && projectFiles) {
             const folderNode = findNodeByPath(projectFiles, path);
-            if(folderNode) pathsToToggle = getAllChildPaths(folderNode);
+            if(folderNode) pathsToToggle = [path, ...getAllChildPaths(folderNode)];
         }
         
         if (isSelected) {

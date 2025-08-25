@@ -1,26 +1,33 @@
 import React, { useState } from 'react';
 import { decomposeUserFlow, generateImage } from '../../services/aiService.ts';
-import { PhotoIcon, SparklesIcon } from '../icons.tsx';
+import { PhotoIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
+interface StoryboardFrame {
+    description: string;
+    imageUrl: string;
+}
+
 export const StoryboardGenerator: React.FC = () => {
     const [flow, setFlow] = useState('User logs in, sees a dashboard with three widgets, and clicks a button to open a settings modal.');
-    const [images, setImages] = useState<string[]>([]);
+    const [frames, setFrames] = useState<StoryboardFrame[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [progress, setProgress] = useState('');
     const { addNotification } = useNotification();
 
     const handleGenerate = async () => {
         setIsLoading(true);
-        setImages([]);
+        setFrames([]);
         setProgress('Decomposing user flow...');
         try {
             const { steps } = await decomposeUserFlow(flow);
+            const newFrames: StoryboardFrame[] = [];
             for (let i = 0; i < steps.length; i++) {
                 setProgress(`Generating wireframe for: "${steps[i]}" (${i + 1}/${steps.length})`);
                 const imageUrl = await generateImage(`A clean UI wireframe of: ${steps[i]}, user interface, UX design, simple, clean lines.`);
-                setImages(prev => [...prev, imageUrl]);
+                newFrames.push({ description: steps[i], imageUrl });
+                setFrames([...newFrames]);
             }
             addNotification('Storyboard generated!', 'success');
         } catch (err) {
@@ -44,12 +51,15 @@ export const StoryboardGenerator: React.FC = () => {
                 </div>
                 <button onClick={handleGenerate} disabled={isLoading} className="btn-primary w-full max-w-sm mx-auto py-3">{isLoading ? <LoadingSpinner/> : 'Generate Storyboard'}</button>
             </div>
-            <div className="flex-grow mt-6 bg-background border rounded-lg p-4 overflow-auto">
+            <div className="flex-grow mt-6 bg-background border rounded-lg p-4 overflow-x-auto">
                 {isLoading && <div className="text-center"><LoadingSpinner /><p className="mt-2 text-sm text-text-secondary">{progress}</p></div>}
-                <div className="flex gap-4">
-                    {images.map((img, i) => (
-                        <div key={i} className="flex-shrink-0 w-64 h-64 bg-surface border rounded-md">
-                            <img src={img} alt={`Storyboard frame ${i + 1}`} className="w-full h-full object-contain"/>
+                <div className="flex gap-4 h-full">
+                    {frames.map((frame, i) => (
+                        <div key={i} className="flex-shrink-0 w-72 h-full bg-surface border rounded-md flex flex-col p-2">
+                            <div className="flex-grow bg-gray-200 rounded-sm flex items-center justify-center">
+                                <img src={frame.imageUrl} alt={frame.description} className="max-w-full max-h-full object-contain"/>
+                            </div>
+                            <p className="text-xs text-center mt-2 p-1">{frame.description}</p>
                         </div>
                     ))}
                 </div>

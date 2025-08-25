@@ -55,8 +55,9 @@ export const I18nHelper: React.FC = () => {
                     <div className="flex flex-col flex-1 min-h-0">
                         <label className="text-sm font-medium mb-2">Generated i18n JSON</label>
                         <div className="flex-grow p-1 bg-background border rounded overflow-auto">
-                            {isLoading && !i18nJson && <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>}
-                            {i18nJson && <MarkdownRenderer content={'```json\n' + JSON.stringify(i18nJson, null, 2) + '\n```'} />}
+                            {isLoading && !i18nJson ? <div className="flex justify-center items-center h-full"><LoadingSpinner /></div> : (
+                                i18nJson && <MarkdownRenderer content={'```json\n' + JSON.stringify(i18nJson, null, 2) + '\n```'} />
+                            )}
                         </div>
                     </div>
                      <div className="flex flex-col flex-1 min-h-0">

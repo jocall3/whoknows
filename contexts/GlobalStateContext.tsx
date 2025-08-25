@@ -46,41 +46,41 @@ const reducer = (state: GlobalState, action: Action): GlobalState => {
     case 'SET_VIEW':
       return { ...state, activeView: action.payload.view, viewProps: action.payload.props || {} };
     case 'TOGGLE_FEATURE_VISIBILITY': {
-        const { featureId } = action.payload;
-        const isHidden = state.hiddenFeatures.includes(featureId);
-        const newHiddenFeatures = isHidden
-            ? state.hiddenFeatures.filter(id => id !== featureId)
-            : [...state.hiddenFeatures, featureId];
-        return { ...state, hiddenFeatures: newHiddenFeatures };
+      const { featureId } = action.payload;
+      const isHidden = state.hiddenFeatures.includes(featureId);
+      const newHiddenFeatures = isHidden
+        ? state.hiddenFeatures.filter(id => id !== featureId)
+        : [...state.hiddenFeatures, featureId];
+      return { ...state, hiddenFeatures: newHiddenFeatures };
     }
     case 'SET_APP_USER':
-        if (action.payload === null) { // User logged out
-            return {
-                ...state,
-                user: null,
-                githubUser: null,
-                selectedRepo: null,
-                projectFiles: null,
-            }
-        }
-        return { ...state, user: action.payload };
-    case 'SET_GITHUB_USER':
+      if (action.payload === null) { // User logged out
         return {
-            ...state,
-            githubUser: action.payload,
-             // Reset repo-specific data if disconnected
-            selectedRepo: action.payload ? state.selectedRepo : null,
-            projectFiles: action.payload ? state.projectFiles : null,
+          ...state,
+          user: null,
+          githubUser: null,
+          selectedRepo: null,
+          projectFiles: null,
         }
+      }
+      return { ...state, user: action.payload };
+    case 'SET_GITHUB_USER':
+      return {
+        ...state,
+        githubUser: action.payload,
+        // Reset repo-specific data if disconnected
+        selectedRepo: action.payload ? state.selectedRepo : null,
+        projectFiles: action.payload ? state.projectFiles : null,
+      }
     case 'LOAD_PROJECT_FILES':
       return { ...state, projectFiles: action.payload };
     case 'SET_SELECTED_REPO':
       return { ...state, selectedRepo: action.payload, projectFiles: null }; // Reset files on repo change
     case 'SET_VAULT_STATE':
-        return {
-            ...state,
-            vaultState: { ...state.vaultState, ...action.payload },
-        };
+      return {
+        ...state,
+        vaultState: { ...state.vaultState, ...action.payload },
+      };
     default:
       return state;
   }
@@ -98,63 +98,63 @@ const LOCAL_STORAGE_KEY = 'devcore_snapshot';
 const CONSENT_KEY = 'devcore_ls_consent';
 
 export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const canPersist = (() => {
-        try {
-            return localStorage.getItem(CONSENT_KEY) === 'granted';
-        } catch (e) {
-            return false;
-        }
-    })();
+  const canPersist = (() => {
+    try {
+      return localStorage.getItem(CONSENT_KEY) === 'granted';
+    } catch (e) {
+      return false;
+    }
+  })();
 
-    const [state, dispatch] = useReducer(reducer, initialState, (initial) => {
-        if (!canPersist) return initial;
-        
-        try {
-            const storedStateJSON = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (!storedStateJSON) return initial;
-            
-            const storedState = JSON.parse(storedStateJSON);
-            const hydratedState = { ...initial };
+  const [state, dispatch] = useReducer(reducer, initialState, (initial) => {
+    if (!canPersist) return initial;
 
-            // Hydrate state from local storage
-            if (storedState.selectedRepo) hydratedState.selectedRepo = storedState.selectedRepo;
-            if (storedState.activeView) hydratedState.activeView = storedState.activeView;
-            if (storedState.viewProps) hydratedState.viewProps = storedState.viewProps;
-            if (storedState.hiddenFeatures) hydratedState.hiddenFeatures = storedState.hiddenFeatures;
-            
-            return hydratedState;
-        } catch (error) {
-            console.error("Failed to parse state from localStorage", error);
-            return initial;
-        }
-    });
+    try {
+      const storedStateJSON = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (!storedStateJSON) return initial;
 
-    useEffect(() => {
-        if (!canPersist) return;
+      const storedState = JSON.parse(storedStateJSON);
+      const hydratedState = { ...initial };
 
-        const handler = setTimeout(() => {
-            try {
-                const stateToSave = { 
-                    selectedRepo: state.selectedRepo,
-                    activeView: state.activeView,
-                    viewProps: state.viewProps,
-                    hiddenFeatures: state.hiddenFeatures,
-                };
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
-            } catch (error) {
-                console.error("Failed to save state to localStorage", error);
-            }
-        }, 500);
-        
-        return () => clearTimeout(handler);
-    }, [state, canPersist]);
+      // Hydrate state from local storage
+      if (storedState.selectedRepo) hydratedState.selectedRepo = storedState.selectedRepo;
+      if (storedState.activeView) hydratedState.activeView = storedState.activeView;
+      if (storedState.viewProps) hydratedState.viewProps = storedState.viewProps;
+      if (storedState.hiddenFeatures) hydratedState.hiddenFeatures = storedState.hiddenFeatures;
+
+      return hydratedState;
+    } catch (error) {
+      console.error("Failed to parse state from localStorage", error);
+      return initial;
+    }
+  });
+
+  useEffect(() => {
+    if (!canPersist) return;
+
+    const handler = setTimeout(() => {
+      try {
+        const stateToSave = {
+          selectedRepo: state.selectedRepo,
+          activeView: state.activeView,
+          viewProps: state.viewProps,
+          hiddenFeatures: state.hiddenFeatures,
+        };
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
+      } catch (error) {
+        console.error("Failed to save state to localStorage", error);
+      }
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [state, canPersist]);
 
 
-    return (
-        <GlobalStateContext.Provider value={{ state, dispatch }}>
-            {children}
-        </GlobalStateContext.Provider>
-    );
+  return (
+    <GlobalStateContext.Provider value={{ state, dispatch }}>
+      {children}
+    </GlobalStateContext.Provider>
+  );
 };
 
 export const useGlobalState = () => useContext(GlobalStateContext);

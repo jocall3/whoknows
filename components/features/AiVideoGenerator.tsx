@@ -46,8 +46,8 @@ export const AiVideoGenerator: React.FC = () => {
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
             <header className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center"><VideoCameraIcon /><span className="ml-3">AI Video Generator</span></h1>
-                <p className="text-text-secondary mt-1">A UI for text-to-video generation.</p>
+                <h1 className="text-3xl font-bold flex items-center"><VideoCameraIcon /><span className="ml-3">AI Video Generator (Simulated)</span></h1>
+                <p className="text-text-secondary mt-1">Generate a sequence of images from a prompt to simulate video creation.</p>
             </header>
             <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
                 <div className="flex flex-col gap-4">
@@ -57,7 +57,7 @@ export const AiVideoGenerator: React.FC = () => {
                     </div>
                     <button onClick={handleGenerate} disabled={isLoading} className="btn-primary w-full py-3">{isLoading ? <LoadingSpinner/> : 'Generate Video Frames'}</button>
                     <p className="text-xs text-center text-yellow-600 bg-yellow-400/10 p-2 rounded-md">
-                        <strong>Note:</strong> This is a simulation. It generates a sequence of images and plays them as a slideshow to mimic video generation.
+                        <strong>Note:</strong> This is a simulation. It generates a sequence of images and plays them as a slideshow to mimic video generation, as client-side video generation APIs are not yet standard.
                     </p>
                 </div>
                 <div className="flex flex-col">

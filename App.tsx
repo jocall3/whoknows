@@ -2,17 +2,17 @@
 import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { useGlobalState } from './contexts/GlobalStateContext.tsx';
-import type { ViewType, AppUser, Feature } from './types.ts';
+import type { ViewType, AppUser, Feature, CustomFeature } from './types.ts';
 import { CommandPalette } from './components/CommandPalette.tsx';
 import { NotificationProvider } from './contexts/NotificationContext.tsx';
 import { useTheme } from './hooks/useTheme.ts';
 import { VaultProvider } from './components/vault/VaultProvider.tsx';
 import { initGoogleAuth } from './services/googleAuthService.ts';
-
+import { getAllCustomFeatures } from './services/dbService.ts';
 import { Window } from './components/desktop/Window.tsx';
 import { FeatureDock } from './components/desktop/FeatureDock.tsx';
 import { Taskbar } from './components/desktop/Taskbar.tsx';
-import { FEATURES_MAP } from './components/features/index.ts';
+import { FEATURES_MAP, componentMap } from './components/features/index.ts';
 
 
 export const LoadingIndicator: React.FC = () => (
@@ -74,11 +74,24 @@ const Z_INDEX_BASE = 10;
 
 const AppContent: React.FC = () => {
     const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
-
     const [windows, setWindows] = useState<Record<string, WindowState>>({});
     const [activeId, setActiveId] = useState<string | null>(null);
     const [nextZIndex, setNextZIndex] = useState(Z_INDEX_BASE);
+    const [customFeatures, setCustomFeatures] = useState<CustomFeature[]>([]);
+
+    const fetchCustomFeatures = useCallback(async () => {
+        const features = await getAllCustomFeatures();
+        setCustomFeatures(features);
+    }, []);
   
+    useEffect(() => {
+        fetchCustomFeatures();
+        // Listen for an event that indicates a feature was saved in the forge
+        const handleFeatureUpdated = () => fetchCustomFeatures();
+        window.addEventListener('custom-feature-update', handleFeatureUpdated);
+        return () => window.removeEventListener('custom-feature-update', handleFeatureUpdated);
+    }, [fetchCustomFeatures]);
+    
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -140,7 +153,10 @@ const AppContent: React.FC = () => {
     };
 
     const focusWindow = (id: string) => {
-        if (id === activeId && windows[id]?.zIndex === nextZIndex) return;
+        if (id === activeId && windows[id]?.zIndex === nextZIndex) {
+             setWindows(prev => ({ ...prev, [id]: { ...prev[id], isMinimized: false }}));
+             return;
+        }
         const newZIndex = nextZIndex + 1;
         setNextZIndex(newZIndex);
         setActiveId(id);
@@ -160,19 +176,35 @@ const AppContent: React.FC = () => {
     const openWindows = Object.values(windows).filter(w => !w.isMinimized);
     const minimizedWindows = Object.values(windows).filter(w => w.isMinimized);
 
+    const allFeaturesMap = useMemo(() => {
+        const combined = new Map(FEATURES_MAP);
+        customFeatures.forEach(cf => {
+            combined.set(cf.id, {
+                ...cf,
+                component: componentMap['custom-feature-runner'],
+                category: 'Custom'
+            });
+        });
+        return combined;
+    }, [customFeatures]);
+
+
     return (
         <div className="h-full w-full relative overflow-hidden bg-cover bg-center" style={{backgroundImage: 'url(https://source.unsplash.com/random/1920x1080?abstract)'}}>
             <ErrorBoundary>
-                <FeatureDock onOpen={openWindow} />
+                <FeatureDock onOpen={openWindow} customFeatures={customFeatures} />
                 <main className="w-full h-full">
                     {openWindows.map(win => {
-                        const feature = FEATURES_MAP.get(win.id);
+                        const feature = allFeaturesMap.get(win.id);
                         if (!feature) return null;
+                        
+                        const props = feature.id.startsWith('custom-') ? { ...win.props, feature } : win.props;
+                        
                         return (
                             <Suspense key={win.id} fallback={<div />}>
                                 <Window
                                     feature={feature}
-                                    state={win}
+                                    state={{...win, props}}
                                     isActive={win.id === activeId}
                                     onClose={closeWindow}
                                     onMinimize={minimizeWindow}
@@ -184,7 +216,7 @@ const AppContent: React.FC = () => {
                     })}
                 </main>
                 <Taskbar
-                    minimizedWindows={minimizedWindows.map(w => FEATURES_MAP.get(w.id)).filter(Boolean) as Feature[]}
+                    minimizedWindows={minimizedWindows.map(w => allFeaturesMap.get(w.id)).filter(Boolean) as (Feature | CustomFeature)[]}
                     onRestore={focusWindow}
                 />
                 <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} onSelect={openWindow} />

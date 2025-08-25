@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { sqlToApiEndpoints } from '../../services/aiService.ts';
 import type { GeneratedFile } from '../../types.ts';
-import { ServerStackIcon, SparklesIcon } from '../icons.tsx';
+import { ServerStackIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
@@ -74,8 +74,9 @@ export const SqlToApiGenerator: React.FC = () => {
                         ))}
                     </div>
                     <div className="flex-grow bg-background border border-t-0 rounded-b-md overflow-auto">
-                        {isLoading && <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>}
-                        {activeFile ? <MarkdownRenderer content={'```javascript\n' + activeFile.content + '\n```'} /> : <div className="p-4 text-text-secondary">Generated code will appear here.</div>}
+                        {isLoading ? <div className="flex justify-center items-center h-full"><LoadingSpinner /></div> : (
+                            activeFile ? <MarkdownRenderer content={'```javascript\n' + activeFile.content + '\n```'} /> : <div className="p-4 text-text-secondary">Generated code will appear here.</div>
+                        )}
                     </div>
                 </div>
             </div>

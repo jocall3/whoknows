@@ -3,7 +3,7 @@ import type { Feature } from '../../types.ts';
 import { RAW_FEATURES } from '../../constants.tsx';
 import { lazyWithRetry } from '../../services/componentLoader.ts';
 
-const componentMap: Record<string, React.FC<any>> = {
+export const componentMap: Record<string, React.LazyExoticComponent<React.FC<any>>> = {
     'ai-command-center': lazyWithRetry(() => import('./AiCommandCenter.tsx'), 'AiCommandCenter'),
     'project-explorer': lazyWithRetry(() => import('./ProjectExplorer.tsx'), 'ProjectExplorer'),
     'workspace-connector-hub': lazyWithRetry(() => import('./WorkspaceConnectorHub.tsx'), 'WorkspaceConnectorHub'),
@@ -84,6 +84,11 @@ const componentMap: Record<string, React.FC<any>> = {
     'cloud-cost-estimator': lazyWithRetry(() => import('./CloudCostEstimator.tsx'), 'CloudCostEstimator'),
     'smart-logger': lazyWithRetry(() => import('./SmartLogger.tsx'), 'SmartLogger'),
     'accessibility-annotation': lazyWithRetry(() => import('./AccessibilityAnnotation.tsx'), 'AccessibilityAnnotation'),
+    
+    // --- Newly Added Features ---
+    'wordpress-plugin-generator': lazyWithRetry(() => import('./WordPressPluginGenerator.tsx'), 'WordPressPluginGenerator'),
+    'feature-forge': lazyWithRetry(() => import('./FeatureForge.tsx'), 'FeatureForge'),
+    'custom-feature-runner': lazyWithRetry(() => import('./CustomFeatureRunner.tsx'), 'CustomFeatureRunner'),
 };
 
 export const ALL_FEATURES: Feature[] = RAW_FEATURES.map(feature => ({

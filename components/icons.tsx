@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 
 const IconWrapper: React.FC<{children: React.ReactNode; className?: string}> = ({ children, className }) => (
@@ -62,6 +60,8 @@ export const MailIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.o
 
 
 // --- From CustomFeatureIcons.tsx ---
+export const WordPressIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.28 12.38l-2.32 6.01-3.32-8.66-2.14 8.66-2.3-6.04C6.18 14.33 6 14.17 6 14c0-.28.22-.5.5-.5h1.93l1.32 3.42 2.21-5.74-2.12-2.18h3.33l1.85 2.25 1.3-3.4h1.9c.28 0 .5.22.5.5 0 .15-.07.28-.15.38z" /></svg></IconWrapper>;
+export const HammerIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.83-5.83M11.42 15.17l2.472-2.472a3.375 3.375 0 0 0-4.773-4.773L6.23 10.72M11.42 15.17 6.23 10.72m5.19 4.45L18.849 8.152a2.25 2.25 0 0 0-3.182-3.182L8.15 11.152m5.19 4.45L8.15 11.152" /></svg></IconWrapper>;
 export const CommandCenterIcon: React.FC = () => <IconWrapper><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 9V5l-7 7 7 7v-4.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 14.5V19l7-7-7-7v4.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.4"/></svg></IconWrapper>;
 export const ProjectExplorerIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.75h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></IconWrapper>;
 export const ConnectionsIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" /></svg></IconWrapper>;
