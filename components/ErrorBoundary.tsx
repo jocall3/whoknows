@@ -1,5 +1,6 @@
 import React from 'react';
-import { logError, debugErrorStream } from '../services/index.ts';
+import { logError } from '../services/telemetryService.ts';
+import { debugErrorStream } from '../services/aiService.ts';
 import { SparklesIcon } from './icons.tsx';
 import { MarkdownRenderer, LoadingSpinner } from './shared/index.tsx';
 
@@ -60,7 +61,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                     <h1 className="text-2xl font-bold text-red-600 mb-2">An Unexpected Error Occurred</h1>
                     <p className="text-text-secondary mb-4">A component has crashed. You can try reloading or ask the AI for debugging help.</p>
                     
-                    <details className="text-left bg-gray-50 p-2 rounded-md max-w-xl text-xs font-mono mb-4 flex-grow overflow-auto border border-border">
+                    <details className="text-left bg-gray-50 dark:bg-slate-900 p-2 rounded-md max-w-xl text-xs font-mono mb-4 flex-grow overflow-auto border border-border">
                         <summary className="cursor-pointer">Error Details</summary>
                         <pre className="mt-2 whitespace-pre-wrap">{this.state.error?.stack}</pre>
                     </details>
@@ -83,7 +84,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                     </div>
                 </div>
 
-                <div className="flex flex-col bg-gray-50 rounded-lg p-4 border border-border">
+                <div className="flex flex-col bg-gray-50 dark:bg-slate-900 rounded-lg p-4 border border-border">
                     <h2 className="text-lg font-bold text-text-primary mb-2">AI Assistant</h2>
                     <div className="flex-grow overflow-y-auto">
                         {this.state.isAiLoading && <div className="flex justify-center items-center h-full"><LoadingSpinner /></div>}

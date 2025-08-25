@@ -85,7 +85,7 @@ const knowledgeBase = FEATURE_TAXONOMY.map(f => `- ${f.name} (${f.id}): ${f.desc
 const ExamplePromptButton: React.FC<{ text: string, onClick: (text: string) => void }> = ({ text, onClick }) => (
     <button
         onClick={() => onClick(text)}
-        className="px-3 py-1.5 bg-surface border border-border rounded-full text-xs hover:bg-gray-100 transition-colors"
+        className="px-3 py-1.5 bg-surface border border-border rounded-full text-xs hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
     >
         {text}
     </button>

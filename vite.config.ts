@@ -10,10 +10,18 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
 
     return {
+      optimizeDeps: {
+        exclude: [
+          'firebase/app',
+          'firebase/auth',
+          'firebase/firestore',
+          'axe-core'
+        ]
+      },
       define: {
         // The API key is injected into the app during the build process.
         // It's crucial that this variable is set in your deployment environment.
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.API_KEY': JSON.stringify(env.API_KEY),
         'process.env.GOOGLE_CLIENT_ID': JSON.stringify(env.GOOGLE_CLIENT_ID),
         'process.env.FIREBASE_API_KEY': JSON.stringify(env.FIREBASE_API_KEY),
         'process.env.FIREBASE_AUTH_DOMAIN': JSON.stringify(env.FIREBASE_AUTH_DOMAIN),
