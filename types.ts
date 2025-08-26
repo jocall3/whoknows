@@ -1,8 +1,19 @@
 import type React from 'react';
-import { CHROME_VIEW_IDS, FEATURE_CATEGORIES } from './constants.tsx';
+import { CHROME_VIEW_IDS } from './constants.tsx';
 
 export type ChromeViewType = typeof CHROME_VIEW_IDS[number];
 export type FeatureId = string;
+// FIX: Expand FeatureCategory to include all categories used in the app.
+export const FEATURE_CATEGORIES = [
+    'Global Economic Operating System',
+    'Computational Compassion at Scale',
+    'The Meta-Creation Platform',
+    'The Governance Layer',
+    'Core', 'Workflow', 'AI Tools', 'Testing', 'Git', 'Deployment', 'Data',
+    'Local Dev', 'Performance & Auditing', 'Deployment & CI/CD', 'Security',
+    'Productivity', 'Cloud', 'Custom'
+] as const;
+
 export type FeatureCategory = typeof FEATURE_CATEGORIES[number];
 
 export interface Feature {

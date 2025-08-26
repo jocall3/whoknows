@@ -3,7 +3,7 @@
 import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { useGlobalState } from './contexts/GlobalStateContext.tsx';
-import type { ViewType, AppUser, Feature, CustomFeature } from './types.ts';
+import type { ViewType, AppUser, Feature, CustomFeature, FeatureCategory } from './types.ts';
 import { CommandPalette } from './components/CommandPalette.tsx';
 import { NotificationProvider } from './contexts/NotificationContext.tsx';
 import { useTheme } from './hooks/useTheme.ts';
@@ -187,7 +187,9 @@ const DesktopExperience: React.FC = () => {
             combined.set(cf.id, {
                 ...cf,
                 component: componentMap['custom-feature-runner'],
-                category: 'Custom'
+                // FIX: Cast 'Custom' to FeatureCategory to resolve type error.
+                // The root cause is addressed by expanding FeatureCategory in types.ts.
+                category: 'Custom' as FeatureCategory,
             });
         });
         return combined;

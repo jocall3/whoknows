@@ -4,6 +4,10 @@ import { RAW_FEATURES } from '../../constants.tsx';
 import { lazyWithRetry } from '../../services/componentLoader.ts';
 
 export const componentMap: Record<string, React.LazyExoticComponent<React.FC<any>>> = {
+    'pillar-one-geos': lazyWithRetry(() => import('./PillarOneGeos.tsx'), 'PillarOneGeos'),
+    'pillar-two-compassion': lazyWithRetry(() => import('./PillarTwoCompassion.tsx'), 'PillarTwoCompassion'),
+    'pillar-three-meta-creation': lazyWithRetry(() => import('./PillarThreeMetaCreation.tsx'), 'PillarThreeMetaCreation'),
+    'pillar-four-governance': lazyWithRetry(() => import('./PillarFourGovernance.tsx'), 'PillarFourGovernance'),
     'ai-command-center': lazyWithRetry(() => import('./AiCommandCenter.tsx'), 'AiCommandCenter'),
     'project-explorer': lazyWithRetry(() => import('./ProjectExplorer.tsx'), 'ProjectExplorer'),
     'workspace-connector-hub': lazyWithRetry(() => import('./WorkspaceConnectorHub.tsx'), 'WorkspaceConnectorHub'),

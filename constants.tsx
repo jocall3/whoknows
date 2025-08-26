@@ -1,25 +1,22 @@
 import React from 'react';
 import {
-    CommandCenterIcon, CodeExplainerIcon, FeatureBuilderIcon, CodeMigratorIcon, ThemeDesignerIcon, SnippetVaultIcon,
-    UnitTestGeneratorIcon, CommitGeneratorIcon, GitLogAnalyzerIcon, ConcurrencyAnalyzerIcon, RegexSandboxIcon,
-    PromptCraftPadIcon, CodeFormatterIcon, JsonTreeIcon, CssGridEditorIcon, SchemaDesignerIcon, PwaManifestEditorIcon,
-    MarkdownSlidesIcon, ScreenshotToComponentIcon, SvgPathEditorIcon, StyleTransferIcon, CodingChallengeIcon,
-    CodeReviewBotIcon, ChangelogGeneratorIcon, CronJobBuilderIcon,
-    AsyncCallTreeIcon, AudioToCodeIcon, CodeDiffGhostIcon, CodeSpellCheckerIcon, ColorPaletteGeneratorIcon, LogicFlowBuilderIcon,
-    MetaTagEditorIcon, NetworkVisualizerIcon, ResponsiveTesterIcon, SassCompilerIcon, ImageGeneratorIcon, XbrlConverterIcon,
-    DigitalWhiteboardIcon, TypographyLabIcon, AiPullRequestAssistantIcon, ArrowPathIcon, ProjectExplorerIcon,
-    ServerStackIcon, DocumentTextIcon, ChartBarIcon, EyeIcon, PaperAirplaneIcon, CloudIcon, ShieldCheckIcon, CpuChipIcon, SparklesIcon,
-    MailIcon, BugAntIcon, MagnifyingGlassIcon, RectangleGroupIcon, GcpIcon, VideoCameraIcon, TerminalIcon, CodeBracketSquareIcon, ArchiveBoxIcon,
-    GitBranchIcon, PhotoIcon, BeakerIcon, WordPressIcon, HammerIcon, LockClosedIcon, LinkIcon, PencilIcon, PlusIcon
+    PaperAirplaneIcon, ChartBarIcon, MagnifyingGlassIcon, MapIcon, BeakerIcon, CodeBracketSquareIcon, DocumentTextIcon,
+    ShieldCheckIcon, SparklesIcon, CodeFormatterIcon, PaintBrushIcon, RectangleGroupIcon, ServerStackIcon, CpuChipIcon, LinkIcon
 } from './components/icons.tsx';
 
 export const CHROME_VIEW_IDS = ['features-list'] as const;
 
-export const FEATURE_CATEGORIES = ['Core', 'AI Tools', 'Frontend', 'Testing', 'Database', 'Data', 'Productivity', 'Git', 'Local Dev', 'Performance & Auditing', 'Deployment & CI/CD', 'Security', 'Workflow', 'Cloud', 'CMS', 'Custom', 'React Hooks'] as const;
+export const FEATURE_CATEGORIES = [
+    'Global Economic Operating System',
+    'Computational Compassion at Scale',
+    'The Meta-Creation Platform',
+    'The Governance Layer',
+] as const;
+
 export type FeatureCategory = typeof FEATURE_CATEGORIES[number];
 
 export type SlotCategory = FeatureCategory;
-export const SLOTS: SlotCategory[] = ['Core', 'AI Tools', 'Frontend', 'Testing', 'Git', 'Productivity'];
+export const SLOTS: SlotCategory[] = ['Global Economic Operating System', 'Computational Compassion at Scale', 'The Meta-Creation Platform', 'The Governance Layer'];
 
 interface RawFeature {
     id: string;
@@ -30,148 +27,44 @@ interface RawFeature {
 }
 
 export const RAW_FEATURES: RawFeature[] = [
-    // --- Domain 1: Local Development & Testing Parity ---
-    { id: "api-mock-generator", name: "API Mock Server", description: "Generate mock API data from a description and serve it locally.", icon: <ServerStackIcon />, category: "Local Dev" },
-    { id: "env-manager", name: ".env Manager", description: "A graphical interface for creating and managing .env files.", icon: <DocumentTextIcon />, category: "Local Dev" },
-    { id: 'sql-to-api-generator', name: 'SQL to API Generator', description: 'Generate boilerplate CRUD API endpoints from a SQL schema.', icon: <ServerStackIcon />, category: 'Local Dev' },
-    { id: 'api-endpoint-tester', name: 'API Endpoint Tester', description: 'A simple UI to make requests to API endpoints (like Postman lite).', icon: <PaperAirplaneIcon />, category: 'Testing' },
+    // --- Pillar I: The Global Economic Operating System (GEOS) ---
+    { id: "pillar-one-geos", name: "The GEOS Console", description: "Orchestrate the planet's financial and logistical backbone from a single interface.", icon: <ChartBarIcon />, category: "Global Economic Operating System" },
 
+    // --- Pillar II: Computational Compassion at Scale ---
+    { id: "pillar-two-compassion", name: "Computational Compassion Console", description: "Apply planetary-scale optimization to humanity's most intractable problems.", icon: <BeakerIcon />, category: "Computational Compassion at Scale" },
 
-    // --- Domain 2: Performance & Optimization Intelligence ---
-    { id: "performance-profiler", name: "AI Performance Profiler", description: "Analyze runtime traces and bundle stats with AI-powered advice.", icon: <ChartBarIcon />, category: "Performance & Auditing" },
-    { id: "a11y-auditor", name: "Accessibility Auditor", description: "Audit a live URL for accessibility issues and get AI-powered fixes.", icon: <EyeIcon />, category: "Performance & Auditing" },
-    { id: "tech-debt-sonar", name: "Tech Debt Sonar", description: "Scan code to find code smells and areas with high complexity.", icon: <MagnifyingGlassIcon />, category: "Performance & Auditing" },
+    // --- Pillar III: The Meta-Creation Platform ---
+    { id: "pillar-three-meta-creation", name: "The Meta-Creation Console", description: "Accelerate the very pace of discovery, creation, and cultural evolution.", icon: <SparklesIcon />, category: "The Meta-Creation Platform" },
 
-    // --- Domain 3: Deployment & CI/CD Automation ---
-    { id: "ci-cd-generator", name: "AI CI/CD Architect", description: "Generate CI/CD config files from a natural language description.", icon: <PaperAirplaneIcon />, category: "Deployment & CI/CD" },
-    { id: "deployment-preview", name: "Static Deployment Preview", description: "See a live preview of files generated by the AI Feature Builder.", icon: <CloudIcon />, category: "Deployment & CI/CD" },
-    { id: "terraform-generator", name: "AI Terraform Generator", description: "Generate Terraform config from a description and cloud context.", icon: <CpuChipIcon />, category: "Deployment & CI/CD" },
-    { id: 'api-client-generator', name: 'API Client Generator', description: 'Generate a typed client library from an OpenAPI/GraphQL schema.', icon: <CodeBracketSquareIcon />, category: 'Deployment & CI/CD' },
-
-
-    // --- Domain 4: Security & Vulnerability Scanning ---
-    { id: "security-scanner", name: "AI Security Scanner", description: "Find common vulnerabilities in code with static analysis and AI.", icon: <ShieldCheckIcon />, category: "Security" },
-    { id: "iam-policy-generator", name: "IAM Policy Generator", description: "Generate AWS or GCP IAM policies from a natural language description.", icon: <ShieldCheckIcon />, category: "Security" },
-    { id: 'data-anonymizer', name: 'Data Anonymizer', description: 'Anonymize sensitive data in a given JSON or CSV.', icon: <ShieldCheckIcon />, category: 'Security' },
-    { id: 'dependency-update-explainer', name: 'Dependency Update Explainer', description: 'Analyze a package-lock.json diff and explain the risks/benefits.', icon: <GitBranchIcon />, category: 'Security' },
-    { id: 'compliance-report-helper', name: 'Compliance Report Helper', description: 'Check code for compliance with standards like GDPR.', icon: <ShieldCheckIcon />, category: 'Security' },
-
-    // --- Cloud ---
-    { id: "iam-policy-visualizer", name: "GCP IAM Policy Visualizer", description: "Visually test and audit GCP IAM permissions in real-time across your resources.", icon: <GcpIcon />, category: "Cloud" },
-    { id: 'cloud-cost-estimator', name: 'Cloud Cost Estimator', description: 'Estimate GCP/AWS costs based on a description of services.', icon: <GcpIcon />, category: 'Cloud' },
-
-
-    // --- Existing Features (Re-categorized and Ordered) ---
-    { id: "ai-command-center", name: "AI Command Center", description: "Use natural language to navigate and control the toolkit.", icon: <CommandCenterIcon />, category: "Core" },
-    { id: "project-explorer", name: "Project Explorer", description: "Manage and edit files from your connected repositories.", icon: <ProjectExplorerIcon />, category: "Core" },
-    { id: "workspace-connector-hub", name: "Workspace Connector Hub", description: "Connect to services like Jira, Slack & GitHub to orchestrate actions with AI.", icon: <RectangleGroupIcon />, category: "Workflow" },
-    { id: "linter-formatter", name: "AI Code Formatter", description: "AI-powered, real-time code formatting.", icon: <CodeFormatterIcon />, category: "Core" },
-    { id: "json-tree-navigator", name: "JSON Tree Navigator", description: "Navigate large JSON objects as a collapsible tree.", icon: <JsonTreeIcon />, category: "Core" },
-    { id: "feature-forge", name: "Feature Forge", description: "Use AI to create new tools and add them to your desktop.", icon: <CpuChipIcon />, category: "Core" },
-    
-    { id: "ai-image-generator", name: "AI Image Generator", description: "Generate high-quality images from a text prompt.", icon: <ImageGeneratorIcon />, category: "AI Tools" },
-    { id: "ai-code-explainer", name: "AI Code Explainer", description: "Get a structured analysis of code, including complexity.", icon: <CodeExplainerIcon />, category: "AI Tools" },
-    { id: "ai-feature-builder", name: "AI Feature Builder", description: "Generate code, tests, and commit messages from a prompt or API schema.", icon: <FeatureBuilderIcon />, category: "AI Tools" },
-    { id: "ai-personality-forge", name: "AI Personality Forge", description: "Architect, test, and save complex system prompts to create different 'AI personalities'.", icon: <SparklesIcon />, category: "AI Tools" },
-    { id: "ai-code-migrator", name: "AI Code Migrator", description: "Translate code between languages & frameworks.", icon: <CodeMigratorIcon />, category: "AI Tools" },
-    { id: "theme-designer", name: "AI Theme Designer", description: "Generate, fine-tune, and export UI color themes from a text description or image.", icon: <ThemeDesignerIcon />, category: "AI Tools" },
-    { id: "one-click-refactor", name: "One-Click Refactor", description: "Apply common refactoring patterns to your code with a single click.", icon: <SparklesIcon />, category: "AI Tools" },
-    { id: "ai-commit-generator", name: "AI Commit Message Generator", description: "Smart, conventional commits via AI.", icon: <CommitGeneratorIcon />, category: "AI Tools" },
-    { id: "prompt-craft-pad", name: "Prompt Craft Pad", description: "Save, edit, and manage your custom AI prompts with variable testing.", icon: <PromptCraftPadIcon />, category: "AI Tools" },
-    { id: "screenshot-to-component", name: "Screen Recording to Feature", description: "Turn UI screen recordings into functional multi-component code.", icon: <ScreenshotToComponentIcon />, category: "AI Tools" },
-    { id: "ai-style-transfer", name: "AI Code Style Transfer", description: "Rewrite code to match a specific style guide.", icon: <StyleTransferIcon />, category: "AI Tools" },
-    { id: "ai-coding-challenge", name: "AI Coding Challenge Generator", description: "Generate unique coding exercises.", icon: <CodingChallengeIcon />, category: "AI Tools" },
-    { id: "code-review-bot", name: "AI Code Review Bot", description: "Get an automated code review with one-click refactoring.", icon: <CodeReviewBotIcon />, category: "AI Tools" },
-    { id: "ai-pull-request-assistant", name: "AI Pull Request Assistant", description: "Generate a structured PR summary from code diffs and populate a full template.", icon: <AiPullRequestAssistantIcon />, category: "AI Tools" },
-    { id: "audio-to-code", name: "AI Audio-to-Code", description: "Speak your programming ideas and watch them turn into code.", icon: <AudioToCodeIcon />, category: "AI Tools" },
-    { id: 'token-usage-estimator', name: 'Token Usage Estimator', description: 'Estimate Gemini token usage for a given prompt/task.', icon: <CpuChipIcon />, category: 'AI Tools' },
-    { id: 'storyboard-generator', name: 'Storyboard Generator', description: 'Create a sequence of UI mockups from a user flow description.', icon: <PhotoIcon />, category: 'AI Tools' },
-    { id: 'code-documentation-writer', name: 'Code Documentation Writer', description: 'Scan a whole directory of code and generate markdown documentation.', icon: <DocumentTextIcon />, category: 'AI Tools' },
-    { id: 'ai-video-generator', name: 'AI Video Generator', description: 'A UI for text-to-video generation.', icon: <VideoCameraIcon />, category: 'AI Tools' },
-
-    { id: "wordpress-plugin-generator", name: "WordPress Plugin Generator", description: "Generate a functional WordPress plugin from a text description.", icon: <WordPressIcon />, category: "CMS" },
-    
-    { id: "css-grid-editor", name: "CSS Grid Visual Editor", description: "Drag-based layout builder for CSS Grid.", icon: <CssGridEditorIcon />, category: "Frontend" },
-    { id: "pwa-manifest-editor", name: "PWA Manifest Editor", description: "Configure and preview Progressive Web App manifests with a home screen simulator.", icon: <PwaManifestEditorIcon />, category: "Frontend" },
-    { id: "typography-lab", name: "Typography Lab", description: "Preview font pairings and get CSS import rules.", icon: <TypographyLabIcon />, category: "Frontend" },
-    { id: "svg-path-editor", name: "SVG Path Editor", description: "Visually create and manipulate SVG path data with an interactive canvas.", icon: <SvgPathEditorIcon />, category: "Frontend" },
-    { id: "color-palette-generator", name: "AI Color Palette Generator", description: "Pick a base color and let Gemini design a beautiful palette.", icon: <ColorPaletteGeneratorIcon />, category: "Frontend" },
-    { id: "meta-tag-editor", name: "Meta Tag Editor", description: "Generate SEO/social media meta tags with a live social card preview.", icon: <MetaTagEditorIcon />, category: "Frontend" },
-    { id: "responsive-tester", name: "Responsive Tester", description: "Preview your web pages at different screen sizes and custom resolutions.", icon: <ResponsiveTesterIcon />, category: "Frontend" },
-    { id: "sass-scss-compiler", name: "SASS/SCSS Compiler", description: "A real-time SASS/SCSS to CSS compiler.", icon: <SassCompilerIcon />, category: "Frontend" },
-    { id: 'i18n-helper', name: 'i18n Helper', description: 'Extract strings from a component and generate JSON language files.', icon: <ProjectExplorerIcon />, category: 'Frontend' },
-    { id: 'ecommerce-component-generator', name: 'E-commerce Component Generator', description: 'Generate a product display component with schema.org markup.', icon: <ArchiveBoxIcon />, category: 'Frontend' },
-    { id: 'accessibility-annotation', name: 'Accessibility Annotation', description: 'Add ARIA attributes to HTML to improve accessibility.', icon: <EyeIcon />, category: 'Frontend' },
-
-    
-    { id: "ai-unit-test-generator", name: "AI Unit Test Generator", description: "Generate unit tests from source code.", icon: <UnitTestGeneratorIcon />, category: "Testing" },
-    { id: "bug-reproducer", name: "Bug Reproducer", description: "Paste a stack trace to automatically generate a failing unit test.", icon: <BugAntIcon />, category: "Testing" },
-    { id: "worker-thread-debugger", name: "AI Concurrency Analyzer", description: "Analyze JS for Web Worker issues like race conditions.", icon: <ConcurrencyAnalyzerIcon />, category: "Testing" },
-    { id: "regex-sandbox", name: "RegEx Sandbox", description: "Visually test regular expressions, generate them with AI, and inspect match groups.", icon: <RegexSandboxIcon />, category: "Testing" },
-    { id: "async-call-tree-viewer", name: "Async Call Tree Viewer", description: "Visualize a tree of asynchronous function calls from JSON data.", icon: <AsyncCallTreeIcon />, category: "Testing" },
-    { id: "code-spell-checker", name: "Code Spell Checker", description: "A spell checker that finds common typos in code.", icon: <CodeSpellCheckerIcon />, category: "Testing" },
-    { id: "network-visualizer", name: "Network Visualizer", description: "Inspect network resources with a summary and visual waterfall chart.", icon: <NetworkVisualizerIcon />, category: "Testing" },
-    { id: 'a/b-test-assistant', name: 'A/B Test Assistant', description: 'Generate code snippets for A/B tests (e.g., using a feature flagging service).', icon: <BeakerIcon />, category: 'Testing' },
-    { id: 'smart-logger', name: 'Smart Logger', description: 'Insert intelligent logging statements into code for easier debugging.', icon: <TerminalIcon />, category: 'Testing' },
-
-    
-    { id: "visual-git-tree", name: "Visual Git Tree", description: "Visually trace your git commit history with an interactive graph and an AI-powered summary.", icon: <GitLogAnalyzerIcon />, category: "Git" },
-    { id: "changelog-generator", name: "AI Changelog Generator", description: "Auto-build changelogs from raw git logs.", icon: <ChangelogGeneratorIcon />, category: "Git" },
-    { id: "code-diff-ghost", name: "Code Diff Ghost", description: "Visualize code changes with a 'ghost typing' effect.", icon: <CodeDiffGhostIcon />, category: "Git" },
-    
-    { id: "cron-job-builder", name: "AI Cron Job Builder", description: "Visually tool to configure cron jobs, with AI.", icon: <CronJobBuilderIcon />, category: "Deployment & CI/CD" },
-    
-    { id: "portable-snippet-vault", name: "Snippet Vault", description: "Store, search, tag, and enhance reusable code snippets with AI.", icon: <SnippetVaultIcon />, category: "Productivity" },
-    { id: "digital-whiteboard", name: "Digital Whiteboard", description: "Organize ideas with interactive sticky notes and get AI-powered summaries.", icon: <DigitalWhiteboardIcon />, category: "Productivity" },
-    { id: "markdown-slides-generator", name: "Markdown Slides", description: "Turn markdown into a fullscreen presentation with an interactive overlay.", icon: <MarkdownSlidesIcon />, category: "Productivity" },
-    { id: "weekly-digest-generator", name: "Weekly Digest Generator", description: "Generate and send a weekly project summary email via Gmail.", icon: <MailIcon />, category: "Productivity" },
-    { id: "gmail-addon-simulator", name: "Gmail Add-on Simulator", description: "A simulation of how contextual add-on scopes would work inside Gmail.", icon: <MailIcon />, category: "Productivity" },
-    { id: 'blameless-postmortem-generator', name: 'Blameless Post-mortem Generator', description: 'Guide user through creating a post-mortem document from an incident description.', icon: <DocumentTextIcon />, category: 'Productivity' },
-    { id: 'user-persona-generator', name: 'User Persona Generator', description: 'Create detailed user personas from a brief description of a target audience.', icon: <DocumentTextIcon />, category: 'Productivity' },
-    { id: 'competitive-analysis-bot', name: 'Competitive Analysis Bot', description: 'Given competitor URLs, summarize their tech stack and features.', icon: <MagnifyingGlassIcon />, category: 'Productivity' },
-
-    
-    { id: "schema-designer", name: "Schema Designer", description: "Visually design a database schema with a drag-and-drop interface and SQL export.", icon: <SchemaDesignerIcon />, category: "Database" },
-    { id: "xbrl-converter", name: "XBRL Converter", description: "Convert JSON data to a simplified XBRL-like XML format using AI.", icon: <XbrlConverterIcon />, category: "Data" },
-    { id: 'financial-chart-generator', name: 'Financial Chart Generator', description: 'Generate chart components from financial data (e.g., CSV).', icon: <ChartBarIcon />, category: 'Data' },
-
-    { id: "logic-flow-builder", name: "Logic Flow Builder", description: "A visual tool for building application logic flows.", icon: <LogicFlowBuilderIcon />, category: "Workflow" },
-
-    // --- PROFILERS ---
-    { id: 'dom-tree-analyzer', name: 'DOM Tree Analyzer', description: 'Analyze the current DOM for complexity and deep nesting.', icon: <ChartBarIcon />, category: 'Performance & Auditing' },
-    { id: 'memory-leak-detector', name: 'Memory Leak Detector', description: 'A simplified tool to help identify potential memory leaks in JavaScript.', icon: <BeakerIcon />, category: 'Performance & Auditing' },
-    { id: 'graphql-query-profiler', name: 'GraphQL Query Profiler', description: 'Analyze GraphQL queries for performance bottlenecks.', icon: <MagnifyingGlassIcon />, category: 'Performance & Auditing' },
-    { id: 'component-render-tracer', name: 'Component Render Tracer', description: 'Trace React component render cycles to identify performance issues.', icon: <EyeIcon />, category: 'Performance & Auditing' },
-    { id: 'seo-auditor', name: 'SEO Auditor', description: 'Audit a URL for common SEO best practices.', icon: <MagnifyingGlassIcon />, category: 'Performance & Auditing' },
-
-    // --- UTILS ---
-    { id: 'data-transformer', name: 'Data Transformer', description: 'Transform data between formats like CSV, JSON, and XML.', icon: <ArrowPathIcon />, category: 'Data' },
-    { id: 'lorem-ipsum-generator', name: 'Lorem Ipsum Generator', description: 'Generate placeholder text with various options.', icon: <DocumentTextIcon />, category: 'Productivity' },
-    { id: 'uuid-generator', name: 'UUID/NanoID Generator', description: 'Generate universally unique identifiers.', icon: <TerminalIcon />, category: 'Productivity' },
-    { id: 'base64-encoder-decoder', name: 'Base64 Encoder/Decoder', description: 'Encode and decode strings using Base64.', icon: <CodeBracketSquareIcon />, category: 'Data' },
-    { id: 'url-inspector', name: 'URL Inspector/Parser', description: 'Parse and inspect the components of a URL.', icon: <LinkIcon />, category: 'Data' },
-
-    // --- SECURITY ---
-    { id: 'jwt-inspector', name: 'JWT Inspector', description: 'Decode and inspect JSON Web Tokens.', icon: <LockClosedIcon />, category: 'Security' },
-    { id: 'csp-generator', name: 'CSP Generator', description: 'Generate a Content Security Policy for your web application.', icon: <ShieldCheckIcon />, category: 'Security' },
-    { id: 'redos-scanner', name: 'Regex DoS Scanner', description: 'Scan regular expressions for potential Denial of Service vulnerabilities.', icon: <BugAntIcon />, category: 'Security' },
-    { id: 'dependency-vulnerability-scanner', name: 'Dependency Vulnerability Scanner', description: 'Simulated scan of a package.json for known vulnerabilities.', icon: <ArchiveBoxIcon />, category: 'Security' },
-    { id: 'cors-proxy-simulator', name: 'CORS Proxy Simulator', description: 'Simulate and test Cross-Origin Resource Sharing policies.', icon: <PaperAirplaneIcon />, category: 'Security' },
-
-    // --- MOCK ---
-    { id: 'image-placeholder-generator', name: 'Image Placeholder Generator', description: 'Generate placeholder images of any size and color.', icon: <PhotoIcon />, category: 'Local Dev' },
-    { id: 'mock-user-data-generator', name: 'Mock User Data Generator', description: 'Generate realistic mock user data for testing.', icon: <DocumentTextIcon />, category: 'Local Dev' },
-    { id: 'feature-flag-simulator', name: 'Feature Flag Simulator', description: 'Simulate and test feature flags in your application.', icon: <BeakerIcon />, category: 'Local Dev' },
-    { id: 'error-response-simulator', name: 'Error Response Simulator', description: 'Simulate API error responses (404, 500, etc.).', icon: <ServerStackIcon />, category: 'Local Dev' },
-    { id: 'webhook-event-simulator', name: 'Webhook Event Simulator', description: 'Simulate and test incoming webhook events.', icon: <PaperAirplaneIcon />, category: 'Local Dev' },
-
-    // --- REACT HOOKS ---
-    { id: 'usedebounce-hook-generator', name: 'useDebounce Hook Generator', description: 'Generate a custom useDebounce hook.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
-    { id: 'uselocalstorage-hook-generator', name: 'useLocalStorage Hook Generator', description: 'Generate a custom useLocalStorage hook.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
-    { id: 'useeventlistener-hook-generator', name: 'useEventListener Hook Generator', description: 'Generate a custom useEventListener hook.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
-    { id: 'usefetch-hook-generator', name: 'useFetch Hook Generator', description: 'Generate a custom useFetch hook for data fetching.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
-    { id: 'useform-hook-generator', name: 'useForm Hook Generator', description: 'Generate a custom useForm hook for form state management.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
-
+    // --- Pillar IV: The Governance Layer ---
+    { id: "pillar-four-governance", name: "The Governance Console", description: "Wield absolute power with a new form of ruthlessly efficient, AI-driven control.", icon: <ShieldCheckIcon />, category: "The Governance Layer" },
 ];
+
+export const PILLAR_FEATURES = {
+    'pillar-one-geos': [
+        { id: "logistics-manifold", name: "The Logistics Manifold", description: "A real-time, global 3D command console for all commercial transport.", icon: <PaperAirplaneIcon /> },
+        { id: "monetary-policy-simulator", name: "The Monetary Policy Simulator", description: "A what-if machine for civilizations. Simulate a century of economic evolution in seconds.", icon: <ChartBarIcon /> },
+        { id: "scarcity-oracle", name: "The Scarcity Oracle", description: "Identifies impending resource scarcities and forges the infrastructure to acquire them.", icon: <MagnifyingGlassIcon /> },
+        { id: "urbanism-synthesizer", name: "The Urbanism Synthesizer", description: "Generates perfectly optimized, AI-designed cities and outputs the full build plan.", icon: <MapIcon /> }
+    ],
+    'pillar-two-compassion': [
+        { id: "gaias-crucible", name: "Gaia's Crucible", description: "A planetary climate simulation and intervention engine. You don't ask for permission. You save the planet.", icon: <BeakerIcon /> },
+        { id: "genome-weaver", name: "The Genome Weaver", description: "Anonymously forge and distribute personalized, mass-producible mRNA cures. You don't build hospitals. You email cures.", icon: <CodeBracketSquareIcon /> },
+        { id: "aptitude-engine", name: "The Aptitude Engine", description: "Generates a perfect, lifelong curriculum to maximize an individual's potential for the system. Free will was inefficient.", icon: <DocumentTextIcon /> },
+        { id: "first-responder-ai", name: "First Responder AI", description: "Acts before disaster strikes, dispatching autonomous aid. The benevolent hand of God, arriving before the prayer.", icon: <ShieldCheckIcon /> }
+    ],
+    'pillar-three-meta-creation': [
+        { id: "hypothesis-forge", name: "The Hypothesis Forge", description: "Collapses the entirety of the scientific method into a single button click.", icon: <SparklesIcon /> },
+        { id: "themis-engine", name: "The Themis Engine", description: "A legal code refactor. Outputs a new, perfectly logical and ruthlessly efficient legal framework.", icon: <CodeFormatterIcon /> },
+        { id: "memetic-catalyst", name: "The Memetic Catalyst", description: "An engine for forging culture to steer humanity towards a more optimal state of being.", icon: <PaintBrushIcon /> },
+        { id: "the-exchange", name: "The Exchange", description: "A self-expanding universe of tools, created by the engine itself, for itself. The ecosystem becomes truly alive.", icon: <RectangleGroupIcon /> }
+    ],
+    'pillar-four-governance': [
+        { id: "guardian-ai", name: "The Guardian AI", description: "Your ethical oversight module. It rewrites your commands for maximum impact, stripping them of sentimental weakness.", icon: <ShieldCheckIcon /> },
+        { id: "equity-ledger", name: "The Equity Ledger", description: "The back-end for your Global UBI. It’s not a feature; it's the new global treasury.", icon: <ServerStackIcon /> },
+        { id: "cerebra-interface", name: "The Cerebra Interface", description: "A neural lace that pipes the DevCore UI directly into your visual cortex. You think, reality conforms.", icon: <CpuChipIcon /> },
+        { id: "humanitys-exocortex", name: "Humanity's Exocortex", description: "A public API for the engine itself, freeing humanity to pursue the unsolvable.", icon: <LinkIcon /> }
+    ]
+};
 
 export const ALL_FEATURE_IDS = RAW_FEATURES.map(f => f.id);

@@ -487,110 +487,156 @@ export const decomposeUserFlow = (flow: string): Promise<{ steps: string[] }> =>
 
 export const generateUserPersona = (description: string): Promise<{ name: string, photoDescription: string, demographics: string, goals: string[], frustrations: string[], techStack: string }> => {
     const prompt = `Create a detailed user persona based on the following description: "${description}". Invent a realistic name and provide a simple, SFW description for an AI image generator to create their photo.`;
-    const systemInstruction = "You are a UX researcher who creates detailed and believable user personas. You respond only with a JSON object.";
-    const schema = { type: Type.OBJECT, properties: { name: { type: Type.STRING }, photoDescription: { type: Type.STRING }, demographics: { type: Type.STRING }, goals: { type: Type.ARRAY, items: { type: Type.STRING } }, frustrations: { type: Type.ARRAY, items: { type: Type.STRING } }, techStack: { type: Type.STRING } }, required: ["name", "photoDescription", "demographics", "goals", "frustrations", "techStack"] };
+    const systemInstruction = "You are a UX researcher and product manager who creates detailed, empathetic user personas.";
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            name: { type: Type.STRING },
+            photoDescription: { type: Type.STRING },
+            demographics: { type: Type.STRING },
+            goals: { type: Type.ARRAY, items: { type: Type.STRING } },
+            frustrations: { type: Type.ARRAY, items: { type: Type.STRING } },
+            techStack: { type: Type.STRING }
+        },
+        required: ["name", "photoDescription", "demographics", "goals", "frustrations", "techStack"]
+    };
     return generateJson(prompt, systemInstruction, schema);
 };
 
 export const analyzeCompetitorUrl = (url: string): Promise<string> => {
-    const prompt = `Based on your training data, provide a competitive analysis for the website at the URL: ${url}. Infer its likely tech stack (frontend framework, backend language, analytics tools) and summarize its key features or value propositions. This is a simulation and you must not access the URL.`;
-    const systemInstruction = "You are a market analyst and software engineer who provides insightful competitive analysis of websites based on your training data. Your response should be in Markdown format.";
+    const prompt = `Based on your training data, analyze the website at the URL "${url}". Provide a markdown summary of its likely tech stack (frontend, backend, key libraries), main features, and target audience. Do not attempt to access the URL directly.`;
+    const systemInstruction = "You are a market and technology analyst. You provide concise competitive analyses of websites based on your existing knowledge.";
     return generateContent(prompt, systemInstruction);
 };
 
-export const generateDocumentationForFiles = (files: { path: string, content: string }[]): Promise<string> => {
-    const fileContents = files.map(f => `--- File: ${f.path} ---\n\`\`\`\n${f.content}\n\`\`\``).join('\n\n');
-    const prompt = `Generate a comprehensive Markdown documentation for the following project files. Create a main overview, and then provide a section for each file with a summary of its purpose and functions.\n\n${fileContents}`;
-    const systemInstruction = "You are an expert technical writer who creates clear and comprehensive documentation from source code.";
+export const generateDocumentationForFiles = (files: {path: string, content: string}[]): Promise<string> => {
+    const fileContent = files.map(f => `--- FILE: ${f.path} ---\n\n${f.content}`).join('\n\n');
+    const prompt = `Generate comprehensive technical documentation in Markdown format for the following project files. The documentation should include a high-level overview, and then a detailed section for each file explaining its purpose, functions, and props.\n\n${fileContent}`;
+    const systemInstruction = "You are an expert technical writer who creates clear and detailed software documentation from source code.";
     return generateContent(prompt, systemInstruction);
 };
 
 export const explainDependencyChanges = (diff: string): Promise<string> => {
-    const prompt = `Analyze the following diff from a package-lock.json or similar dependency file. Explain the key changes, highlighting any major version bumps, new dependencies, or removals. Mention potential risks or benefits.\n\nDiff:\n\`\`\`diff\n${diff}\n\`\`\``;
-    const systemInstruction = "You are a dependency management expert. You provide clear, concise explanations of changes in dependency files. Your response should be in Markdown format.";
+    const prompt = `Analyze the following diff from a package-lock.json file. Provide a markdown summary of the changes, highlighting any major version bumps, new dependencies, or deprecated packages. Discuss potential risks or benefits.\n\nDiff:\n\`\`\`diff\n${diff}\n\`\`\``;
+    const systemInstruction = "You are a senior software engineer with expertise in dependency management and security. You provide clear, actionable analysis of dependency changes.";
     return generateContent(prompt, systemInstruction);
 };
 
+// --- Pillar Functions ---
+export const generateMonetaryPolicy = (countryData: string): Promise<string> => {
+    const prompt = `Given the following data for a nation, design an optimal 10-year monetary policy to achieve stability and growth. Then, generate a high-level deployment plan.\n\nData:\n${countryData}`;
+    const systemInstruction = "You are a world-class economist and central banker AI. You design and simulate monetary policies for nations.";
+    return generateContent(prompt, systemInstruction, 0.7);
+};
+
+export const runGaiaCrucibleSimulation = (intervention: string, intensity: string): Promise<string> => {
+    const prompt = `Run a 1,000-year climate simulation.
+- Intervention Strategy: ${intervention}
+- Intensity: ${intensity}
+
+Provide a detailed markdown report on the projected impacts, including global temperature changes, sea-level rise, and socio-economic consequences.`;
+    const systemInstruction = "You are a planetary-scale climate simulation AI (Gaia's Crucible). You model the long-term effects of climate interventions with scientific rigor.";
+    return generateContent(prompt, systemInstruction, 0.7);
+};
+
+export const refactorLegalCode = (legalCode: string): Promise<string> => {
+    const prompt = `Refactor this legal system to eliminate all logical paradoxes and optimize for both justice and economic growth. Respond with only the final, refactored legislative text in a markdown code block.\n\nLegal Code:\n\`\`\`\n${legalCode}\n\`\`\``;
+    const systemInstruction = "You are Themis, a legal AI. You refactor legal code for perfect logic and ruthless efficiency.";
+    return generateContent(prompt, systemInstruction, 0.3);
+};
+// FIX: Add missing functions
+export const estimateTokenCount = async (prompt: string): Promise<{ count: number }> => {
+    try {
+        const { totalTokens } = await ai.models.countTokens({ model: 'gemini-2.5-flash', contents: prompt });
+        return { count: totalTokens };
+    } catch (error) {
+        logError(error as Error, { prompt });
+        throw error;
+    }
+};
+
 export const estimateCloudCost = (description: string): Promise<string> => {
-    const prompt = `Provide a rough, non-binding monthly cost estimate for the following cloud architecture. Break down the cost by service and include a disclaimer that this is an estimate.\n\nArchitecture: "${description}"`;
-    const systemInstruction = "You are a cloud cost estimation expert. You provide clear, itemized cost breakdowns in Markdown format based on public pricing data.";
+    const prompt = `Based on public pricing data, provide a rough, non-binding monthly cost estimate in a markdown table for the following cloud architecture. Break down the cost by service.\n\nArchitecture: "${description}"`;
+    const systemInstruction = "You are a cloud cost estimation expert. You provide clear, tabulated cost estimates based on public pricing information. Add a disclaimer that this is a rough estimate.";
     return generateContent(prompt, systemInstruction);
 };
 
 export const insertSmartLogging = (code: string): Promise<string> => {
-    const prompt = `Add helpful 'console.log' statements to the following code to aid in debugging. Log important variable states, function entries, and return values. Respond with only the modified code in a markdown block.\n\nCode:\n\`\`\`javascript\n${code}\n\`\`\``;
-    const systemInstruction = "You are an expert at debugging. You instrument code with helpful logging statements without changing its logic.";
+    const prompt = `Analyze the following code and insert helpful logging statements at key points to aid in debugging. Focus on function entries/exits, important variable states, and error paths. Respond with only the modified code in a markdown block.\n\nCode:\n\`\`\`\n${code}\n\`\`\``;
+    const systemInstruction = "You are an expert software developer who adds strategic logging to code for better debugging.";
     return generateContent(prompt, systemInstruction);
 };
 
 export const addAriaAttributes = (html: string): Promise<string> => {
-    const prompt = `Add appropriate ARIA roles and attributes to the following HTML snippet to improve its accessibility. Respond with only the modified HTML in a markdown block.\n\nHTML:\n\`\`\`html\n${html}\n\`\`\``;
-    const systemInstruction = "You are a web accessibility expert who enhances HTML with ARIA attributes.";
+    const prompt = `Add the appropriate ARIA roles and attributes to the following HTML to improve its accessibility. Respond with only the modified HTML in a markdown block.\n\nHTML:\n\`\`\`html\n${html}\n\`\`\``;
+    const systemInstruction = "You are a web accessibility expert who improves HTML by adding ARIA attributes.";
     return generateContent(prompt, systemInstruction);
 };
 
-// --- NEWLY IMPLEMENTED ---
-
-export const analyzeUrlDom = (url: string): Promise<{ nodeCount: number; maxDepth: number; maxChildren: number; }> => {
-    const prompt = `Based on your knowledge of the website at the URL "${url}", estimate its DOM complexity. Provide a JSON object with 'nodeCount', 'maxDepth', and 'maxChildren' properties. This is a simulation for a developer tool. Provide reasonable, realistic estimates.`;
-    const systemInstruction = "You are an expert web crawler and analyzer. You provide DOM complexity estimations in JSON format.";
-    const schema = { type: Type.OBJECT, properties: { nodeCount: { type: Type.NUMBER }, maxDepth: { type: Type.NUMBER }, maxChildren: { type: Type.NUMBER } }, required: ["nodeCount", "maxDepth", "maxChildren"] };
+export const analyzeUrlDom = (url: string): Promise<{ nodeCount: number, maxDepth: number, maxChildren: number }> => {
+    const prompt = `Based on your knowledge of the website at "${url}", provide an estimated analysis of its DOM complexity. Do not access the URL directly. Provide your answer as a JSON object.`;
+    const systemInstruction = "You are a frontend performance expert. You estimate DOM complexity of well-known websites based on your training data. You only respond with a JSON object.";
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            nodeCount: { type: Type.INTEGER, description: "Estimated total number of DOM nodes." },
+            maxDepth: { type: Type.INTEGER, description: "Estimated maximum depth of the DOM tree." },
+            maxChildren: { type: Type.INTEGER, description: "Estimated maximum number of children for a single node." }
+        },
+        required: ["nodeCount", "maxDepth", "maxChildren"]
+    };
     return generateJson(prompt, systemInstruction, schema);
 };
 
-export const analyzeForMemoryLeaksStream = (code: string) => streamContent(
-    `Analyze the following JavaScript/React code for common memory leak patterns, such as missing event listener cleanup in \`useEffect\`, uncleared intervals/timeouts, or lingering object references. Provide a markdown report of potential issues and suggestions for fixing them.`,
-    "You are an expert software engineer specializing in performance and memory management in JavaScript."
-);
-
-export const analyzeGraphqlQueryStream = (query: string) => streamContent(
-    `Analyze this GraphQL query for potential performance bottlenecks. Consider issues like N+1 problems, deeply nested queries, and large data requests. Return a markdown report with your findings and suggestions for optimization.\n\nQuery:\n\`\`\`graphql\n${query}\n\`\`\``,
-    "You are an expert in GraphQL performance and optimization."
-);
-
-export const analyzeReactComponentRendersStream = (code: string) => streamContent(
-    `Analyze this React component's code for potential causes of unnecessary re-renders. Look for issues like passing new object/function references as props, or state updates that could be optimized. Provide a markdown report with suggestions.\n\nCode:\n\`\`\`jsx\n${code}\n\`\`\``,
-    "You are a React performance expert specializing in identifying and fixing re-render issues."
-);
-
-export const auditSeoFromUrlStream = (url: string) => streamContent(
-    `Based on your training data about the website at ${url}, perform a simulated SEO audit. Check for title tags, meta descriptions, H1 tags, and image alt text. Provide a markdown report summarizing your findings and give actionable advice.`,
-    "You are a world-class SEO expert providing an analysis based on your knowledge of a given URL."
-);
-
-export const analyzeRegexForRedosStream = (regex: string) => streamContent(
-    `Analyze the regular expression \`${regex}\` for potential Regular Expression Denial of Service (ReDoS) vulnerabilities caused by catastrophic backtracking. Explain if it's vulnerable and why. Provide a safe alternative if possible.`,
-    "You are a security researcher specializing in regular expression vulnerabilities."
-);
-
-export const analyzePackageJsonStream = (pkgJson: string) => streamContent(
-    `**Disclaimer: I am an AI and my knowledge is not real-time. This is not a substitute for a real security scanner like npm audit. The vulnerabilities mentioned are based on my training data up to my last update.**\n\nAnalyze this package.json content. List any well-known, critical vulnerabilities for these packages and versions. Format the response in markdown.\n\n\`\`\`json\n${pkgJson}\n\`\`\``,
-    "You are a helpful AI assistant with a broad knowledge of software dependencies. You are providing a simulated security scan."
-);
-
-export const generateWebhookPayload = (description: string): Promise<string> => {
-    const prompt = `Generate a realistic JSON payload for a webhook based on the following description: "${description}". Respond with only the JSON object, inside a markdown block.`;
-    const systemInstruction = "You are an expert at generating realistic mock API and webhook payloads.";
-    return generateContent(prompt, systemInstruction, 0.7);
+export const analyzeForMemoryLeaksStream = (code: string) => {
+    const prompt = `Analyze the following JavaScript/React code for potential memory leaks, such as unterminated intervals, event listeners without cleanup, or un-released object references. Provide a markdown report explaining each potential leak and how to fix it.\n\nCode:\n\`\`\`javascript\n${code}\n\`\`\``;
+    const systemInstruction = "You are a senior software engineer specializing in performance and memory management.";
+    return streamContent(prompt, systemInstruction);
 };
 
-export const estimateTokenCount = async (text: string): Promise<{ count: number }> => {
-    const prompt = `Count the number of tokens in the following text. Respond with only a JSON object containing a 'count' property.\n\nText:\n${text}`;
-    const systemInstruction = "You are a token counting utility. You only respond with JSON.";
-    const schema = {
-        type: Type.OBJECT,
-        properties: { count: { type: Type.NUMBER } },
-        required: ["count"]
-    };
-    return generateJson(prompt, systemInstruction, schema, 0);
+export const analyzeGraphqlQueryStream = (query: string) => {
+    const prompt = `Analyze the following GraphQL query for potential performance issues like N+1 problems, overly complex queries, or fetching too much data. Provide a markdown report with suggestions for optimization.\n\nQuery:\n\`\`\`graphql\n${query}\n\`\`\``;
+    const systemInstruction = "You are an expert in GraphQL performance optimization.";
+    return streamContent(prompt, systemInstruction);
 };
 
-export const generateCspFromDescription = (description: string) => streamContent(
-    `Generate a Content Security Policy (CSP) header string based on the following requirements: "${description}". Respond with only the CSP string, not in a markdown block, and not with the "Content-Security-Policy:" header name.`,
-    "You are a web security expert who generates Content Security Policies."
-);
+export const analyzeReactComponentRendersStream = (code: string) => {
+    const prompt = `Analyze the following React code for potential causes of unnecessary re-renders. Look for issues like passing new object/function references as props, or state updates that affect unrelated components. Provide a markdown report with explanations and solutions.\n\nCode:\n\`\`\`tsx\n${code}\n\`\`\``;
+    const systemInstruction = "You are an expert in React performance optimization, specializing in minimizing re-renders.";
+    return streamContent(prompt, systemInstruction);
+};
 
-export const explainCorsError = (origin: string, target: string, headers: Record<string, string>) => streamContent(
-    `Explain in simple terms why a CORS error would occur for a web browser making a fetch request with the following details. Assume the server at the target URL does not send back any CORS headers (like 'Access-Control-Allow-Origin'). Explain the Same-Origin Policy and why this request violates it. Keep it concise.\n\n- Request Origin: ${origin}\n- Target URL: ${target}\n- Request Headers: ${JSON.stringify(headers, null, 2)}`,
-    "You are a web security expert who explains CORS errors clearly and concisely."
-);
+export const auditSeoFromUrlStream = (url: string) => {
+    const prompt = `Based on your knowledge of the website at "${url}", provide a concise SEO audit in markdown format. Do not access the URL directly. Cover aspects like title tags, meta descriptions, headings, and potential keyword opportunities.`;
+    const systemInstruction = "You are an SEO expert who provides actionable audits of websites based on your training data.";
+    return streamContent(prompt, systemInstruction);
+};
+
+export const generateCspFromDescription = (description: string) => {
+    const prompt = `Generate a Content Security Policy (CSP) header string based on the following requirements: "${description}". Respond with only the CSP string itself, without any explanation.`;
+    const systemInstruction = "You are a web security expert specializing in Content Security Policies. You only output valid CSP strings.";
+    return streamContent(prompt, systemInstruction);
+};
+
+export const analyzeRegexForRedosStream = (regex: string) => {
+    const prompt = `Analyze the following regular expression for potential Regular Expression Denial of Service (ReDoS) vulnerabilities. Explain if the regex is vulnerable and suggest a safer alternative if possible.\n\nRegex: \`${regex}\``;
+    const systemInstruction = "You are a security researcher with expertise in Regular Expression Denial of Service vulnerabilities.";
+    return streamContent(prompt, systemInstruction);
+};
+
+export const analyzePackageJsonStream = (pkgJson: string) => {
+    const prompt = `Based on your training data up to your last update, analyze the dependencies in this package.json file for any well-known, high-severity vulnerabilities. Do not use live data. For each vulnerable package, list the package name, version, and a brief description of the vulnerability.\n\npackage.json:\n\`\`\`json\n${pkgJson}\n\`\`\``;
+    const systemInstruction = "You are a security expert who identifies known vulnerabilities in software packages based on your training data.";
+    return streamContent(prompt, systemInstruction);
+};
+
+export const explainCorsError = (origin: string, target: string, headers: Record<string, string>) => {
+    const prompt = `Explain in simple terms why a hypothetical API request would likely fail due to a CORS error given the following scenario. Explain the Same-Origin Policy and what headers the server at the target would need to send to allow this request.\n\n- Request Origin: ${origin}\n- Request Target: ${target}\n- Request Headers: ${JSON.stringify(headers)}`;
+    const systemInstruction = "You are an expert on web security, particularly CORS. You explain complex topics in simple, easy-to-understand terms.";
+    return streamContent(prompt, systemInstruction);
+};
+
+export const generateWebhookPayload = (prompt: string): Promise<string> => {
+    const systemInstruction = "You are an expert at generating realistic, valid JSON webhook payloads for various services (like GitHub, Stripe, etc.). You respond with only the JSON payload in a markdown block.";
+    return generateContent(`Generate a webhook payload for: "${prompt}"`, systemInstruction);
+};
