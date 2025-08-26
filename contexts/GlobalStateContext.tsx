@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
 import type { ViewType, AppUser, GitHubUser, FileNode } from '../types.ts';
+import { simulationState } from '../services/simulationState.ts';
 
 // State shape
 interface GlobalState {
@@ -14,6 +15,7 @@ interface GlobalState {
     isInitialized: boolean;
     isUnlocked: boolean;
   };
+  isSimulationMode: boolean;
 }
 
 // Action types
@@ -24,7 +26,8 @@ type Action =
   | { type: 'SET_GITHUB_USER', payload: GitHubUser | null }
   | { type: 'LOAD_PROJECT_FILES'; payload: FileNode | null }
   | { type: 'SET_SELECTED_REPO'; payload: { owner: string; repo: string } | null }
-  | { type: 'SET_VAULT_STATE'; payload: Partial<{ isInitialized: boolean, isUnlocked: boolean }> };
+  | { type: 'SET_VAULT_STATE'; payload: Partial<{ isInitialized: boolean, isUnlocked: boolean }> }
+  | { type: 'TOGGLE_SIMULATION_MODE' };
 
 
 const initialState: GlobalState = {
@@ -39,6 +42,7 @@ const initialState: GlobalState = {
     isInitialized: false,
     isUnlocked: false,
   },
+  isSimulationMode: true,
 };
 
 const reducer = (state: GlobalState, action: Action): GlobalState => {
@@ -81,6 +85,8 @@ const reducer = (state: GlobalState, action: Action): GlobalState => {
         ...state,
         vaultState: { ...state.vaultState, ...action.payload },
       };
+    case 'TOGGLE_SIMULATION_MODE':
+      return { ...state, isSimulationMode: !state.isSimulationMode };
     default:
       return state;
   }
@@ -147,7 +153,12 @@ export const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [state, canPersist]);
+  }, [state.selectedRepo, state.activeView, state.viewProps, state.hiddenFeatures, canPersist]);
+
+  useEffect(() => {
+    // Sync with the global simulation state for services to access
+    simulationState.isSimulationMode = state.isSimulationMode;
+  }, [state.isSimulationMode]);
 
 
   return (

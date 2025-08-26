@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { GitBranchIcon, BellIcon } from './icons.tsx';
+import { RealityToggle } from './RealityToggle.tsx';
 
 type BgImageStatus = 'loading' | 'loaded' | 'error';
 
@@ -61,6 +62,7 @@ export const StatusBar: React.FC<{ bgImageStatus: BgImageStatus }> = ({ bgImageS
           <GitBranchIcon />
           <span>main</span>
         </div>
+        <RealityToggle />
         <StatusMessage status={bgImageStatus} />
       </div>
       <div className="flex items-center space-x-4">

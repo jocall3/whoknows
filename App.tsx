@@ -1,4 +1,5 @@
 
+
 import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { useGlobalState } from './contexts/GlobalStateContext.tsx';
@@ -7,12 +8,14 @@ import { CommandPalette } from './components/CommandPalette.tsx';
 import { NotificationProvider } from './contexts/NotificationContext.tsx';
 import { useTheme } from './hooks/useTheme.ts';
 import { VaultProvider } from './components/vault/VaultProvider.tsx';
-import { initGoogleAuth } from './services/googleAuthService.ts';
-import { getAllCustomFeatures } from './services/dbService.ts';
+import { initGoogleAuth, getAllCustomFeatures } from './services/index.ts';
 import { Window } from './components/desktop/Window.tsx';
 import { FeatureDock } from './components/desktop/FeatureDock.tsx';
 import { Taskbar } from './components/desktop/Taskbar.tsx';
 import { FEATURES_MAP, componentMap } from './components/features/index.ts';
+import { LandingPage } from './components/LandingPage.tsx';
+import { OnboardingModal } from './components/OnboardingModal.tsx';
+import { useLocalStorage } from './hooks/useLocalStorage.ts';
 
 
 export const LoadingIndicator: React.FC = () => (
@@ -71,8 +74,7 @@ interface WindowState {
 
 const Z_INDEX_BASE = 10;
 
-
-const AppContent: React.FC = () => {
+const DesktopExperience: React.FC = () => {
     const [isCommandPaletteOpen, setCommandPaletteOpen] = useState(false);
     const [windows, setWindows] = useState<Record<string, WindowState>>({});
     const [activeId, setActiveId] = useState<string | null>(null);
@@ -87,7 +89,10 @@ const AppContent: React.FC = () => {
     useEffect(() => {
         fetchCustomFeatures();
         // Listen for an event that indicates a feature was saved in the forge
-        const handleFeatureUpdated = () => fetchCustomFeatures();
+        const handleFeatureUpdated = () => {
+          window.dispatchEvent(new CustomEvent('custom-feature-update'));
+          fetchCustomFeatures();
+        };
         window.addEventListener('custom-feature-update', handleFeatureUpdated);
         return () => window.removeEventListener('custom-feature-update', handleFeatureUpdated);
     }, [fetchCustomFeatures]);
@@ -227,20 +232,28 @@ const AppContent: React.FC = () => {
 
 
 const App: React.FC = () => {
-    const [showConsentModal, setShowConsentModal] = useState(false);
+    const [appState, setAppState] = useState<'consent' | 'onboarding' | 'landing' | 'desktop'>('consent');
+    const [hasOnboarded, setHasOnboarded] = useLocalStorage('devcore_onboarded', false);
     const { dispatch } = useGlobalState();
     useTheme(); // Initialize theme hook
 
     useEffect(() => {
       try {
           const consent = localStorage.getItem('devcore_ls_consent');
-          if (!consent) {
-              setShowConsentModal(true);
+          if (consent) {
+              if (hasOnboarded) {
+                setAppState('landing');
+              } else {
+                setAppState('onboarding');
+              }
+          } else {
+              setAppState('consent');
           }
       } catch (e) {
           console.warn("Could not access localStorage.", e);
+          setAppState('landing'); // Proceed without persistence
       }
-    }, []);
+    }, [hasOnboarded]);
 
     useEffect(() => {
         const handleUserChanged = (user: AppUser | null) => {
@@ -261,32 +274,45 @@ const App: React.FC = () => {
             return () => gsiScript.removeEventListener('load', init);
         }
     }, [dispatch]);
+    
+    const handleConsent = (consent: 'granted' | 'denied') => {
+        try {
+            localStorage.setItem('devcore_ls_consent', consent);
+        } catch(e) {
+            console.error("Could not write to localStorage.", e);
+        }
+
+        if (hasOnboarded) {
+            setAppState('landing');
+        } else {
+            setAppState('onboarding');
+        }
+    }
   
-    const handleAcceptConsent = () => {
-      try {
-          localStorage.setItem('devcore_ls_consent', 'granted');
-          window.location.reload();
-      } catch (e) {
-          console.error("Could not write to localStorage.", e);
-          setShowConsentModal(false);
-      }
+    const handleAcknowledgeOnboarding = () => {
+        setHasOnboarded(true);
+        setAppState('landing');
     };
-  
-    const handleDeclineConsent = () => {
-      try {
-          localStorage.setItem('devcore_ls_consent', 'denied');
-      } catch (e) {
-          console.error("Could not write to localStorage.", e);
-      }
-      setShowConsentModal(false);
+
+    const renderOverlay = () => {
+        switch (appState) {
+            case 'consent':
+                return <LocalStorageConsentModal onAccept={() => handleConsent('granted')} onDecline={() => handleConsent('denied')} />;
+            case 'onboarding':
+                return <OnboardingModal onAcknowledge={handleAcknowledgeOnboarding} />;
+            case 'landing':
+                return <LandingPage onLaunch={() => setAppState('desktop')} />;
+            default:
+                return null;
+        }
     };
 
     return (
         <div className="h-screen w-screen font-sans overflow-hidden bg-background">
             <NotificationProvider>
                 <VaultProvider>
-                    {showConsentModal && <LocalStorageConsentModal onAccept={handleAcceptConsent} onDecline={handleDeclineConsent} />}
-                    <AppContent />
+                    <DesktopExperience />
+                    {renderOverlay()}
                 </VaultProvider>
             </NotificationProvider>
         </div>

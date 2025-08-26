@@ -5,6 +5,7 @@ import type { Feature, ViewType, CustomFeature } from '../../types.ts';
 import { ALL_FEATURES } from '../features/index.ts';
 import { CpuChipIcon } from '../icons.tsx';
 
+// Helper to resolve string icon names for custom features
 const ICON_MAP: Record<string, React.FC> = ALL_FEATURES.reduce((acc, feature) => {
     const iconType = (feature.icon as React.ReactElement)?.type;
     if (typeof iconType === 'function' && iconType.name) {
@@ -12,7 +13,7 @@ const ICON_MAP: Record<string, React.FC> = ALL_FEATURES.reduce((acc, feature) =>
       acc[iconName] = iconType as React.FC;
     }
     return acc;
-  }, {} as Record<string, React.FC>);
+}, {} as Record<string, React.FC>);
   
 const IconComponent = ({ name }: { name: string }) => {
     const Comp = ICON_MAP[name];

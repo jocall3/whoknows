@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateDocumentationForFiles } from '../../services/aiService.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 import type { FileNode } from '../../types.ts';
 import { DocumentTextIcon, FolderIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
+import { getDecryptedCredential } from '../../services/vaultService.ts';
+import { initializeOctokit } from '../../services/authService.ts';
+import { getFileContent } from '../../services/githubService.ts';
 
 const FileTreeSelector: React.FC<{ node: FileNode, selectedPaths: Set<string>, onToggle: (path: string, isFolder: boolean) => void }> = ({ node, selectedPaths, onToggle }) => {
     const [isOpen, setIsOpen] = useState(true);
@@ -44,11 +47,33 @@ const FileTreeSelector: React.FC<{ node: FileNode, selectedPaths: Set<string>, o
 
 export const CodeDocumentationWriter: React.FC = () => {
     const { state } = useGlobalState();
-    const { projectFiles } = state;
+    const { projectFiles, selectedRepo, user } = state;
     const [selectedPaths, setSelectedPaths] = useState(new Set<string>());
     const [documentation, setDocumentation] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { addNotification } = useNotification();
+    
+    const getApiClient = useCallback(async () => {
+        if (!user) {
+            throw new Error("You must be logged in.");
+        }
+        const token = await getDecryptedCredential('github_pat');
+        if (!token) {
+            throw new Error("GitHub token not found. Please connect on the Connections page.");
+        }
+        return initializeOctokit(token);
+    }, [user]);
+    
+    const findNodeByPath = (node: FileNode, path: string): FileNode | null => {
+        if (node.path === path) return node;
+        if (node.children) {
+            for (const child of node.children) {
+                const found = findNodeByPath(child, path);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
 
     const handleGenerate = async () => {
         if (selectedPaths.size === 0) {
@@ -58,16 +83,37 @@ export const CodeDocumentationWriter: React.FC = () => {
         setIsLoading(true);
         setDocumentation('');
         try {
-            // This is a simplified fetcher. In a real app, this would get content from the GitHubService
-            const filesToDocument = Array.from(selectedPaths)
-                .filter(path => path) // Filter out root path
-                .map(path => ({ path, content: `// Mock content for ${path}`}));
-            
-            if (filesToDocument.length === 0) {
-                 addNotification('Please select specific files or sub-directories.', 'info');
-                 setIsLoading(false);
-                 return;
+            if (!selectedRepo) {
+                throw new Error('Please select a repository first.');
             }
+
+            const pathsToFetch = Array.from(selectedPaths)
+                .filter(path => path && projectFiles && findNodeByPath(projectFiles, path)?.type === 'file');
+
+            if (pathsToFetch.length === 0) {
+                addNotification('Please select specific files to document.', 'info');
+                setIsLoading(false);
+                return;
+            }
+
+            if (pathsToFetch.length > 10) {
+                addNotification('For performance reasons, please select 10 files or fewer.', 'info');
+                setIsLoading(false);
+                return;
+            }
+            
+            const octokit = await getApiClient();
+
+            const filePromises = pathsToFetch.map(path => 
+                getFileContent(octokit, selectedRepo.owner, selectedRepo.repo, path)
+                    .then(content => ({ path, content }))
+                    .catch(err => {
+                        console.error(`Failed to fetch ${path}`, err);
+                        return { path, content: `// Error fetching content for this file.` };
+                    })
+            );
+            
+            const filesToDocument = await Promise.all(filePromises);
 
             const result = await generateDocumentationForFiles(filesToDocument);
             setDocumentation(result);
@@ -86,17 +132,6 @@ export const CodeDocumentationWriter: React.FC = () => {
         }
         return paths;
     };
-    
-    const findNodeByPath = (node: FileNode, path: string): FileNode | null => {
-        if (node.path === path) return node;
-        if (node.children) {
-            for (const child of node.children) {
-                const found = findNodeByPath(child, path);
-                if (found) return found;
-            }
-        }
-        return null;
-    }
     
     const handleToggle = (path: string, isFolder: boolean) => {
         const newSelected = new Set(selectedPaths);

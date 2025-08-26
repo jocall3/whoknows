@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGlobalState } from '../contexts/GlobalStateContext.tsx';
-import { clearAllFiles } from '../services/dbService.ts';
+import { clearAllFiles } from '../services/index.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
 import { useTheme } from '../hooks/useTheme.ts';
 import { ALL_FEATURES } from './features/index.ts';

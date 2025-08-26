@@ -3,7 +3,7 @@ import { FeatureDock } from './FeatureDock.tsx';
 import { Window } from './Window.tsx';
 import { Taskbar } from './Taskbar.tsx';
 import { ALL_FEATURES } from '../features/index.ts';
-import type { Feature } from '../../types.ts';
+import type { Feature, CustomFeature } from '../../types.ts';
 
 interface WindowState {
   id: string;
@@ -15,7 +15,7 @@ interface WindowState {
 
 const Z_INDEX_BASE = 10;
 
-export const DesktopView: React.FC<{ openFeatureId?: string }> = ({ openFeatureId }) => {
+export const DesktopView: React.FC<{ openFeatureId?: string; customFeatures: CustomFeature[] }> = ({ openFeatureId, customFeatures }) => {
     const [windows, setWindows] = useState<Record<string, WindowState>>({});
     const [activeId, setActiveId] = useState<string | null>(null);
     const [nextZIndex, setNextZIndex] = useState(Z_INDEX_BASE);
@@ -96,7 +96,7 @@ export const DesktopView: React.FC<{ openFeatureId?: string }> = ({ openFeatureI
 
     return (
         <div className="h-full flex flex-col bg-transparent">
-            <FeatureDock onOpen={openWindow} />
+            <FeatureDock onOpen={openWindow} customFeatures={customFeatures} />
             <div className="flex-grow relative overflow-hidden">
                 {openWindows.map(win => {
                     const feature = featuresMap.get(win.id);

@@ -21,3 +21,5 @@ export * from './workspaceConnectorService.ts';
 export * from './authService.ts';
 export * from './cryptoService.ts';
 export * from './vaultService.ts';
+export * from './simulationState.ts';
+export * from './live/index.ts';

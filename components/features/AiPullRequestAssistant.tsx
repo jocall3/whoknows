@@ -1,8 +1,8 @@
 
+
 import React, { useState, useMemo, useCallback } from 'react';
 import * as Diff from 'diff';
-import { generatePrSummaryStructured, generateTechnicalSpecFromDiff, downloadFile } from '../../services/index.ts';
-import { createDocument, insertText } from '../../services/workspaceService.ts';
+import { generatePrSummaryStructured, generateTechnicalSpecFromDiff, downloadFile, createDocument, insertText } from '../../services/index.ts';
 import type { StructuredPrSummary } from '../../types.ts';
 import { AiPullRequestAssistantIcon, DocumentIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
@@ -91,42 +91,53 @@ export const AiPullRequestAssistant: React.FC = () => {
                         <label htmlFor="after-code" className="text-sm font-medium text-text-secondary mb-2">After</label>
                         <textarea id="after-code" value={afterCode} onChange={e => setAfterCode(e.target.value)} className="flex-grow p-4 bg-surface border border-border rounded-md resize-none font-mono text-sm" />
                     </div>
-                    <button onClick={handleGenerateSummary} disabled={isLoading} className="btn-primary w-full flex items-center justify-center px-6 py-3">
-                        {isLoading ? <LoadingSpinner /> : 'Generate Summary'}
+                    <button
+                        onClick={handleGenerateSummary}
+                        disabled={isLoading}
+                        className="btn-primary w-full mt-4 flex items-center justify-center gap-2 py-2"
+                    >
+                        {isLoading ? <LoadingSpinner/> : 'Generate Summary'}
                     </button>
-                    {error && <p className="text-red-500 text-xs text-center">{error}</p>}
                 </div>
-
-                {/* Right side: Summary and Export */}
+                {/* Right side: Summary and actions */}
                 <div className="flex flex-col gap-4 min-h-0">
-                    <div className="flex flex-col bg-surface border border-border p-4 rounded-lg flex-grow min-h-0">
-                        <h3 className="text-lg font-bold mb-2">Generated Summary</h3>
-                        <div className="flex-grow overflow-y-auto pr-2 space-y-2">
-                            {summary ? (
-                                <>
-                                    <input type="text" readOnly value={summary.title} className="w-full font-bold p-2 bg-background rounded"/>
-                                    <textarea readOnly value={summary.summary} className="w-full h-24 p-2 bg-background rounded resize-none"/>
-                                    <div>
-                                        <h4 className="font-semibold">Changes:</h4>
-                                        <ul className="list-disc list-inside text-sm">
-                                            {summary.changes.map((c, i) => <li key={i}>{c}</li>)}
-                                        </ul>
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="text-text-secondary h-full flex items-center justify-center">
-                                    {isLoading ? <LoadingSpinner /> : 'PR summary will appear here.'}
-                                </div>
-                            )}
-                        </div>
-                         {summary && user && (
-                            <div className="mt-4 pt-4 border-t border-border">
-                                <button onClick={handleExportToDocs} disabled={isExporting} className="w-full btn-primary bg-blue-600 flex items-center justify-center gap-2 py-2">
-                                    {isExporting ? <LoadingSpinner /> : <><DocumentIcon /> Export to Google Docs</>}
-                                </button>
-                            </div>
-                         )}
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-bold">Generated Summary</h3>
+                        {summary && (
+                             <button
+                                onClick={() => downloadFile(`${summary.title}\n\n${summary.summary}\n\n${summary.changes.join('\n')}`, `pr_${summary.title.slice(0,10)}.md`, 'text/markdown')}
+                                disabled={!summary} 
+                                className="btn-primary px-3 py-1 text-sm disabled:bg-gray-400"
+                            >
+                                Download .md
+                           </button>
+                        )}
                     </div>
+                    <div className="flex-grow bg-surface p-4 border rounded-lg overflow-y-auto">
+                        {isLoading && <div className="flex justify-center items-center h-full"><LoadingSpinner/></div>}
+                        {error && <p className="text-red-500">{error}</p>}
+                        {summary && (
+                            <div className="space-y-4">
+                                <input type="text" value={summary.title} readOnly className="w-full p-2 bg-background border rounded font-bold"/>
+                                <div className="p-2 bg-background border rounded space-y-2">
+                                    <h4 className="font-semibold">Summary</h4>
+                                    <p className="text-sm">{summary.summary}</p>
+                                    <h4 className="font-semibold">Changes</h4>
+                                    <ul className="list-disc list-inside text-sm">
+                                        {summary.changes.map((c, i) => <li key={i}>{c}</li>)}
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                     <button
+                        onClick={handleExportToDocs}
+                        disabled={isExporting || !summary || !user}
+                        className="btn-primary w-full mt-4 flex items-center justify-center gap-2 py-2"
+                        title={!user ? "Sign in to export to Google Docs" : !summary ? "Generate summary first" : "Export a full tech spec to Google Docs"}
+                    >
+                        {isExporting ? <LoadingSpinner/> : <DocumentIcon/>} Export Tech Spec to Docs
+                    </button>
                 </div>
             </div>
         </div>

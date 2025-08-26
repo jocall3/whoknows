@@ -1,16 +1,30 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { CpuChipIcon } from '../icons.tsx';
+import { estimateTokenCount } from '../../services/index.ts';
+import { useNotification } from '../../contexts/NotificationContext.tsx';
+import { LoadingSpinner } from '../shared/index.tsx';
 
 export const TokenUsageEstimator: React.FC = () => {
     const [prompt, setPrompt] = useState('');
     const [estimate, setEstimate] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const { addNotification } = useNotification();
 
-    const handleEstimate = () => {
-        // A very rough approximation. A real tokenizer would be more accurate.
-        // On average, a token is about 0.75 words.
-        const wordCount = prompt.trim().split(/\s+/).filter(Boolean).length;
-        const estimatedTokens = Math.ceil(wordCount * 1.33);
-        setEstimate(estimatedTokens);
+    const handleEstimate = async () => {
+        if (!prompt.trim()) {
+            addNotification('Please enter some text to estimate.', 'info');
+            return;
+        }
+        setIsLoading(true);
+        setEstimate(0);
+        try {
+            const { count } = await estimateTokenCount(prompt);
+            setEstimate(count);
+        } catch (e) {
+            addNotification('Failed to estimate tokens via API.', 'error');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -29,8 +43,8 @@ export const TokenUsageEstimator: React.FC = () => {
                         placeholder="Enter your prompt here..."
                     />
                 </div>
-                <button onClick={handleEstimate} className="btn-primary px-6 py-3">
-                    Estimate Tokens
+                <button onClick={handleEstimate} disabled={isLoading} className="btn-primary px-6 py-3 min-w-[180px] flex items-center justify-center">
+                    {isLoading ? <LoadingSpinner /> : 'Estimate Tokens via API'}
                 </button>
                 {estimate > 0 && (
                     <div className="mt-4 text-center">
@@ -38,9 +52,6 @@ export const TokenUsageEstimator: React.FC = () => {
                         <p className="text-text-secondary">Estimated Tokens</p>
                     </div>
                 )}
-                 <p className="text-xs text-center text-yellow-600 mt-4 bg-yellow-400/10 p-2 rounded-md max-w-2xl">
-                    <strong>Disclaimer:</strong> This is a coarse, non-API-based estimate using a simple word count multiplier. The actual token count used by the Gemini API may vary.
-                </p>
             </div>
         </div>
     );

@@ -1,11 +1,13 @@
 import * as vaultService from './vaultService.ts';
 import { logError, logEvent } from './telemetryService.ts';
 import { getDecryptedCredential } from './vaultService.ts';
+import { simulationState } from './simulationState.ts';
+import * as plaidService from './live/plaidService.ts';
 
 // Interface for any action
 export interface WorkspaceAction {
   id: string; // e.g., 'jira_create_ticket'
-  service: 'Jira' | 'Slack' | 'GitHub'; // etc.
+  service: 'Jira' | 'Slack' | 'GitHub' | 'Plaid';
   description: string;
   // Function to define the necessary input fields for this action
   getParameters: () => { [key: string]: { type: 'string' | 'number', required: boolean, default?: string } };
@@ -28,6 +30,10 @@ ACTION_REGISTRY.set('jira_create_ticket', {
     issueType: { type: 'string', required: true, default: 'Task' }
   }),
   execute: async (params) => {
+    if (simulationState.isSimulationMode) {
+        return { id: `SIM-${Math.floor(Math.random() * 1000)}`, key: 'SIM-123', self: 'http://localhost/jira/rest/api/2/issue/SIM-123', message: "Jira ticket created in simulation." };
+    }
+
     const domain = await getDecryptedCredential('jira_domain');
     const token = await getDecryptedCredential('jira_pat');
     const email = await getDecryptedCredential('jira_email');
@@ -87,6 +93,9 @@ ACTION_REGISTRY.set('slack_post_message', {
     text: { type: 'string', required: true }
   }),
   execute: async (params) => {
+     if (simulationState.isSimulationMode) {
+        return { ok: true, channel: params.channel, ts: new Date().getTime() / 1000, message: { text: params.text }, status_message: "Message posted to Slack in simulation." };
+    }
     const token = await getDecryptedCredential('slack_bot_token');
     if (!token) {
         throw new Error("Slack credentials not found in vault. Please connect Slack in the Workspace Connector Hub.");
@@ -111,19 +120,36 @@ ACTION_REGISTRY.set('slack_post_message', {
 });
 
 
+// --- PLAID EXAMPLE ---
+ACTION_REGISTRY.set('plaid_link_account', {
+    id: 'plaid_link_account',
+    service: 'Plaid',
+    description: 'Links a new bank account using Plaid.',
+    getParameters: () => ({}),
+    execute: async () => {
+        if (simulationState.isSimulationMode) {
+            return { public_token: 'sim_public_token_123', account_id: 'sim_account_id_456', message: "Successfully linked account in simulation." };
+        } else {
+            // This would trigger the Plaid Link flow for the user.
+            return plaidService.linkPlaidAccount();
+        }
+    }
+});
+
+
 // --- CENTRAL EXECUTION FUNCTION ---
 export async function executeWorkspaceAction(actionId: string, params: any): Promise<any> {
     const action = ACTION_REGISTRY.get(actionId);
     if (!action) {
         throw new Error(`Action "${actionId}" not found.`);
     }
-    logEvent('workspace_action_execute', { actionId });
+    logEvent('workspace_action_execute', { actionId, isSimulation: simulationState.isSimulationMode });
     try {
         const result = await action.execute(params);
-        logEvent('workspace_action_success', { actionId });
+        logEvent('workspace_action_success', { actionId, isSimulation: simulationState.isSimulationMode });
         return result;
     } catch (error) {
-        logError(error as Error, { context: 'executeWorkspaceAction', actionId });
+        logError(error as Error, { context: 'executeWorkspaceAction', actionId, isSimulation: simulationState.isSimulationMode });
         throw error;
     }
 }

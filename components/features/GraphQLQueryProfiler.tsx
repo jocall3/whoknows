@@ -1,0 +1,63 @@
+import React, { useState } from 'react';
+import { MagnifyingGlassIcon } from '../icons.tsx';
+import { analyzeGraphqlQueryStream } from '../../services/index.ts';
+import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
+
+const exampleQuery = `query GetUsers {
+  users(first: 10) {
+    id
+    name
+    posts { # This could be an N+1 problem
+      title
+    }
+  }
+}`;
+
+export const GraphQLQueryProfiler: React.FC = () => {
+    const [query, setQuery] = useState(exampleQuery);
+    const [analysis, setAnalysis] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleProfile = async () => {
+        setIsLoading(true);
+        setAnalysis('');
+        try {
+            const stream = analyzeGraphqlQueryStream(query);
+            let fullResponse = '';
+            for await (const chunk of stream) {
+                fullResponse += chunk;
+                setAnalysis(fullResponse);
+            }
+        } catch (e) {
+            setAnalysis(`Error: ${e instanceof Error ? e.message : 'Unknown error'}`);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
+            <header className="mb-6">
+                <h1 className="text-3xl font-bold flex items-center">
+                    <MagnifyingGlassIcon />
+                    <span className="ml-3">GraphQL Query Analyzer</span>
+                </h1>
+                <p className="text-text-secondary mt-1">Use AI to analyze GraphQL queries for performance bottlenecks.</p>
+            </header>
+            <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
+                <div className="flex flex-col">
+                    <label className="text-sm font-medium mb-2">GraphQL Query</label>
+                    <textarea value={query} onChange={e => setQuery(e.target.value)} className="flex-grow p-2 bg-surface border rounded font-mono text-xs"/>
+                    <button onClick={handleProfile} disabled={isLoading} className="btn-primary w-full mt-4 py-3">{isLoading ? <LoadingSpinner /> : 'Analyze Query'}</button>
+                </div>
+                <div className="flex flex-col">
+                    <label className="text-sm font-medium mb-2">AI Performance Analysis</label>
+                    <div className="flex-grow p-4 bg-background border rounded overflow-auto">
+                        {isLoading && !analysis && <div className="flex justify-center items-center h-full"><LoadingSpinner/></div>}
+                        {analysis && <MarkdownRenderer content={analysis} />}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};

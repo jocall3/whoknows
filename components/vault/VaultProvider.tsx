@@ -7,7 +7,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { VaultModalContext } from '../../contexts/VaultModalContext.tsx';
 import { CreateMasterPasswordModal } from './CreateMasterPasswordModal.tsx';
 import { UnlockVaultModal } from './UnlockVaultModal.tsx';
-import * as vaultService from '../../services/vaultService.ts';
+import * as vaultService from '../../services/index.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 
 type PromiseResolver = (value: boolean) => void;

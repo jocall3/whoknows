@@ -1,11 +1,25 @@
 
 import React, { Suspense, useRef } from 'react';
-import type { Feature } from '../../types.ts';
+import type { Feature, CustomFeature } from '../../types.ts';
 import { LoadingIndicator } from '../../App.tsx';
-import { MinimizeIcon, XMarkIcon } from '../icons.tsx';
+import { MinimizeIcon, XMarkIcon, CpuChipIcon } from '../icons.tsx';
 import { ALL_FEATURES } from '../features/index.ts';
 
-const featuresMap = new Map(ALL_FEATURES.map(f => [f.id, f]));
+// Helper to resolve string icon names for custom features
+const ICON_MAP: Record<string, React.FC> = ALL_FEATURES.reduce((acc, feature) => {
+    const iconType = (feature.icon as React.ReactElement)?.type;
+    if (typeof iconType === 'function' && iconType.name) {
+      const iconName = iconType.name;
+      acc[iconName] = iconType as React.FC;
+    }
+    return acc;
+}, {} as Record<string, React.FC>);
+  
+const IconComponent = ({ name }: { name: string }) => {
+    const Comp = ICON_MAP[name];
+    return Comp ? <Comp /> : <CpuChipIcon />;
+};
+
 
 interface WindowState {
   id: string;
@@ -17,7 +31,7 @@ interface WindowState {
 }
 
 interface WindowProps {
-  feature: Feature;
+  feature: Feature & { props?: any };
   state: WindowState;
   isActive: boolean;
   onClose: (id: string) => void;
@@ -30,7 +44,8 @@ export const Window: React.FC<WindowProps> = ({ feature, state, isActive, onClos
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
   const initialPos = useRef<{ x: number; y: number } | null>(null);
   
-  const FeatureComponent = featuresMap.get(feature.id)?.component;
+  const FeatureComponent = feature.component;
+  const featureIcon = typeof feature.icon === 'string' ? <IconComponent name={feature.icon} /> : feature.icon;
 
   const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -74,7 +89,7 @@ export const Window: React.FC<WindowProps> = ({ feature, state, isActive, onClos
         onMouseDown={handleDragStart}
       >
         <div className="flex items-center gap-2 text-xs text-text-primary">
-           <div className="w-4 h-4">{feature.icon}</div>
+           <div className="w-4 h-4">{featureIcon}</div>
            <span>{feature.name}</span>
         </div>
         <div className="flex items-center gap-1">

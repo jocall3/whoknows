@@ -1,13 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { Type, FunctionDeclaration } from "@google/genai";
-import { logError } from '../../services/telemetryService.ts';
-import { getInferenceFunction, CommandResponse } from '../../services/aiService.ts';
-import { FEATURE_TAXONOMY } from '../../services/taxonomyService.ts';
+import { logError, getInferenceFunction, CommandResponse, FEATURE_TAXONOMY, executeWorkspaceAction, ACTION_REGISTRY } from '../../services/index.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 import { CommandLineIcon } from '../icons.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { ALL_FEATURE_IDS } from '../../constants.tsx';
-import { executeWorkspaceAction, ACTION_REGISTRY } from '../../services/workspaceConnectorService.ts';
 
 const baseFunctionDeclarations: FunctionDeclaration[] = [
     {

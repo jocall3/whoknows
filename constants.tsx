@@ -7,15 +7,15 @@ import {
     CodeReviewBotIcon, ChangelogGeneratorIcon, CronJobBuilderIcon,
     AsyncCallTreeIcon, AudioToCodeIcon, CodeDiffGhostIcon, CodeSpellCheckerIcon, ColorPaletteGeneratorIcon, LogicFlowBuilderIcon,
     MetaTagEditorIcon, NetworkVisualizerIcon, ResponsiveTesterIcon, SassCompilerIcon, ImageGeneratorIcon, XbrlConverterIcon,
-    DigitalWhiteboardIcon, TypographyLabIcon, AiPullRequestAssistantIcon, ProjectExplorerIcon,
+    DigitalWhiteboardIcon, TypographyLabIcon, AiPullRequestAssistantIcon, ArrowPathIcon, ProjectExplorerIcon,
     ServerStackIcon, DocumentTextIcon, ChartBarIcon, EyeIcon, PaperAirplaneIcon, CloudIcon, ShieldCheckIcon, CpuChipIcon, SparklesIcon,
     MailIcon, BugAntIcon, MagnifyingGlassIcon, RectangleGroupIcon, GcpIcon, VideoCameraIcon, TerminalIcon, CodeBracketSquareIcon, ArchiveBoxIcon,
-    GitBranchIcon, PhotoIcon, BeakerIcon, WordPressIcon, HammerIcon
+    GitBranchIcon, PhotoIcon, BeakerIcon, WordPressIcon, HammerIcon, LockClosedIcon, LinkIcon, PencilIcon, PlusIcon
 } from './components/icons.tsx';
 
 export const CHROME_VIEW_IDS = ['features-list'] as const;
 
-export const FEATURE_CATEGORIES = ['Core', 'AI Tools', 'Frontend', 'Testing', 'Database', 'Data', 'Productivity', 'Git', 'Local Dev', 'Performance & Auditing', 'Deployment & CI/CD', 'Security', 'Workflow', 'Cloud', 'CMS', 'Custom'] as const;
+export const FEATURE_CATEGORIES = ['Core', 'AI Tools', 'Frontend', 'Testing', 'Database', 'Data', 'Productivity', 'Git', 'Local Dev', 'Performance & Auditing', 'Deployment & CI/CD', 'Security', 'Workflow', 'Cloud', 'CMS', 'Custom', 'React Hooks'] as const;
 export type FeatureCategory = typeof FEATURE_CATEGORIES[number];
 
 export type SlotCategory = FeatureCategory;
@@ -136,6 +136,42 @@ export const RAW_FEATURES: RawFeature[] = [
     { id: 'financial-chart-generator', name: 'Financial Chart Generator', description: 'Generate chart components from financial data (e.g., CSV).', icon: <ChartBarIcon />, category: 'Data' },
 
     { id: "logic-flow-builder", name: "Logic Flow Builder", description: "A visual tool for building application logic flows.", icon: <LogicFlowBuilderIcon />, category: "Workflow" },
+
+    // --- PROFILERS ---
+    { id: 'dom-tree-analyzer', name: 'DOM Tree Analyzer', description: 'Analyze the current DOM for complexity and deep nesting.', icon: <ChartBarIcon />, category: 'Performance & Auditing' },
+    { id: 'memory-leak-detector', name: 'Memory Leak Detector', description: 'A simplified tool to help identify potential memory leaks in JavaScript.', icon: <BeakerIcon />, category: 'Performance & Auditing' },
+    { id: 'graphql-query-profiler', name: 'GraphQL Query Profiler', description: 'Analyze GraphQL queries for performance bottlenecks.', icon: <MagnifyingGlassIcon />, category: 'Performance & Auditing' },
+    { id: 'component-render-tracer', name: 'Component Render Tracer', description: 'Trace React component render cycles to identify performance issues.', icon: <EyeIcon />, category: 'Performance & Auditing' },
+    { id: 'seo-auditor', name: 'SEO Auditor', description: 'Audit a URL for common SEO best practices.', icon: <MagnifyingGlassIcon />, category: 'Performance & Auditing' },
+
+    // --- UTILS ---
+    { id: 'data-transformer', name: 'Data Transformer', description: 'Transform data between formats like CSV, JSON, and XML.', icon: <ArrowPathIcon />, category: 'Data' },
+    { id: 'lorem-ipsum-generator', name: 'Lorem Ipsum Generator', description: 'Generate placeholder text with various options.', icon: <DocumentTextIcon />, category: 'Productivity' },
+    { id: 'uuid-generator', name: 'UUID/NanoID Generator', description: 'Generate universally unique identifiers.', icon: <TerminalIcon />, category: 'Productivity' },
+    { id: 'base64-encoder-decoder', name: 'Base64 Encoder/Decoder', description: 'Encode and decode strings using Base64.', icon: <CodeBracketSquareIcon />, category: 'Data' },
+    { id: 'url-inspector', name: 'URL Inspector/Parser', description: 'Parse and inspect the components of a URL.', icon: <LinkIcon />, category: 'Data' },
+
+    // --- SECURITY ---
+    { id: 'jwt-inspector', name: 'JWT Inspector', description: 'Decode and inspect JSON Web Tokens.', icon: <LockClosedIcon />, category: 'Security' },
+    { id: 'csp-generator', name: 'CSP Generator', description: 'Generate a Content Security Policy for your web application.', icon: <ShieldCheckIcon />, category: 'Security' },
+    { id: 'redos-scanner', name: 'Regex DoS Scanner', description: 'Scan regular expressions for potential Denial of Service vulnerabilities.', icon: <BugAntIcon />, category: 'Security' },
+    { id: 'dependency-vulnerability-scanner', name: 'Dependency Vulnerability Scanner', description: 'Simulated scan of a package.json for known vulnerabilities.', icon: <ArchiveBoxIcon />, category: 'Security' },
+    { id: 'cors-proxy-simulator', name: 'CORS Proxy Simulator', description: 'Simulate and test Cross-Origin Resource Sharing policies.', icon: <PaperAirplaneIcon />, category: 'Security' },
+
+    // --- MOCK ---
+    { id: 'image-placeholder-generator', name: 'Image Placeholder Generator', description: 'Generate placeholder images of any size and color.', icon: <PhotoIcon />, category: 'Local Dev' },
+    { id: 'mock-user-data-generator', name: 'Mock User Data Generator', description: 'Generate realistic mock user data for testing.', icon: <DocumentTextIcon />, category: 'Local Dev' },
+    { id: 'feature-flag-simulator', name: 'Feature Flag Simulator', description: 'Simulate and test feature flags in your application.', icon: <BeakerIcon />, category: 'Local Dev' },
+    { id: 'error-response-simulator', name: 'Error Response Simulator', description: 'Simulate API error responses (404, 500, etc.).', icon: <ServerStackIcon />, category: 'Local Dev' },
+    { id: 'webhook-event-simulator', name: 'Webhook Event Simulator', description: 'Simulate and test incoming webhook events.', icon: <PaperAirplaneIcon />, category: 'Local Dev' },
+
+    // --- REACT HOOKS ---
+    { id: 'usedebounce-hook-generator', name: 'useDebounce Hook Generator', description: 'Generate a custom useDebounce hook.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
+    { id: 'uselocalstorage-hook-generator', name: 'useLocalStorage Hook Generator', description: 'Generate a custom useLocalStorage hook.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
+    { id: 'useeventlistener-hook-generator', name: 'useEventListener Hook Generator', description: 'Generate a custom useEventListener hook.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
+    { id: 'usefetch-hook-generator', name: 'useFetch Hook Generator', description: 'Generate a custom useFetch hook for data fetching.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
+    { id: 'useform-hook-generator', name: 'useForm Hook Generator', description: 'Generate a custom useForm hook for form state management.', icon: <CodeBracketSquareIcon />, category: 'React Hooks' },
+
 ];
 
 export const ALL_FEATURE_IDS = RAW_FEATURES.map(f => f.id);

@@ -4,7 +4,7 @@
 */
 
 import React, { useState } from 'react';
-import * as vaultService from '../../services/vaultService.ts';
+import * as vaultService from '../../services/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 interface Props {

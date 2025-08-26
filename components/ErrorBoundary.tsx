@@ -1,6 +1,5 @@
 import React from 'react';
-import { logError } from '../services/telemetryService.ts';
-import { debugErrorStream } from '../services/aiService.ts';
+import { logError, debugErrorStream } from '../services/index.ts';
 import { SparklesIcon } from './icons.tsx';
 import { MarkdownRenderer, LoadingSpinner } from './shared/index.tsx';
 

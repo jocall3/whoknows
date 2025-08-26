@@ -89,6 +89,41 @@ export const componentMap: Record<string, React.LazyExoticComponent<React.FC<any
     'wordpress-plugin-generator': lazyWithRetry(() => import('./WordPressPluginGenerator.tsx'), 'WordPressPluginGenerator'),
     'feature-forge': lazyWithRetry(() => import('./FeatureForge.tsx'), 'FeatureForge'),
     'custom-feature-runner': lazyWithRetry(() => import('./CustomFeatureRunner.tsx'), 'CustomFeatureRunner'),
+
+    // --- Profilers ---
+    'dom-tree-analyzer': lazyWithRetry(() => import('./DomTreeAnalyzer.tsx'), 'DomTreeAnalyzer'),
+    'memory-leak-detector': lazyWithRetry(() => import('./MemoryLeakDetector.tsx'), 'MemoryLeakDetector'),
+    'graphql-query-profiler': lazyWithRetry(() => import('./GraphQLQueryProfiler.tsx'), 'GraphQLQueryProfiler'),
+    'component-render-tracer': lazyWithRetry(() => import('./ComponentRenderTracer.tsx'), 'ComponentRenderTracer'),
+    'seo-auditor': lazyWithRetry(() => import('./SeoAuditor.tsx'), 'SeoAuditor'),
+
+    // --- Utils ---
+    'data-transformer': lazyWithRetry(() => import('./DataTransformer.tsx'), 'DataTransformer'),
+    'lorem-ipsum-generator': lazyWithRetry(() => import('./LoremIpsumGenerator.tsx'), 'LoremIpsumGenerator'),
+    'uuid-generator': lazyWithRetry(() => import('./UuidGenerator.tsx'), 'UuidGenerator'),
+    'base64-encoder-decoder': lazyWithRetry(() => import('./Base64EncoderDecoder.tsx'), 'Base64EncoderDecoder'),
+    'url-inspector': lazyWithRetry(() => import('./UrlInspector.tsx'), 'UrlInspector'),
+
+    // --- Security ---
+    'jwt-inspector': lazyWithRetry(() => import('./JwtInspector.tsx'), 'JwtInspector'),
+    'csp-generator': lazyWithRetry(() => import('./CspGenerator.tsx'), 'CspGenerator'),
+    'redos-scanner': lazyWithRetry(() => import('./RedosScanner.tsx'), 'RedosScanner'),
+    'dependency-vulnerability-scanner': lazyWithRetry(() => import('./DependencyVulnerabilityScanner.tsx'), 'DependencyVulnerabilityScanner'),
+    'cors-proxy-simulator': lazyWithRetry(() => import('./CorsProxySimulator.tsx'), 'CorsProxySimulator'),
+
+    // --- Mock ---
+    'image-placeholder-generator': lazyWithRetry(() => import('./ImagePlaceholderGenerator.tsx'), 'ImagePlaceholderGenerator'),
+    'mock-user-data-generator': lazyWithRetry(() => import('./MockUserDataGenerator.tsx'), 'MockUserDataGenerator'),
+    'feature-flag-simulator': lazyWithRetry(() => import('./FeatureFlagSimulator.tsx'), 'FeatureFlagSimulator'),
+    'error-response-simulator': lazyWithRetry(() => import('./ErrorResponseSimulator.tsx'), 'ErrorResponseSimulator'),
+    'webhook-event-simulator': lazyWithRetry(() => import('./WebhookEventSimulator.tsx'), 'WebhookEventSimulator'),
+    
+    // --- React Hooks ---
+    'usedebounce-hook-generator': lazyWithRetry(() => import('./UseDebounceHookGenerator.tsx'), 'UseDebounceHookGenerator'),
+    'uselocalstorage-hook-generator': lazyWithRetry(() => import('./UseLocalStorageHookGenerator.tsx'), 'UseLocalStorageHookGenerator'),
+    'useeventlistener-hook-generator': lazyWithRetry(() => import('./UseEventListenerHookGenerator.tsx'), 'UseEventListenerHookGenerator'),
+    'usefetch-hook-generator': lazyWithRetry(() => import('./UseFetchHookGenerator.tsx'), 'UseFetchHookGenerator'),
+    'useform-hook-generator': lazyWithRetry(() => import('./UseFormHookGenerator.tsx'), 'UseFormHookGenerator'),
 };
 
 export const ALL_FEATURES: Feature[] = RAW_FEATURES.map(feature => ({

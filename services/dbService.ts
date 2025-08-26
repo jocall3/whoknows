@@ -1,5 +1,7 @@
 import { openDB, DBSchema } from 'idb';
 import type { GeneratedFile, EncryptedData, CustomFeature } from '../types.ts';
+import { simulationState } from './simulationState.ts';
+import * as liveDB from './live/databaseClient.ts';
 
 const DB_NAME = 'devcore-db';
 const DB_VERSION = 3; // Incremented version for new store
@@ -59,79 +61,135 @@ const dbPromise = openDB<DevCoreDB>(DB_NAME, DB_VERSION, {
 
 // --- Generated Files Store ---
 export const saveFile = async (file: GeneratedFile): Promise<void> => {
-  const db = await dbPromise;
-  await db.put(FILES_STORE_NAME, file);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        await db.put(FILES_STORE_NAME, file);
+    } else {
+        await liveDB.liveSaveFile(file);
+    }
 };
 
 export const getAllFiles = async (): Promise<GeneratedFile[]> => {
-  const db = await dbPromise;
-  return db.getAll(FILES_STORE_NAME);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        return db.getAll(FILES_STORE_NAME);
+    } else {
+        return liveDB.liveGetAllFiles();
+    }
 };
 
 export const getFileByPath = async (filePath: string): Promise<GeneratedFile | undefined> => {
-  const db = await dbPromise;
-  return db.get(FILES_STORE_NAME, filePath);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        return db.get(FILES_STORE_NAME, filePath);
+    } else {
+        return liveDB.liveGetFileByPath(filePath);
+    }
 };
 
 export const clearAllFiles = async (): Promise<void> => {
-  const db = await dbPromise;
-  await db.clear(FILES_STORE_NAME);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        await db.clear(FILES_STORE_NAME);
+    } else {
+        await liveDB.liveClearAllFiles();
+    }
 };
 
 // --- Vault Store ---
 export const saveVaultData = async (key: string, value: any): Promise<void> => {
-  const db = await dbPromise;
-  await db.put(VAULT_STORE_NAME, value, key);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        await db.put(VAULT_STORE_NAME, value, key);
+    } else {
+        await liveDB.liveSaveVaultData(key, value);
+    }
 };
 
 export const getVaultData = async (key: string): Promise<any | undefined> => {
-  const db = await dbPromise;
-  return db.get(VAULT_STORE_NAME, key);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        return db.get(VAULT_STORE_NAME, key);
+    } else {
+        return liveDB.liveGetVaultData(key);
+    }
 };
 
 // --- Encrypted Tokens Store ---
 export const saveEncryptedToken = async (data: EncryptedData): Promise<void> => {
-  const db = await dbPromise;
-  await db.put(ENCRYPTED_TOKENS_STORE_NAME, data);
+     if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        await db.put(ENCRYPTED_TOKENS_STORE_NAME, data);
+    } else {
+        await liveDB.liveSaveEncryptedToken(data);
+    }
 };
 
 export const getEncryptedToken = async (id: string): Promise<EncryptedData | undefined> => {
-  const db = await dbPromise;
-  return db.get(ENCRYPTED_TOKENS_STORE_NAME, id);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        return db.get(ENCRYPTED_TOKENS_STORE_NAME, id);
+    } else {
+        return liveDB.liveGetEncryptedToken(id);
+    }
 };
 
 export const getAllEncryptedTokenIds = async (): Promise<string[]> => {
-    const db = await dbPromise;
-    return db.getAllKeys(ENCRYPTED_TOKENS_STORE_NAME);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        return db.getAllKeys(ENCRYPTED_TOKENS_STORE_NAME);
+    } else {
+        return liveDB.liveGetAllEncryptedTokenIds();
+    }
 };
 
 // --- Custom Features Store ---
 export const saveCustomFeature = async (feature: CustomFeature): Promise<void> => {
-    const db = await dbPromise;
-    await db.put(CUSTOM_FEATURES_STORE_NAME, feature);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        await db.put(CUSTOM_FEATURES_STORE_NAME, feature);
+    } else {
+        await liveDB.liveSaveCustomFeature(feature);
+    }
 };
 
 export const getAllCustomFeatures = async (): Promise<CustomFeature[]> => {
-    const db = await dbPromise;
-    return db.getAll(CUSTOM_FEATURES_STORE_NAME);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        return db.getAll(CUSTOM_FEATURES_STORE_NAME);
+    } else {
+        return liveDB.liveGetAllCustomFeatures();
+    }
 };
 
 export const getCustomFeature = async (id: string): Promise<CustomFeature | undefined> => {
-    const db = await dbPromise;
-    return db.get(CUSTOM_FEATURES_STORE_NAME, id);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        return db.get(CUSTOM_FEATURES_STORE_NAME, id);
+    } else {
+        return liveDB.liveGetCustomFeature(id);
+    }
 };
 
 export const deleteCustomFeature = async (id: string): Promise<void> => {
-    const db = await dbPromise;
-    await db.delete(CUSTOM_FEATURES_STORE_NAME, id);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        await db.delete(CUSTOM_FEATURES_STORE_NAME, id);
+    } else {
+        await liveDB.liveDeleteCustomFeature(id);
+    }
 };
 
 
 // --- Global Actions ---
 export const clearAllData = async (): Promise<void> => {
-    const db = await dbPromise;
-    await db.clear(FILES_STORE_NAME);
-    await db.clear(VAULT_STORE_NAME);
-    await db.clear(ENCRYPTED_TOKENS_STORE_NAME);
-    await db.clear(CUSTOM_FEATURES_STORE_NAME);
+    if (simulationState.isSimulationMode) {
+        const db = await dbPromise;
+        await db.clear(FILES_STORE_NAME);
+        await db.clear(VAULT_STORE_NAME);
+        await db.clear(ENCRYPTED_TOKENS_STORE_NAME);
+        await db.clear(CUSTOM_FEATURES_STORE_NAME);
+    } else {
+        await liveDB.liveClearAllData();
+    }
 }
