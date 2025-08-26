@@ -2,26 +2,26 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import axe from 'axe-core';
+import { configure, run, type AxeResults, type ElementContext } from 'axe-core';
 
 // Configure axe-core to be less noisy in the console
-axe.configure({
+configure({
     reporter: 'v2',
     rules: [
         { id: 'region', enabled: false } // A common false positive in isolated components
     ]
 });
 
-export type AxeResult = axe.AxeResults;
+export type AxeResult = AxeResults;
 
 /**
  * Runs an axe accessibility audit on a given HTML element.
  * @param context The element or selector string to run the audit on.
  * @returns A promise that resolves with the axe audit results.
  */
-export const runAxeAudit = async (context: axe.ElementContext): Promise<AxeResult> => {
+export const runAxeAudit = async (context: ElementContext): Promise<AxeResult> => {
     try {
-        const results = await axe.run(context, {
+        const results = await run(context, {
              resultTypes: ['violations', 'incomplete']
         });
         return results;

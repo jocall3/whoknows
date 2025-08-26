@@ -3,6 +3,7 @@ import { CHROME_VIEW_IDS } from './constants.tsx';
 
 export type ChromeViewType = typeof CHROME_VIEW_IDS[number];
 export type FeatureId = string;
+
 // FIX: Expand FeatureCategory to include all categories used in the app.
 export const FEATURE_CATEGORIES = [
     'Global Economic Operating System',
@@ -15,6 +16,7 @@ export const FEATURE_CATEGORIES = [
 ] as const;
 
 export type FeatureCategory = typeof FEATURE_CATEGORIES[number];
+
 
 export interface Feature {
   id: FeatureId;

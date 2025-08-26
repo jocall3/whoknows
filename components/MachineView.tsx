@@ -58,9 +58,8 @@ const DropZone: React.FC<{
             const featureId = e.dataTransfer.getData('text/plain');
             const featureData = FEATURES_MAP.get(featureId);
             if (featureData) {
-                // FIX: A feature with 'Core' category should be placeable in any slot.
-                // The original logic `category === 'Core'` was a typo.
-                if (featureData.category === category || featureData.category === 'Core') { // Allow any category in Core for flexibility
+                // A feature can be placed if its category matches the slot, or if the feature's category is 'Core'.
+                if (featureData.category === category || featureData.category === 'Core') {
                     onDrop(category, featureData);
                 } else {
                     console.warn(`Feature category "${featureData.category}" does not match slot "${category}"`);

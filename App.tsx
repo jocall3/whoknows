@@ -1,5 +1,4 @@
 
-
 import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { useGlobalState } from './contexts/GlobalStateContext.tsx';
@@ -85,34 +84,32 @@ const DesktopExperience: React.FC = () => {
         const features = await getAllCustomFeatures();
         setCustomFeatures(features);
     }, []);
-  
+
     useEffect(() => {
         fetchCustomFeatures();
-        // Listen for an event that indicates a feature was saved in the forge
-        const handleFeatureUpdated = () => {
-          window.dispatchEvent(new CustomEvent('custom-feature-update'));
-          fetchCustomFeatures();
-        };
-        window.addEventListener('custom-feature-update', handleFeatureUpdated);
-        return () => window.removeEventListener('custom-feature-update', handleFeatureUpdated);
+        window.addEventListener('custom-feature-update', fetchCustomFeatures);
+        return () => window.removeEventListener('custom-feature-update', fetchCustomFeatures);
     }, [fetchCustomFeatures]);
-    
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault();
-                setCommandPaletteOpen(isOpen => !isOpen);
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+
+    const allFeatures = useMemo(() => {
+        const features = new Map<string, Feature | (Omit<CustomFeature, 'code'> & { component: React.FC<any>, category: FeatureCategory, props: any })>();
+        FEATURES_MAP.forEach((value, key) => features.set(key, value));
+        customFeatures.forEach(f => {
+            features.set(f.id, { 
+                ...f, 
+                component: componentMap['custom-feature-runner'], 
+                category: 'Custom', 
+                props: { feature: f } 
+            });
+        });
+        return features;
+    }, [customFeatures]);
+
 
     const openWindow = useCallback((featureId: ViewType, props: any = {}) => {
         const newZIndex = nextZIndex + 1;
         setNextZIndex(newZIndex);
         setActiveId(featureId);
-        setCommandPaletteOpen(false);
 
         setWindows(prev => {
             const existingWindow = prev[featureId];
@@ -121,9 +118,9 @@ const DesktopExperience: React.FC = () => {
                     ...prev,
                     [featureId]: {
                         ...existingWindow,
-                        props: { ...existingWindow.props, ...props },
                         isMinimized: false,
                         zIndex: newZIndex,
+                        props: { ...existingWindow.props, ...props },
                     }
                 };
             }
@@ -131,22 +128,30 @@ const DesktopExperience: React.FC = () => {
             const openWindowsCount = Object.values(prev).filter(w => !w.isMinimized).length;
             const newWindow: WindowState = {
                 id: featureId,
-                props,
-                position: { x: 100 + openWindowsCount * 30, y: 100 + openWindowsCount * 30 },
-                size: { width: 800, height: 600 },
+                position: { x: 50 + openWindowsCount * 30, y: 50 + openWindowsCount * 30 },
+                size: { width: 960, height: 720 },
                 zIndex: newZIndex,
                 isMinimized: false,
+                props,
             };
             return { ...prev, [featureId]: newWindow };
         });
     }, [nextZIndex]);
-    
+
+    const handlePaletteSelect = (view: ViewType) => {
+        openWindow(view);
+        setCommandPaletteOpen(false);
+    };
+
     const closeWindow = (id: string) => {
         setWindows(prev => {
             const newState = { ...prev };
             delete newState[id];
             return newState;
         });
+        if (activeId === id) {
+            setActiveId(null);
+        }
     };
 
     const minimizeWindow = (id: string) => {
@@ -154,20 +159,19 @@ const DesktopExperience: React.FC = () => {
             ...prev,
             [id]: { ...prev[id], isMinimized: true }
         }));
-        setActiveId(null);
+        if (activeId === id) {
+            setActiveId(null);
+        }
     };
 
     const focusWindow = (id: string) => {
-        if (id === activeId && windows[id]?.zIndex === nextZIndex) {
-             setWindows(prev => ({ ...prev, [id]: { ...prev[id], isMinimized: false }}));
-             return;
-        }
+        if (id === activeId) return;
         const newZIndex = nextZIndex + 1;
         setNextZIndex(newZIndex);
         setActiveId(id);
         setWindows(prev => ({
             ...prev,
-            [id]: { ...prev[id], zIndex: newZIndex, isMinimized: false }
+            [id]: { ...prev[id], zIndex: newZIndex }
         }));
     };
     
@@ -176,149 +180,102 @@ const DesktopExperience: React.FC = () => {
             ...prev,
             [id]: { ...prev[id], ...updates }
         }));
-    };
-    
-    const openWindows = Object.values(windows).filter(w => !w.isMinimized);
-    const minimizedWindows = Object.values(windows).filter(w => w.isMinimized);
-
-    const allFeaturesMap = useMemo(() => {
-        const combined = new Map(FEATURES_MAP);
-        customFeatures.forEach(cf => {
-            combined.set(cf.id, {
-                ...cf,
-                component: componentMap['custom-feature-runner'],
-                // FIX: Cast 'Custom' to FeatureCategory to resolve type error.
-                // The root cause is addressed by expanding FeatureCategory in types.ts.
-                category: 'Custom' as FeatureCategory,
-            });
-        });
-        return combined;
-    }, [customFeatures]);
-
-
-    return (
-        <div className="h-full w-full relative overflow-hidden bg-cover bg-center" style={{backgroundImage: 'url(https://source.unsplash.com/random/1920x1080?abstract)'}}>
-            <ErrorBoundary>
-                <FeatureDock onOpen={openWindow} customFeatures={customFeatures} />
-                <main className="w-full h-full">
-                    {openWindows.map(win => {
-                        const feature = allFeaturesMap.get(win.id);
-                        if (!feature) return null;
-                        
-                        const props = feature.id.startsWith('custom-') ? { ...win.props, feature } : win.props;
-                        
-                        return (
-                            <Suspense key={win.id} fallback={<div />}>
-                                <Window
-                                    feature={feature}
-                                    state={{...win, props}}
-                                    isActive={win.id === activeId}
-                                    onClose={closeWindow}
-                                    onMinimize={minimizeWindow}
-                                    onFocus={focusWindow}
-                                    onUpdate={updateWindowState}
-                                />
-                            </Suspense>
-                        );
-                    })}
-                </main>
-                <Taskbar
-                    minimizedWindows={minimizedWindows.map(w => allFeaturesMap.get(w.id)).filter(Boolean) as (Feature | CustomFeature)[]}
-                    onRestore={focusWindow}
-                />
-                <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} onSelect={openWindow} />
-            </ErrorBoundary>
-        </div>
-    );
-};
-
-
-const App: React.FC = () => {
-    const [appState, setAppState] = useState<'consent' | 'onboarding' | 'landing' | 'desktop'>('consent');
-    const [hasOnboarded, setHasOnboarded] = useLocalStorage('devcore_onboarded', false);
-    const { dispatch } = useGlobalState();
-    useTheme(); // Initialize theme hook
+    }
 
     useEffect(() => {
-      try {
-          const consent = localStorage.getItem('devcore_ls_consent');
-          if (consent) {
-              if (hasOnboarded) {
-                setAppState('landing');
-              } else {
-                setAppState('onboarding');
-              }
-          } else {
-              setAppState('consent');
-          }
-      } catch (e) {
-          console.warn("Could not access localStorage.", e);
-          setAppState('landing'); // Proceed without persistence
-      }
-    }, [hasOnboarded]);
-
-    useEffect(() => {
-        const handleUserChanged = (user: AppUser | null) => {
-            dispatch({ type: 'SET_APP_USER', payload: user });
-        };
-
-        const init = () => {
-            if (window.google) {
-                initGoogleAuth(handleUserChanged);
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                setCommandPaletteOpen(o => !o);
+            }
+            if (e.key === 'Escape') {
+                setCommandPaletteOpen(false);
             }
         };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
-        const gsiScript = document.getElementById('gsi-client');
-        if (window.google) {
-            init();
-        } else if (gsiScript) {
-            gsiScript.addEventListener('load', init);
-            return () => gsiScript.removeEventListener('load', init);
-        }
-    }, [dispatch]);
-    
-    const handleConsent = (consent: 'granted' | 'denied') => {
-        try {
-            localStorage.setItem('devcore_ls_consent', consent);
-        } catch(e) {
-            console.error("Could not write to localStorage.", e);
-        }
-
-        if (hasOnboarded) {
-            setAppState('landing');
-        } else {
-            setAppState('onboarding');
-        }
-    }
-  
-    const handleAcknowledgeOnboarding = () => {
-        setHasOnboarded(true);
-        setAppState('landing');
-    };
-
-    const renderOverlay = () => {
-        switch (appState) {
-            case 'consent':
-                return <LocalStorageConsentModal onAccept={() => handleConsent('granted')} onDecline={() => handleConsent('denied')} />;
-            case 'onboarding':
-                return <OnboardingModal onAcknowledge={handleAcknowledgeOnboarding} />;
-            case 'landing':
-                return <LandingPage onLaunch={() => setAppState('desktop')} />;
-            default:
-                return null;
-        }
-    };
+    const openWindowsList = Object.values(windows).filter(w => !w.isMinimized);
+    const minimizedWindowsList = Object.values(windows).filter(w => w.isMinimized);
 
     return (
-        <div className="h-screen w-screen font-sans overflow-hidden bg-background">
-            <NotificationProvider>
-                <VaultProvider>
-                    <DesktopExperience />
-                    {renderOverlay()}
-                </VaultProvider>
-            </NotificationProvider>
+        <div className="h-full w-full flex flex-col bg-transparent overflow-hidden">
+            <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} onSelect={handlePaletteSelect} />
+
+            <div className="flex-grow relative">
+                <FeatureDock onOpen={openWindow} customFeatures={customFeatures} />
+                {openWindowsList.map(win => {
+                    const feature = allFeatures.get(win.id);
+                    if (!feature) return null;
+                    const featureWithProps = { ...feature, props: win.props };
+                    return (
+                        <Window
+                            key={win.id}
+                            feature={featureWithProps}
+                            state={win}
+                            isActive={win.id === activeId}
+                            onClose={() => closeWindow(win.id)}
+                            onMinimize={() => minimizeWindow(win.id)}
+                            onFocus={() => focusWindow(win.id)}
+                            onUpdate={updateWindowState}
+                        />
+                    );
+                })}
+            </div>
+
+            <Taskbar
+                minimizedWindows={minimizedWindowsList.map(w => allFeatures.get(w.id)).filter(Boolean) as (Feature | CustomFeature)[]}
+                onRestore={(id) => openWindow(id)}
+            />
         </div>
     );
 };
+
+
+function App() {
+  useTheme();
+  const { dispatch } = useGlobalState();
+  
+  const [lsConsent, setLsConsent] = useLocalStorage<'granted' | 'declined' | null>('devcore_ls_consent', null);
+  const [showOnboarding, setShowOnboarding] = useLocalStorage('devcore_show_onboarding', true);
+  const [showLanding, setShowLanding] = useState(true);
+
+  useEffect(() => {
+    initGoogleAuth((appUser: AppUser | null) => {
+        dispatch({ type: 'SET_APP_USER', payload: appUser });
+    });
+  }, [dispatch]);
+
+  const handleConsent = (consent: 'granted' | 'declined') => {
+      setLsConsent(consent);
+      if (consent === 'granted') {
+        window.location.reload();
+      }
+  };
+  
+  const handleLaunch = () => {
+      setShowLanding(false);
+  }
+
+  if (lsConsent === null) {
+      return <LocalStorageConsentModal onAccept={() => handleConsent('granted')} onDecline={() => handleConsent('declined')} />;
+  }
+  
+  if (showLanding) {
+      return <LandingPage onLaunch={handleLaunch} />;
+  }
+
+  return (
+    <ErrorBoundary>
+        <NotificationProvider>
+            <VaultProvider>
+                {showOnboarding && <OnboardingModal onAcknowledge={() => setShowOnboarding(false)} />}
+                <DesktopExperience />
+            </VaultProvider>
+        </NotificationProvider>
+    </ErrorBoundary>
+  );
+}
 
 export default App;

@@ -6,6 +6,7 @@ import { CpuChipIcon, PlusIcon, TrashIcon } from '../icons.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { ALL_FEATURES } from './index.ts';
+import { CustomFeatureRunner } from './CustomFeatureRunner.tsx';
 
 const ICON_MAP: Record<string, React.FC> = ALL_FEATURES.reduce((acc, feature) => {
     const iconType = (feature.icon as React.ReactElement)?.type;
@@ -58,6 +59,9 @@ export const FeatureForge: React.FC = () => {
             id: `custom-${Date.now()}`
         };
         await saveCustomFeature(newFeature);
+        // Dispatch event to notify other parts of the app (like the desktop view) to reload features
+        window.dispatchEvent(new CustomEvent('custom-feature-update'));
+        
         setGeneratedFeature(null);
         setPrompt('');
         fetchFeatures();
@@ -67,6 +71,8 @@ export const FeatureForge: React.FC = () => {
     const handleDelete = async (id: string) => {
         if (window.confirm("Are you sure you want to delete this feature?")) {
             await deleteCustomFeature(id);
+            // Dispatch event to notify other parts of the app (like the desktop view) to reload features
+            window.dispatchEvent(new CustomEvent('custom-feature-update'));
             fetchFeatures();
             addNotification('Feature deleted.', 'info');
         }
@@ -83,30 +89,35 @@ export const FeatureForge: React.FC = () => {
                 <h1 className="text-3xl font-bold flex items-center"><CpuChipIcon /><span className="ml-3">Feature Forge</span></h1>
                 <p className="text-text-secondary mt-1">Use AI to create new tools and add them to your desktop.</p>
             </header>
-            <div className="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
-                {/* Left: Generator */}
-                <div className="lg:col-span-1 flex flex-col gap-4 bg-surface p-4 border border-border rounded-lg">
-                    <h3 className="text-lg font-bold">1. Create a New Feature</h3>
-                    <div className="flex flex-col flex-grow">
-                        <label className="text-sm">Describe the tool you want to build</label>
-                        <textarea value={prompt} onChange={e => setPrompt(e.target.value)} className="w-full mt-1 p-2 bg-background border border-border rounded" rows={4}/>
+            <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
+                {/* Left: Generator & Preview */}
+                <div className="lg:col-span-1 flex flex-col gap-4">
+                    <div className="bg-surface p-4 border border-border rounded-lg">
+                        <h3 className="text-lg font-bold">1. Create a New Feature</h3>
+                        <div className="flex flex-col mt-2">
+                            <label className="text-sm">Describe the tool you want to build</label>
+                            <textarea value={prompt} onChange={e => setPrompt(e.target.value)} className="w-full mt-1 p-2 bg-background border border-border rounded" rows={3}/>
+                        </div>
+                        <button onClick={handleGenerate} disabled={isGenerating} className="btn-primary w-full mt-2 py-2 flex items-center justify-center gap-2">{isGenerating ? <LoadingSpinner/> : 'Generate Feature'}</button>
                     </div>
-                    <button onClick={handleGenerate} disabled={isGenerating} className="btn-primary py-2 flex items-center justify-center gap-2">{isGenerating ? <LoadingSpinner/> : 'Generate Code'}</button>
                     {generatedFeature && (
-                        <div className="p-4 border border-dashed rounded-lg space-y-2 animate-pop-in">
-                            <h4 className="font-bold">Review Generated Feature</h4>
-                            <p><strong>Name:</strong> {generatedFeature.name}</p>
-                            <p><strong>Description:</strong> {generatedFeature.description}</p>
-                            <div className="max-h-48 overflow-y-auto bg-background p-2 rounded"><MarkdownRenderer content={'```tsx\n' + generatedFeature.code + '```'} /></div>
-                            <button onClick={handleSave} className="w-full py-2 bg-green-600 text-white font-bold rounded-md">Save Feature</button>
+                        <div className="flex-grow flex flex-col bg-surface p-4 border border-dashed rounded-lg space-y-2 animate-pop-in min-h-0">
+                            <div className="flex justify-between items-center">
+                                <h4 className="font-bold">2. Review & Save</h4>
+                                <button onClick={handleSave} className="px-4 py-1 bg-green-600 text-white font-bold rounded-md text-sm">Save Feature</button>
+                            </div>
+                            <p className="text-sm"><strong>Name:</strong> {generatedFeature.name}</p>
+                            <div className="flex-grow border rounded-md overflow-hidden min-h-[200px]">
+                                 <CustomFeatureRunner feature={{ ...generatedFeature, id: 'preview' }} />
+                            </div>
                         </div>
                     )}
                 </div>
 
                 {/* Right: Existing Custom Features */}
-                <div className="lg:col-span-2 flex flex-col gap-4 min-h-0">
+                <div className="lg:col-span-1 flex flex-col gap-4 min-h-0">
                    <div className="bg-surface p-4 border border-border rounded-lg flex-grow flex flex-col min-h-0">
-                        <h3 className="text-lg font-bold mb-2">2. Your Custom Features</h3>
+                        <h3 className="text-lg font-bold mb-2">3. Your Custom Features</h3>
                         <div className="flex-grow overflow-y-auto pr-2">
                             {isLoading === 'list' && <LoadingSpinner />}
                             {customFeatures.length === 0 && !isLoading && <p className="text-text-secondary text-center py-8">You haven't created any features yet.</p>}

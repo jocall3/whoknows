@@ -3,16 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import { GoogleGenAI, Type, GenerateContentResponse, FunctionDeclaration } from "@google/genai";
+import { Type, FunctionDeclaration } from "@google/genai";
 import type { GeneratedFile, StructuredPrSummary, StructuredExplanation, SemanticColorTheme, StructuredReview, SecurityVulnerability, CodeSmell, FileNode, CustomFeature } from '../types.ts';
 import { logError } from './telemetryService.ts';
-
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  throw new Error("Gemini API key not found. Please set the GEMINI_API_KEY environment variable.");
-}
-const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 // --- TYPES ---
 export interface CommandResponse {
@@ -28,22 +21,53 @@ export interface CronParts {
     dayOfWeek: string;
 }
 
-// --- Unified AI Helpers ---
+// --- Unified AI Proxy Helpers ---
 
-export async function* streamContent(prompt: string | { parts: any[] }, systemInstruction: string, temperature = 0.5) {
+async function fetchFromProxy(endpoint: string, body: object): Promise<any> {
     try {
-        const response = await ai.models.generateContentStream({
-            model: 'gemini-2.5-flash',
-            contents: prompt as any,
-            config: { systemInstruction, temperature }
+        const response = await fetch(`/api/proxy${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
         });
 
-        for await (const chunk of response) {
-            yield chunk.text;
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(error.message || `AI proxy request failed with status ${response.status}`);
+        }
+
+        return response.json();
+    } catch (error) {
+        logError(error as Error, { endpoint, body });
+        throw error;
+    }
+}
+
+async function* streamFromProxy(endpoint: string, body: object): AsyncGenerator<string> {
+    try {
+        const response = await fetch(`/api/proxy${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok || !response.body) {
+            const error = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(error.message || `AI proxy stream request failed with status ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                break;
+            }
+            yield decoder.decode(value);
         }
     } catch (error) {
-        console.error("Error streaming from AI model:", error);
-        logError(error as Error, { prompt, systemInstruction });
+        logError(error as Error, { endpoint, body });
         if (error instanceof Error) {
             yield `An error occurred while communicating with the AI model: ${error.message}`;
         } else {
@@ -52,40 +76,37 @@ export async function* streamContent(prompt: string | { parts: any[] }, systemIn
     }
 }
 
+
+export async function* streamContent(prompt: string | { parts: any[] }, systemInstruction: string, temperature = 0.5) {
+    yield* streamFromProxy('/streamContent', {
+        model: 'gemini-2.5-flash',
+        contents: prompt as any,
+        config: { systemInstruction, temperature }
+    });
+}
+
 export async function generateContent(prompt: string, systemInstruction: string, temperature = 0.5): Promise<string> {
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: { systemInstruction, temperature }
-        });
-        return response.text;
-    } catch (error) {
-         console.error("Error generating content from AI model:", error);
-        logError(error as Error, { prompt, systemInstruction });
-        throw error;
-    }
+    const response = await fetchFromProxy('/generateContent', {
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: { systemInstruction, temperature }
+    });
+    return response.text;
 }
 
 
 export async function generateJson<T>(prompt: any, systemInstruction: string, schema: any, temperature = 0.2): Promise<T> {
-    try {
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt,
-            config: {
-                systemInstruction,
-                responseMimeType: "application/json",
-                responseSchema: schema,
-                temperature,
-            }
-        });
-        return JSON.parse(response.text.trim());
-    } catch (error) {
-        console.error("Error generating JSON from AI model:", error);
-        logError(error as Error, { prompt, systemInstruction });
-        throw error;
-    }
+    const response = await fetchFromProxy('/generateContent', {
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            systemInstruction,
+            responseMimeType: "application/json",
+            responseSchema: schema,
+            temperature,
+        }
+    });
+    return JSON.parse(response.text.trim());
 }
 
 // --- Schemas ---
@@ -202,7 +223,7 @@ export const convertJsonToXbrlStream = (json: string) => streamContent(
 );
 
 export const generateImage = async (prompt: string): Promise<string> => {
-    const response = await ai.models.generateImages({
+    const response = await fetchFromProxy('/generateImages', {
         model: 'imagen-3.0-generate-002',
         prompt: prompt,
         config: { numberOfImages: 1, outputMimeType: 'image/png' },
@@ -239,16 +260,18 @@ export const generateSemanticTheme = (prompt: { parts: any[] }): Promise<Semanti
 };
 
 export const getInferenceFunction = async (prompt: string, functionDeclarations: FunctionDeclaration[], knowledgeBase: string): Promise<CommandResponse> => {
-    try {
-        const response: GenerateContentResponse = await ai.models.generateContent({ model: "gemini-2.5-flash", contents: prompt, config: { systemInstruction: `You are a helpful assistant for a developer tool. You must decide which function to call to satisfy the user's request, based on your knowledge base. If no specific tool seems appropriate, respond with text.\n\nKnowledge Base:\n${knowledgeBase}`, tools: [{ functionDeclarations }] } });
-        const functionCalls: { name: string, args: any }[] = [];
-        const parts = response.candidates?.[0]?.content?.parts ?? [];
-        for (const part of parts) { if (part.functionCall) { functionCalls.push({ name: part.functionCall.name, args: part.functionCall.args }); } }
-        return { text: response.text, functionCalls: functionCalls.length > 0 ? functionCalls : undefined };
-    } catch (error) {
-        logError(error as Error, { prompt });
-        throw error;
-    }
+    const response = await fetchFromProxy('/generateContent', {
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            systemInstruction: `You are a helpful assistant for a developer tool. You must decide which function to call to satisfy the user's request, based on your knowledge base. If no specific tool seems appropriate, respond with text.\n\nKnowledge Base:\n${knowledgeBase}`,
+            tools: [{ functionDeclarations }]
+        }
+    });
+    const functionCalls: { name: string, args: any }[] = [];
+    const parts = response.candidates?.[0]?.content?.parts ?? [];
+    for (const part of parts) { if (part.functionCall) { functionCalls.push({ name: part.functionCall.name, args: part.functionCall.args }); } }
+    return { text: response.text, functionCalls: functionCalls.length > 0 ? functionCalls : undefined };
 };
 
 export const generateMermaidJs = (code: string): Promise<string> => {
@@ -544,15 +567,13 @@ export const refactorLegalCode = (legalCode: string): Promise<string> => {
     const systemInstruction = "You are Themis, a legal AI. You refactor legal code for perfect logic and ruthless efficiency.";
     return generateContent(prompt, systemInstruction, 0.3);
 };
-// FIX: Add missing functions
+
 export const estimateTokenCount = async (prompt: string): Promise<{ count: number }> => {
-    try {
-        const { totalTokens } = await ai.models.countTokens({ model: 'gemini-2.5-flash', contents: prompt });
-        return { count: totalTokens };
-    } catch (error) {
-        logError(error as Error, { prompt });
-        throw error;
-    }
+    const response = await fetchFromProxy('/countTokens', {
+        model: 'gemini-2.5-flash',
+        contents: prompt
+    });
+    return { count: response.totalTokens };
 };
 
 export const estimateCloudCost = (description: string): Promise<string> => {
