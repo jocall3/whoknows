@@ -1,7 +1,7 @@
 
-## Domain 1: The AI Core & Workflow Orchestration (Inventions 1-15)
+## Domain 1: The AI Core & Workflow Orchestration 
 
-You invented a **Natural Language Operating System for Development**, where human intent is the primary input.
+a **Natural Language Operating System for Development**, where human intent is the primary input.
 
 1.  **The AI Command Center:** The first-ever developer "shell" that accepts ambiguous, high-level commands and decomposes them into executable actions across dozens of tools.
 2.  **The Secure Workspace Fabric (`workspaceConnectorService`):** A client-side, encrypted mesh connecting disparate services (Jira, Slack, GitHub), allowing them to act as a single, cohesive unit.
@@ -19,7 +19,7 @@ You invented a **Natural Language Operating System for Development**, where huma
 14. **Automated Weekly Digest Generation (`WeeklyDigestGenerator`):** An AI that autonomously scrapes commit logs and performance telemetry from the week's work and composes a draft email summary for team leads.
 15. **Conversational Database Management:** Use Case: "Create a new table in our dev database called 'analytics_events' using the schema designer and mock 100 rows of data for it."
 
-## Domain 2: AI-Driven Code Generation & Understanding (Inventions 16-35)
+## Domain 2: AI-Driven Code Generation & Understanding 
 
 You invented **Cognitive Code Synthesis**, where the AI understands the *why* behind the code, not just the *what*.
 
@@ -44,7 +44,7 @@ You invented **Cognitive Code Synthesis**, where the AI understands the *why* be
 34. **The CSS-to-Framework Converter (`convertCssToTailwind`):** Converts vanilla CSS into framework-specific component styles, like Tailwind CSS, creating the necessary HTML structure with utility classes.
 35. **The API Documentation Ghostwriter (`createApiDocumentation`):** Analyzes a backend route's code (e.g., an Express controller) to automatically generate comprehensive Markdown API documentation.
 
-## Domain 3: Hyper-Visual Frontend Development (Inventions 36-50)
+## Domain 3: Hyper-Visual Frontend Development 
 
 You invented an **Intuitive Visual Abstraction Layer**, turning complex code into interactive canvases.
 
@@ -64,8 +64,7 @@ You invented an **Intuitive Visual Abstraction Layer**, turning complex code int
 49. **Live Performance Waterfall (`NetworkVisualizer`):** It doesn't just list network requests; it plots them on a timeline, visually showing dependencies, blockages, and total load time in a way that's immediately understandable.
 50. **The JSON Seismograph:** A use case for the `JsonTreeNavigator` where you can paste two versions of a JSON object and see a visual "diff" of the tree, with changed nodes highlighted.
 
-## Domain 4: Next-Generation Testing & Debugging (Inventions 51-65)
-
+## Domain 4: Next-Generation Testing & Debugging 
 You invented **Predictive & Generative Quality Assurance**, moving testing from a manual chore to an automated, intelligent process.
 
 51. **The Automated Bug Hunter (`BugReproducer`):** A revolutionary tool that takes an error stack trace and automatically writes a minimal, failing unit test that reproduces the exact bug.
@@ -84,8 +83,7 @@ You invented **Predictive & Generative Quality Assurance**, moving testing from 
 64. **The Tech Debt Forecaster (`TechDebtSonar`):** Scans for code smells and uses AI to predict the long-term maintenance cost and risk associated with leaving them unaddressed.
 65. **Async Call Visualizer (`AsyncCallTreeViewer`):** Provides a simple, hierarchical view of nested or chained asynchronous operations, making it easy to spot performance issues in complex promise chains.
 
-## Domain 5: Git, DevOps, & Cloud Architecture (Inventions 66-80)
-
+## Domain 5: Git, DevOps, & Cloud Architecture 
 You invented **Declarative Infrastructure and Process Management**, where complex systems are defined with simple English.
 
 66. **The DevOps Architect (`CiCdPipelineGenerator`):** A developer describes their deployment stages in plain English, and the tool generates a production-ready CI/CD configuration file for platforms like GitHub Actions or GitLab CI.
@@ -104,8 +102,7 @@ You invented **Declarative Infrastructure and Process Management**, where comple
 79. **Visual Deprovisioning Planner:** A use case for the `TerraformGenerator` and `LogicFlowBuilder` where a user can visually select resources on the canvas and have the AI generate a `terraform destroy` plan with dependency analysis.
 80. **Git History Narration (`VisualGitTree`):** The AI can summarize a series of commits in the visualizer, telling a story of how a feature was developed over time.
 
-## Domain 6: Ultimate Developer Productivity (Inventions 81-100)
-
+## Domain 6: Ultimate Developer Productivity 
 You invented the **Ambient Development Assistant**, a suite of tools that seamlessly integrate into the background, anticipating needs and automating cognitive overhead.
 
 81. **The Collective Consciousness (`SnippetVault`):** A snippet vault that uses AI to automatically suggest tags for your code, making it searchable by concept, not just by name.
