@@ -1,4 +1,4 @@
-name: NodeJS with Grunt
+name: Node.js CI/CD with Dependency Caching
 
 on:
   push:
@@ -8,41 +8,44 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Or your preferred runner OS
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [22.x] # Use your desired Node.js version(s)
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        # Cache npm dependencies with actions/setup-node. This is often preferred
+        # over a separate actions/cache step for npm, as it handles paths correctly.
+        cache: 'npm' 
+        # If you were using Yarn, set cache: 'yarn'
+        # If you were using pnpm, set cache: 'pnpm'
 
-    - name: Build
-      run: |
-        npm install
-        npm run build
-            - name: Cache
-  uses: actions/cache@v4.2.4
-  with:
-    # A list of files, directories, and wildcard patterns to cache and restore
-    path: 
-    # An explicit key for restoring and saving the cache
-    key: 
-    # An ordered multiline string listing the prefix-matched keys, that are used for restoring stale cache if no cache hit occurred for key. Note `cache-hit` returns false in this case.
-    restore-keys: # optional
-    # The chunk size used to split up large files during upload, in bytes
-    upload-chunk-size: # optional
-    # An optional boolean when enabled, allows windows runners to save or restore caches that can be restored or saved respectively on other platforms
-    enableCrossOsArchive: # optional, default is false
-    # Fail the workflow if cache entry is not found
-    fail-on-cache-miss: # optional, default is false
-    # Check if a cache entry exists for the given input(s) (key, restore-keys) without downloading the cache
-    lookup-only: # optional, default is false
-    # Run the post step to save the cache even if another step before fails
-    save-always: # optional, default is false
-          
+    - name: Install Dependencies
+      run: npm install # This step will benefit from the cache configured above
+
+    - name: Run Build
+      run: npm run build # Or `grunt build` if Grunt is still explicitly needed here
+                         # (assuming 'build' script is defined in package.json)
+
+    # Optional: If your project has a test script, add a testing step
+    - name: Run Tests
+      run: npm test # Or `npm run test`
+
+    # Optional: If you need to deploy or upload artifacts after a successful build
+    # - name: Deploy (e.g., to S3, Netlify, etc.)
+    #   run: |
+    #     echo "Deployment commands here"
+
+    # - name: Upload Build Artifacts
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: my-app-build-${{ github.sha }}
+    #     path: ./dist # Adjust to your build output directory
