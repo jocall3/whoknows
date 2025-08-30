@@ -37,7 +37,7 @@ jobs:
 
     # Optional: If your project has a test script, add a testing step
     - name: Run Tests
-      run: npm test # Or `npm run test`
+      run: npm run test # Or `npm run test`
 
     # Optional: If you need to deploy or upload artifacts after a successful build
     # - name: Deploy (e.g., to S3, Netlify, etc.)
