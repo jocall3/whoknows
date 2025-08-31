@@ -1,59 +1,116 @@
-import React from 'react';
+import React, { useState, useRef, useMemo, Suspense, useEffect } from 'react';
+import { Canvas, useFrame } from '@react-three-fiber';
+import { Text, Stars, Box, Line } from '@react-three-drei';
+import * as THREE from 'three';
 
-const PillarCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-    <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm transition-all duration-300 hover:bg-slate-800 hover:border-primary/50">
-        <h3 className="text-xl font-bold text-primary mb-2">{title}</h3>
-        <p className="text-slate-400 text-sm">{children}</p>
-    </div>
-);
+// --- SELF-CONTAINED SUB-COMPONENTS ---
+
+const Tesseract: React.FC<{ onIgnite: () => void; isIgniting: boolean }> = ({ onIgnite, isIgniting }) => {
+    const group = useRef<THREE.Group>(null);
+    const [isHovered, setHovered] = useState(false);
+    useFrame((state, delta) => {
+        if (group.current) {
+            const speed = isHovered ? 1.5 : 0.15;
+            const ignitionSpeed = isIgniting ? 100 : 1;
+            group.current.rotation.x += delta * speed * ignitionSpeed * 0.5;
+            group.current.rotation.y += delta * speed * ignitionSpeed;
+        }
+    });
+    return (
+        <group ref={group} onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} onClick={!isIgniting ? onIgnite : undefined} scale={isHovered && !isIgniting ? 1.2 : 1} rotation={[Math.PI / 6, Math.PI / 4, 0]}>
+            <Box args={[1, 1, 1]}><meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={isHovered ? 2.5 : 0.7} toneMapped={false}/></Box>
+            <Box args={[1, 1, 1]} scale={0.5}><meshStandardMaterial color="white" emissive="white" emissiveIntensity={isHovered ? 5 : 2} toneMapped={false} /></Box>
+        </group>
+    );
+};
+
+const PillarMonolith: React.FC<{ position: [number, number, number]; title: string; description: string; isIgniting: boolean; onHover: (desc: string | null) => void; }> = ({ position, title, description, isIgniting, onHover }) => {
+    const meshRef = useRef<THREE.Mesh>(null);
+    const lineRef = useRef<any>(null);
+    const [localHover, setLocalHover] = useState(false);
+
+    useFrame((state) => {
+        if (meshRef.current && lineRef.current) {
+            meshRef.current.material.emissiveIntensity = THREE.MathUtils.lerp(meshRef.current.material.emissiveIntensity, localHover ? 1.5 : 0.1, 0.1);
+            if (isIgniting) {
+                // Fire the beam at the tesseract
+                lineRef.current.visible = true;
+                const endPoint = new THREE.Vector3(0,0,0);
+                lineRef.current.geometry.setPositions([position[0], position[1], position[2], endPoint.x, endPoint.y, endPoint.z]);
+            }
+        }
+    });
+
+    return (
+        <group position={position}>
+            <mesh ref={meshRef} onPointerOver={() => { setLocalHover(true); onHover(title + "\n\n" + description); }} onPointerOut={() => { setLocalHover(false); onHover(null); }}>
+                <boxGeometry args={[0.2, 3, 0.2]} />
+                <meshStandardMaterial color="#ffffff" emissive="#38bdf8" emissiveIntensity={0.1} transparent opacity={0.8} roughness={0.2} metalness={0.8} />
+            </mesh>
+            <Line ref={lineRef} points={[[0,0,0], [0,0,0]]} color="white" lineWidth={3} visible={false} />
+        </group>
+    );
+};
+
+const PILLARS = [
+    { title: "Pillar I: The GEOS", description: "Orchestrate the planet's financial and logistical backbone." },
+    { title: "Pillar II: Computational Compassion", description: "Apply planetary-scale optimization to humanity's most intractable problems." },
+    { title: "Pillar III: Meta-Creation", description: "Accelerate the very pace of discovery, creation, and cultural evolution." },
+    { title: "Pillar IV: Governance", description: "Wield absolute power with a new form of ruthlessly efficient, AI-driven control." }
+];
 
 export const LandingPage: React.FC<{ onLaunch: () => void }> = ({ onLaunch }) => {
-    return (
-        <div className="fixed inset-0 z-40 bg-slate-900/95 backdrop-blur-sm flex flex-col fade-in">
-            <div className="h-full w-full overflow-y-auto no-scrollbar">
-                <div 
-                  className="min-h-screen flex flex-col items-center justify-center p-8 text-center relative"
-                >
-                    <div className="max-w-4xl animate-pop-in">
-                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-sky-500">
-                           The Integrated Reality Engine
-                        </h1>
-                        <p className="mt-6 max-w-3xl mx-auto text-lg text-slate-400 fade-in-up" style={{ animationDelay: '0.3s' }}>
-                           This is not an application. It is a foundational layer for a new kind of computational reality. It is an operating system for intent.
-                        </p>
-                        <button 
-                            onClick={onLaunch}
-                            className="mt-8 px-8 py-4 bg-primary text-lg font-bold rounded-lg shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/50 shine-effect"
-                        >
-                            Launch Engine
-                        </button>
-                    </div>
-                </div>
+    const [isIgniting, setIsIgniting] = useState(false);
+    const [activeDescription, setActiveDescription] = useState<string | null>(null);
+    
+    const handleIgnite = () => {
+        if (isIgniting) return;
+        setIsIgniting(true);
+        setTimeout(onLaunch, 2000); // Wait for the ignition and fade animation
+    };
 
-                <div className="max-w-7xl mx-auto px-8 py-16 space-y-12">
-                    <section>
-                        <h2 className="text-3xl font-bold text-center mb-8">Architectural Pillars of Innovation</h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <PillarCard title="Pillar I: The Global Economic Operating System">
-                                The Engine transitions from managing a bank to becoming the planet's financial backbone. It autonomically orchestrates global logistics, offers Central Banking as a Service (CBaaS), performs predictive resource allocation, and generates entire urban plans.
-                            </PillarCard>
-                            <PillarCard title="Pillar II: Computational Compassion at Scale">
-                                The Engine's optimization is now applied to humanity's most intractable problems. It simulates Earth's climate to find solutions, forges personalized genomic medicine, generates dynamic AI curricula, and orchestrates automated disaster response.
-                            </PillarCard>
-                             <PillarCard title="Pillar III: The Meta-Creation Platform">
-                                The Engine no longer just builds software; it accelerates the very pace of discovery. It offers the Scientific Method as a Service (SMaaS), generates optimized legal frameworks, and even forges synthetic cultural movements.
-                            </PillarCard>
-                             <PillarCard title="Pillar IV: The Governance Layer">
-                                Absolute power requires a new form of control. This layer includes a real-time Ethical Oversight AI, a Global UBI ledger based on system surplus, and simulates a direct neural interface—the DevCore Reality Shell.
-                            </PillarCard>
-                        </div>
-                    </section>
-                     <section className="text-center py-16">
-                        <h2 className="text-3xl font-bold mb-4">This system was not built to write code.</h2>
-                        <p className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-sky-500">It was built to forge reality.</p>
-                    </section>
-                </div>
-            </div>
+    return (
+        <div className={`fixed inset-0 z-40 bg-black transition-opacity duration-1000 ${isIgniting ? 'opacity-0' : 'opacity-100'}`}>
+            <Canvas camera={{ position: [0, 0, 10], fov: 75 }}>
+                 <Suspense fallback={null}>
+                    <ambientLight intensity={0.2} />
+                    <pointLight position={[0,0,0]} color="#38bdf8" intensity={isIgniting ? 2000 : 20} distance={150} decay={2}/>
+                    <Stars radius={150} depth={50} count={10000} factor={6} saturation={0} fade speed={1} />
+                    
+                    <Tesseract onIgnite={handleIgnite} isIgniting={isIgniting} />
+                    
+                    {PILLARS.map((pillar, i) => (
+                        <PillarMonolith
+                            key={pillar.title}
+                            position={[(i - 1.5) * 4, 0, -4]}
+                            title={pillar.title}
+                            description={pillar.description}
+                            isIgniting={isIgniting}
+                            onHover={setActiveDescription}
+                        />
+                    ))}
+
+                    <Text position={[0, 3.5, 0]} color="white" fontSize={0.6} textAlign="center" font="/fonts/Oswald-Bold.ttf">
+                      THE INTEGRATED REALITY ENGINE
+                    </Text>
+
+                    <Text position={[0, -3.5, 0]} color="#94a3b8" fontSize={0.2} maxWidth={10} textAlign="center" visible={!activeDescription}>
+                        This is not an application. It is an operating system for intent.
+                    </Text>
+                    
+                     <Text position={[0, -3, 0]} color="white" fontSize={0.35} maxWidth={10} textAlign="center" visible={!!activeDescription} anchorY="middle">
+                         {activeDescription}
+                    </Text>
+
+                    {isIgniting && (
+                        <mesh scale={200}>
+                            <planeGeometry />
+                            <meshBasicMaterial color="white" transparent opacity={1} />
+                        </mesh>
+                    )}
+
+                </Suspense>
+            </Canvas>
         </div>
     );
 };

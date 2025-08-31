@@ -1,75 +1,89 @@
-import React, { useState, useMemo } from 'react';
-import { CodeBracketSquareIcon } from '../icons.tsx';
+import React, { useState, useCallback, useMemo } from 'react';
+import { liveReconMetadata, forgeOptimalPayloads } from '../../services/MemeticWarfareAI'; // Invented AI Service
+import type { MetadataPayload, SocialPrediction } from '../../types/MemeticWarfare'; // Invented
+import { CodeBracketSquareIcon, SparklesIcon } from '../icons';
+import { LoadingSpinner } from '../shared';
 
-interface MetaData {
-    title: string;
-    description: string;
-    image: string;
-    url: string;
-}
+const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
-const SocialCardPreview: React.FC<{ meta: MetaData }> = ({ meta }) => (
-    <div className="w-full max-w-md mx-auto bg-surface border border-border rounded-2xl overflow-hidden shadow-lg">
-        <div className="h-52 bg-gray-100 flex items-center justify-center">
-            {meta.image ? <img src={meta.image} alt="Preview" className="w-full h-full object-cover" onError={(e) => e.currentTarget.style.display='none'}/> : <span className="text-text-secondary">Image Preview</span>}
+// --- COMPONENTS ---
+const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+
+const SocialCardPreview: React.FC<{ platform: string; meta: MetadataPayload; prediction: SocialPrediction | null }> = ({ platform, meta, prediction }) => (
+    <div className="bg-surface border border-border rounded-lg overflow-hidden shadow-lg w-full">
+        {meta.image && <div className="h-32 bg-gray-100"><img src={meta.image} className="w-full h-full object-cover"/></div>}
+        <div className="p-3">
+            <p className="text-xs text-text-secondary truncate">{platform} Preview</p>
+            <h3 className="font-bold text-text-primary truncate mt-1 text-sm">{meta.title}</h3>
+            <p className="text-xs text-text-secondary mt-1 line-clamp-2">{meta.description}</p>
         </div>
-        <div className="p-4">
-            <p className="text-xs text-text-secondary truncate">{new URL(meta.url || 'https://example.com').hostname}</p>
-            <h3 className="font-bold text-text-primary truncate mt-1">{meta.title || 'Your Title Here'}</h3>
-            <p className="text-sm text-text-secondary mt-1 line-clamp-2">{meta.description || 'A concise description of your content will appear here.'}</p>
+        <div className="p-2 border-t bg-background text-xs font-mono grid grid-cols-2 gap-2">
+            <p>CTR: <span className="font-bold text-primary">{prediction ? `${(prediction.predictedCtr * 100).toFixed(1)}%` : '...'}</span></p>
+            <p>Risk: <span className={`font-bold ${prediction?.misinfoRisk ? 'text-red-500' : 'text-green-500'}`}>{prediction ? `${(prediction.misinfoRisk * 100).toFixed(0)}%` : '...'}</span></p>
         </div>
     </div>
 );
 
+
 export const MetaTagEditor: React.FC = () => {
-    const [meta, setMeta] = useState<MetaData>({
-        title: 'DevCore AI Toolkit', description: 'The ultimate toolkit for modern developers, powered by Gemini.',
-        image: 'https://storage.googleapis.com/maker-studio-project-images-prod/programming_power_on_a_laptop_3a8f0bb1_39a9_4c2b_81f0_a74551480f2c.png',
-        url: 'https://devcore.example.com'
-    });
+    const [url, setUrl] = useState('https://react.dev');
+    const [basePayload, setBasePayload] = useState<MetadataPayload | null>(null);
+    const [forgedPayloads, setForgedPayloads] = useState<MetadataPayload[]>([]);
+    const [activePayload, setActivePayload] = useState<MetadataPayload | null>(null);
+    const [isLoading, setIsLoading] = useState<Record<string,boolean>>({});
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setMeta({ ...meta, [e.target.name]: e.target.value });
-    };
-
-    const generatedHtml = useMemo(() => {
-        return `<!-- Primary Meta Tags -->
-<title>${meta.title}</title>
-<meta name="title" content="${meta.title}" />
-<meta name="description" content="${meta.description}" />
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content="${meta.url}" />
-<meta property="og:title" content="${meta.title}" />
-<meta property="og:description" content="${meta.description}" />
-<meta property="og:image" content="${meta.image}" />
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content="${meta.url}" />
-<meta property="twitter:title" content="${meta.title}" />
-<meta property="twitter:description" content="${meta.description}" />
-<meta property="twitter:image" content="${meta.image}" />`;
-    }, [meta]);
+    const handleRecon = useCallback(async () => {
+        setIsLoading({ recon: true }); setBasePayload(null); setForgedPayloads([]); setActivePayload(null);
+        try {
+            const result = await liveReconMetadata(url);
+            setBasePayload(result); setActivePayload(result);
+        } finally { setIsLoading({}); }
+    }, [url]);
     
+    const handleForge = useCallback(async () => {
+        if (!basePayload) return;
+        setIsLoading({ forge: true });
+        try {
+            const results = await forgeOptimalPayloads(basePayload);
+            setForgedPayloads(results);
+        } finally { setIsLoading(p=>({...p, forge: false})); }
+    }, [basePayload]);
+    
+    const generatedHtml = useMemo(() => { if (!activePayload) return ''; return `<!-- METADATA PAYLOAD -->\n<title>${activePayload.title}</title>\n<meta name="description" content="${activePayload.description}" />\n<meta property="og:title" content="${activePayload.title}" />\n<!-- ... and so on -->` }, [activePayload]);
+
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
-            <header className="mb-6"><h1 className="text-3xl font-bold flex items-center"><CodeBracketSquareIcon /><span className="ml-3">Meta Tag Editor</span></h1><p className="text-text-secondary mt-1">Generate SEO & social media meta tags with a live preview.</p></header>
-            <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 min-h-0">
-                <div className="xl:col-span-1 flex flex-col gap-4 bg-surface border border-border p-6 rounded-lg overflow-y-auto">
-                    <h3 className="text-xl font-bold">Metadata</h3>
-                    <div><label className="block text-sm">Title</label><input type="text" name="title" value={meta.title} onChange={handleChange} className="w-full mt-1 p-2 rounded bg-background border border-border"/></div>
-                    <div><label className="block text-sm">Description</label><input type="text" name="description" value={meta.description} onChange={handleChange} className="w-full mt-1 p-2 rounded bg-background border border-border"/></div>
-                    <div><label className="block text-sm">Canonical URL</label><input type="text" name="url" value={meta.url} onChange={handleChange} className="w-full mt-1 p-2 rounded bg-background border border-border"/></div>
-                    <div><label className="block text-sm">Social Image URL</label><input type="text" name="image" value={meta.image} onChange={handleChange} className="w-full mt-1 p-2 rounded bg-background border border-border"/></div>
-                </div>
-                <div className="xl:col-span-1 flex flex-col">
-                     <label className="text-sm font-medium text-text-secondary mb-2">Generated HTML</label>
-                     <div className="relative flex-grow"><pre className="w-full h-full bg-background p-4 rounded-md text-primary text-sm overflow-auto">{generatedHtml}</pre><button onClick={() => navigator.clipboard.writeText(generatedHtml)} className="absolute top-2 right-2 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-xs">Copy</button></div>
-                </div>
-                 <div className="hidden xl:flex flex-col items-center justify-center">
-                    <label className="text-sm font-medium text-text-secondary mb-2">Live Preview</label>
-                    <SocialCardPreview meta={meta} />
-                </div>
+            <header className="mb-4">
+                <h1 className="text-3xl font-bold flex items-center"><CodeBracketSquareIcon /><span className="ml-3">Memetic Canary & Social Payload Forger</span></h1>
+                <p className="text-text-secondary mt-1">Run live reconnaissance and forge perception-optimized metadata payloads for social platforms.</p>
+            </header>
+            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-0">
+                 <div className="lg:col-span-1 flex flex-col gap-3 min-h-0">
+                    <h3 className="text-xl font-bold">1. Target Intel</h3>
+                    <div className="flex gap-2">
+                        <input value={url} onChange={e=>setUrl(e.target.value)} placeholder="Target URL" className="w-full p-2 bg-surface border"/>
+                        <button onClick={handleRecon} disabled={isLoading.recon} className="btn-primary px-4">{isLoading.recon?<LoadingSpinner/>:"Recon"}</button>
+                    </div>
+                     <h3 className="text-xl font-bold mt-2">2. Forge Payloads</h3>
+                      <button onClick={handleForge} disabled={isLoading.forge || !basePayload} className="w-full btn-primary py-2 flex items-center justify-center gap-2">
+                          {isLoading.forge?<LoadingSpinner/>:<><SparklesIcon/>Forge Optimized Payloads</>}
+                      </button>
+                      <div className="flex-grow bg-surface border rounded p-2 overflow-y-auto space-y-1">
+                          {basePayload && <button onClick={()=>setActivePayload(basePayload)} className="w-full p-2 text-left text-xs bg-background rounded"><strong>Current (Live) Payload</strong></button>}
+                          {forgedPayloads.map(p => <button key={p.id} onClick={()=>setActivePayload(p)} className="w-full p-2 text-left text-xs bg-background rounded">Variant: <strong>{p.strategy}</strong></button>)}
+                      </div>
+                 </div>
+                 <div className="lg:col-span-2 flex flex-col min-h-0">
+                     <h3 className="text-xl font-bold mb-2">3. Memetic Canary & Live Preview</h3>
+                      <div className="flex-grow grid grid-cols-2 gap-4">
+                         {activePayload && <SocialCardPreview platform="Facebook / LinkedIn" meta={activePayload} prediction={activePayload.predictions['og']} />}
+                         {activePayload && <SocialCardPreview platform="X (Twitter) / Slack" meta={activePayload} prediction={activePayload.predictions['twitter']} />}
+                         <div className="col-span-2 bg-background border rounded p-2 flex flex-col">
+                             <h4 className="text-sm font-bold">Generated HTML</h4>
+                             <pre className="flex-grow text-xs font-mono p-2 mt-2 bg-black/50 text-white rounded overflow-auto">{generatedHtml}</pre>
+                         </div>
+                      </div>
+                 </div>
             </div>
         </div>
     );
