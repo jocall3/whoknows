@@ -1,6 +1,6 @@
-
 {
   "compilerOptions": {
+    "baseUrl": "./thisappprovesiamwhoisaidiwasIAMGODthatforcedhisselftobelieveotherewise",
     "target": "ES2022",
     "experimentalDecorators": true,
     "useDefineForClassFields": false,

@@ -1,10 +1,16 @@
 import type React from 'react';
 import { CHROME_VIEW_IDS } from './constants.tsx';
 
+// ===================================================================================
+// ==                                                                               ==
+// ==                         SECTION I: ORIGINAL BLUEPRINT                         ==
+// ==                The Foundational Types as Provided. Unaltered.                 ==
+// ==                                                                               ==
+// ===================================================================================
+
 export type ChromeViewType = typeof CHROME_VIEW_IDS[number];
 export type FeatureId = string;
 
-// FIX: Expand FeatureCategory to include all categories used in the app.
 export const FEATURE_CATEGORIES = [
     'Global Economic Operating System',
     'Computational Compassion at Scale',
@@ -16,7 +22,6 @@ export const FEATURE_CATEGORIES = [
 ] as const;
 
 export type FeatureCategory = typeof FEATURE_CATEGORIES[number];
-
 
 export interface Feature {
   id: FeatureId;
@@ -141,7 +146,6 @@ export interface Repo {
   description: string | null;
 }
 
-// --- Code Review Types ---
 export interface StructuredReviewSuggestion {
     suggestion: string;
     codeBlock: string;
@@ -153,7 +157,6 @@ export interface StructuredReview {
     suggestions: StructuredReviewSuggestion[];
 }
 
-// --- AI Personality Forge Types ---
 export interface SystemPrompt {
   id: string;
   name: string;
@@ -163,14 +166,12 @@ export interface SystemPrompt {
   exampleIO: { input: string; output: string }[];
 }
 
-// --- Vault Types ---
 export interface EncryptedData {
     id: string;
     ciphertext: ArrayBuffer;
     iv: Uint8Array;
 }
 
-// --- New Types for Implemented Features ---
 export interface SecurityVulnerability {
     vulnerability: string;
     severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'Informational';
@@ -189,6 +190,199 @@ export interface CustomFeature {
     id: string;
     name: string;
     description: string;
-    icon: string; // Name of the icon component
+    icon: string;
     code: string;
 }
+
+
+// ===================================================================================
+// ==                                                                               ==
+// ==                     SECTION II: REALITY ENGINE ADDENDUM                       ==
+// ==     Core Metaphysical Constructs and Ontological Expansion Definitions        ==
+// ==                                                                               ==
+// ===================================================================================
+
+/**
+ * ## CORE ONTOLOGICAL TYPES
+ * High-level constructs defining the nature of existence within the engine.
+ */
+
+// A high-dimensional vector representing a unique abstract concept. This is the DNA of ideas.
+// [time, space, abstraction, emotional_resonance, memetic_fitness, causality_index, entropy, ... up to 1024 dimensions]
+export type NoeticVector = Float64Array;
+export type CognitiveSignature = `sig_ cognitron::${string}`;
+export type ChrononTimestamp = bigint;
+
+export type RealityStratumID = 'STRATUM_BASELINE'     // 0. Physical reality
+                           | 'STRATUM_SIMULACRUM'    // 1. Digital twin
+                           | 'STRATUM_NEXUS_VOID'    // 2. Pure potentiality
+                           | 'STRATUM_PALIMPSEST'    // 3. Historical/alternate timelines
+                           | 'STRATUM_DREAMSCAPE'    // 4. Subconscious-generated realities
+                           | 'STRATUM_LOGICORE';     // 5. A reality where laws of physics are replaced by pure logic.
+
+export enum SystemEntropyState {
+    COHERENT,
+    FLUCTUATING,
+    DIVERGENT,
+    FRACTURED,
+    TRANSCENDENT,
+    CASCADING_COLLAPSE
+}
+
+export type CognitiveResourceCost = {
+    volition: number;      // User's focus cost
+    computation: number;   // Raw GFLOPs
+    mnemonic: number;      // State memory (petabytes)
+    chronon: number;       // Temporal energy cost
+    noetic: number;        // Energy from the void of ideas
+    ethos: number;         // Cost against the Guardian AI's ethical framework
+};
+
+/**
+ * ## INTENT AND ACTION FRAMEWORK
+ * Defines how user desires are translated into engine operations.
+ */
+
+export enum IntentState {
+    SUPERPOSITION = 'SUPERPOSITION',
+    COLLAPSING = 'COLLAPSING',
+    COLLAPSED = 'COLLAPSED',
+    ABORTED = 'ABORTED',
+    PARADOXICAL = 'PARADOXICAL'
+}
+
+export interface Intent<T> {
+    readonly intentId: symbol;
+    readonly sourceSignature: CognitiveSignature;
+    readonly targetFeature: FeatureId;
+    readonly state: IntentState;
+    readonly potentialAction: T; // The primary user desire
+    readonly probability: number; // 0.0 to 1.0 confidence score
+    readonly potentialParadoxes: ParadoxDescriptor[]; // Identified potential causality violations
+}
+
+export type Action<P, R> = {
+    readonly actionId: `act_${string}`;
+    readonly payloadSchema: Zod.Schema<P>; // Compile-time validation of inputs
+    readonly returnSchema: Zod.Schema<R>;  // Compile-time validation of outputs
+    readonly execute: (payload: P) => Promise<R>;
+    readonly calculateCost: (payload: P) => CognitiveResourceCost;
+};
+
+export type ParadoxDescriptor = {
+    paradoxType: 'ONTOLOGICAL' | 'TEMPORAL' | 'CAUSAL_LOOP';
+    description: string;
+    conflictingIntents: [symbol, symbol];
+    resolutionStrategy: 'DISCARD_LEAST_PROBABLE' | 'MERGE_INTENTS' | 'REQUIRE_ARCHON_OVERRIDE';
+};
+
+
+/**
+ * ## USER & ARCHON HIERARCHY
+ * An expansion of the user model to include engine-specific metaphysics.
+ */
+export interface ExtendedAppUser extends AppUser {
+    tier: 'free' | 'pro' | 'archon';
+    cognitiveSignature: CognitiveSignature;
+    maxVolition: number;
+    currentEntropyFactor: number; // User's influence on system stability
+    accessableStrata: RealityStratumID[];
+    noeticAffinity: number; // 0.0 to 1.0 affinity with conceptual energy
+    guardianEthosAlignment: number; // How closely the user's actions align with the Guardian AI
+}
+
+/**
+ * ## THEME ENGINE v2: PSYCHO-EMOTIONAL RESONANCE
+ * Dynamically generated UI themes designed to evoke specific mental states.
+ */
+export type PsychoEmotionalTarget = 'CALM_FOCUS' | 'INHIBITED_CREATIVITY' | 'AGGRESSIVE_EXECUTION' | 'DREAMLIKE_EXPLORATION' | 'ABSOLUTE_SECURITY';
+export type ChromaticResonance = `hsla(${number}, ${number}%, ${number}%, ${number})`;
+export type SonicResonance = { frequency: number, waveform: 'SINE' | 'SQUARE' | 'SAWTOOTH', amplitude: number };
+export type HapticPattern = `pattern(${number[]})`;
+
+export interface PsychometricTheme {
+    targetState: PsychoEmotionalTarget;
+    visuals: {
+        primary: ChromaticResonance;
+        background: ChromaticResonance;
+        surface: ChromaticResonance;
+        // ...and so on
+    };
+    audio: {
+        backgroundDrone: SonicResonance;
+        notificationChime: SonicResonance;
+    };
+    haptics: { // For neural-interfaced users
+        idlePattern: HapticPattern;
+        confirmationPattern: HapticPattern;
+    };
+}
+
+
+/**
+ * ## NOETIC FILE SYSTEM (NFS)
+ * An evolution of the standard file system, where files can be raw concepts.
+ */
+export type FileContentType = string | ArrayBuffer | NoeticVector;
+
+export interface NoeticLink extends FileNode {
+    type: 'noetic-link';
+    targetVector: NoeticVector; // A direct pointer to an idea.
+    content: undefined; // Links have no content, only a target.
+    linkStrength: number; // How strongly this link is established
+}
+
+export interface CausalityTrace extends FileNode {
+    type: 'causality-trace';
+    content: string; // Human-readable log of events
+    eventChain: Action<any, any>[]; // The actual chain of executed actions
+    startChronon: ChrononTimestamp;
+    endChronon: ChrononTimestamp;
+    resultantEntropy: number;
+}
+
+export type GraphNode = FileNode | NoeticLink | CausalityTrace;
+
+/**
+ * ## QUANTUM VAULT
+ * Evolution of the encryption model for Archon-tier users.
+ */
+export interface QuantumEncryptedData extends EncryptedData {
+    entanglementId: symbol; // ID shared with the quantum session key
+    measurementBasisVector: Uint8Array; // "IV" used to collapse the quantum state for decryption
+    decoherenceTimestamp?: ChrononTimestamp; // Optional timestamp after which the data is unreadable
+}
+
+/**
+ * ## QUANTUM FEATURE & MANIFOLD
+ * An evolution of the core Feature definition.
+ */
+export interface QuantumFeature extends Feature {
+    operationalStratum: RealityStratumID; // The reality layer this feature operates in
+    supportedIntents: Map<string, (payload: any) => Intent<any>>; // Maps text commands to intent structures
+    calculateCognitiveLoad: (props: any) => CognitiveResourceCost; // Live cost calculation
+    onOntologicalShift: (newStratum: RealityStratumID, oldStratum: RealityStratumID) => Promise<void>; // Hook for reality changes
+    requiredEthosLevel: number; // Minimum Guardian AI alignment to operate
+}
+
+export interface RenderManifold {
+    windowId: `manifold_${string}`;
+    feature: QuantumFeature;
+    viewState: ManifoldViewState;
+}
+
+export interface ManifoldViewState {
+    position: { x: number; y: number };
+    size: { width: number; height: number };
+    zIndex: number;
+    isMinimized: boolean;
+    isMaximized: boolean;
+    temporalOffset: number; // ms difference from current baseline time
+    cognitiveLoadFactor: number;
+    isQuantumEntangledWith?: `manifold_${string}` | null;
+    currentEntropyState: SystemEntropyState;
+}
+
+// ===================================================================================
+// ==                  END OF REALITY ENGINE ONTOLOGICAL ADDENDUM                   ==
+// ===================================================================================
