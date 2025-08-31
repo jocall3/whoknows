@@ -1,81 +1,119 @@
-import React, { useState, useCallback } from 'react';
-import { generateChangelogFromLogStream } from '../../services/aiService.ts';
-import { GitBranchIcon } from '../icons.tsx';
-import { LoadingSpinner } from '../shared/index.tsx';
-import { MarkdownRenderer } from '../shared/index.tsx';
+import React, { useState, useCallback, useMemo } from 'react';
+import { analyzeGitArchaeology } from '../../services/GitCognitionAI'; // Invented, advanced service
+import type { GitArchaeologyReport } from '../../types/GitCognition'; // Invented, structured type
+import { GitBranchIcon } from '../icons';
+import { LoadingSpinner, MarkdownRenderer } from '../shared/LoadingSpinner';
 
 const exampleLog = `commit 3a4b5c...
-Author: Dev One <dev.one@example.com>
-Date:   Mon Jul 15 11:30:00 2024 -0400
+tree 1a2b3d...
+parent 1a2b3c...
+author Dev One <dev.one@example.com> 1721057400 -0400
+committer Dev One <dev.one@example.com> 1721057400 -0400
 
     feat: add user login page
 
 commit 1a2b3c...
-Author: Dev Two <dev.two@example.com>
-Date:   Mon Jul 15 10:00:00 2024 -0400
+tree 2d3e4f...
+parent 0z9y8x...
+author Dev Two <dev.two@example.com> 1721053200 -0400
+committer Dev Two <dev.two@example.com> 1721053200 -0400
 
     fix: correct typo in header
 `;
 
+const MetricCard: React.FC<{ title: string; value: string | number; description: string }> = ({ title, value, description }) => (
+    <div className="bg-background p-3 rounded-lg border border-border" title={description}>
+        <p className="text-xs text-text-secondary uppercase tracking-wider">{title}</p>
+        <p className="text-2xl font-bold font-mono text-primary">{typeof value === 'number' ? value.toFixed(3) : value}</p>
+    </div>
+);
+
+
 export const ChangelogGenerator: React.FC = () => {
     const [log, setLog] = useState(exampleLog);
-    const [changelog, setChangelog] = useState('');
+    const [report, setReport] = useState<GitArchaeologyReport | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
 
-    const handleGenerate = useCallback(async () => {
-        if (!log.trim()) {
-            setError('Please paste your git log output.');
-            return;
-        }
+    const handleAnalyze = useCallback(async () => {
         setIsLoading(true);
-        setError('');
-        setChangelog('');
+        setReport(null);
         try {
-            const stream = generateChangelogFromLogStream(log);
-            let fullResponse = '';
-            for await (const chunk of stream) {
-                fullResponse += chunk;
-                setChangelog(fullResponse);
-            }
+            const result = await analyzeGitArchaeology(log);
+            setReport(result);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+            console.error(err);
         } finally {
             setIsLoading(false);
         }
     }, [log]);
 
+    const TopContributors = ({ data }: {data: Record<string, number>}) => (
+        <div>
+             <h4 className="font-semibold text-sm mb-2">Commit Gravitational Wells</h4>
+             {Object.entries(data).sort(([,a],[,b])=>b-a).slice(0,3).map(([author, commits])=>(
+                <div key={author} className="flex justify-between items-center text-xs p-1">
+                    <span>{author}</span>
+                    <span className="font-mono">{commits} commits</span>
+                </div>
+             ))}
+        </div>
+    );
+     const KnowledgeSilos = ({ data }: {data: Record<string, string[]>}) => (
+        <div>
+             <h4 className="font-semibold text-sm mb-2">Knowledge Silo Triangulation</h4>
+             {Object.entries(data).slice(0,3).map(([path, authors])=>(
+                <div key={path} className="p-2 bg-background border rounded mb-1">
+                    <p className="font-mono text-xs truncate">{path}</p>
+                    <p className="text-xs text-text-secondary">Owned by: {authors.join(', ')}</p>
+                </div>
+             ))}
+        </div>
+    );
+
+
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
-            <header className="mb-6">
+            <header className="mb-4">
                 <h1 className="text-3xl font-bold flex items-center">
                     <GitBranchIcon />
-                    <span className="ml-3">AI Changelog Generator</span>
+                    <span className="ml-3">Git Archaeologist & K/V Tunneler</span>
                 </h1>
-                <p className="text-text-secondary mt-1">Generate a markdown changelog from your raw git log.</p>
+                <p className="text-text-secondary mt-1">Mine the repository's past to quantify its velocity and predict its future.</p>
             </header>
-            <div className="flex-grow flex flex-col gap-4 min-h-0">
-                <div className="flex flex-col flex-1 min-h-0">
-                    <label htmlFor="commit-input" className="text-sm font-medium text-text-secondary mb-2">Raw Git Log</label>
-                    <textarea
-                        id="commit-input"
-                        value={log}
-                        onChange={(e) => setLog(e.target.value)}
-                        className="flex-grow p-4 bg-surface border border-border rounded-md resize-none font-mono text-sm"
-                    />
-                </div>
-                <div className="flex-shrink-0">
-                    <button onClick={handleGenerate} disabled={isLoading} className="btn-primary w-full max-w-xs mx-auto flex items-center justify-center px-6 py-3">
-                        {isLoading ? <LoadingSpinner /> : 'Generate Changelog'}
+            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-0">
+                <div className="lg:col-span-1 flex flex-col gap-4">
+                    <div className="flex flex-col flex-1 min-h-0">
+                        <label className="text-sm font-medium mb-2">Raw Git Log (`git log --pretty=raw`)</label>
+                        <textarea
+                            value={log}
+                            onChange={(e) => setLog(e.target.value)}
+                            className="flex-grow p-2 bg-surface border rounded font-mono text-xs"
+                        />
+                    </div>
+                    <button onClick={handleAnalyze} disabled={isLoading} className="btn-primary w-full py-2">
+                        {isLoading ? <LoadingSpinner /> : 'Run Archaeological Dig'}
                     </button>
                 </div>
-                <div className="flex flex-col flex-1 min-h-0">
-                    <label className="text-sm font-medium text-text-secondary mb-2">Generated Changelog.md</label>
-                    <div className="relative flex-grow p-4 bg-background border border-border rounded-md overflow-y-auto">
-                        {isLoading && !changelog && <div className="flex items-center justify-center h-full"><LoadingSpinner /></div>}
-                        {error && <p className="text-red-500">{error}</p>}
-                        {changelog && <MarkdownRenderer content={changelog} />}
-                        {!isLoading && changelog && <button onClick={() => navigator.clipboard.writeText(changelog)} className="absolute top-2 right-2 px-2 py-1 bg-gray-100 text-xs rounded-md hover:bg-gray-200">Copy</button>}
+
+                <div className="lg:col-span-2 flex flex-col gap-4 min-h-0">
+                    <h3 className="text-xl font-bold">Strategic Dashboard</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                         <MetricCard title="Velocity Index" value={report?.velocityIndex || 0} description="Ratio of 'feat' commits to 'fix/chore' commits."/>
+                         <MetricCard title="Merge Entropy" value={report?.mergeEntropy || 0} description="Score based on frequency/complexity of merges."/>
+                         <MetricCard title="Bus Factor" value={report?.busFactor || 0} description="Lowest number of developers that would halt the project if they left."/>
+                         <MetricCard title="Next Crisis ETA" value={report?.predictedCrisisDate || 'N/A'} description="Predicted date of major integration failure."/>
+                    </div>
+                    <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
+                        <div className="bg-surface border rounded p-3 overflow-y-auto space-y-4">
+                            {report && <TopContributors data={report.commitGravityWells}/>}
+                            {report && <KnowledgeSilos data={report.knowledgeSilos}/>}
+                        </div>
+                        <div className="bg-surface border rounded p-3 overflow-y-auto">
+                            <h4 className="font-semibold text-sm mb-2">K/V Tunnel Report</h4>
+                            <div className="prose prose-sm max-w-none">
+                                {report && <MarkdownRenderer content={report.kvTunnelReport}/>}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
