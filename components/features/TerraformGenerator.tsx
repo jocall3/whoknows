@@ -1,67 +1,109 @@
-import React, { useState, useCallback } from 'react';
-import { generateTerraformConfig } from '../../services/index.ts';
-import { CpuChipIcon, SparklesIcon } from '../icons.tsx';
-import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
+import React, { useState, useCallback, useMemo } from 'react';
+import { ingestCloudState, generateContextAwareTerraform, simulateTerraformPlan } from '../../services/TerraformOracleAI'; // Invented
+import type { CloudState, TerraformPlan } from '../../types/TerraformOracle'; // Invented
+import { CpuChipIcon, SparklesIcon, ExclamationTriangleIcon } from '../icons';
+import { LoadingSpinner, MarkdownRenderer } from '../shared/LoadingSpinner';
+
+const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+
+// Simplified text-based plan renderer
+const PlanRenderer: React.FC<{ plan: TerraformPlan }> = ({ plan }) => {
+    const renderLine = (line: string) => {
+        if (line.startsWith('+')) return <p className="text-green-400">{line}</p>;
+        if (line.startsWith('-')) return <p className="text-red-500">{line}</p>;
+        if (line.startsWith('~')) return <p className="text-yellow-400">{line}</p>;
+        return <p>{line}</p>;
+    };
+    return <pre className="font-mono text-xs p-2 bg-black/50 rounded">{plan.rawPlan.split('\n').map(renderLine)}</pre>;
+};
 
 export const TerraformGenerator: React.FC = () => {
-    const [description, setDescription] = useState('An S3 bucket for static website hosting');
     const [cloud, setCloud] = useState<'aws' | 'gcp'>('aws');
-    const [config, setConfig] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [description, setDescription] = useState('An S3 bucket for static website hosting with CloudFront distribution');
+    const [cloudState, setCloudState] = useState<CloudState | null>(null);
+    const [generatedConfig, setGeneratedConfig] = useState('');
+    const [simulatedPlan, setSimulatedPlan] = useState<TerraformPlan | null>(null);
+    const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+
+    const handleIngest = useCallback(async () => {
+        setIsLoading(p => ({ ...p, state: true }));
+        setCloudState(null);
+        try {
+            const state = await ingestCloudState(cloud);
+            setCloudState(state);
+        } finally {
+            setIsLoading(p => ({ ...p, state: false }));
+        }
+    }, [cloud]);
 
     const handleGenerate = useCallback(async () => {
-        if (!description.trim()) {
-            setError('Please provide a description.');
-            return;
-        }
-        setIsLoading(true);
-        setError('');
-        setConfig('');
+        setIsLoading(p => ({ ...p, generate: true }));
+        setGeneratedConfig(''); setSimulatedPlan(null);
         try {
-            // Context is stubbed for now but demonstrates future capability
-            const context = 'User might have existing VPCs. Check before creating new ones.';
-            const result = await generateTerraformConfig(cloud, description, context);
-            setConfig(result);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to generate config.');
+            const config = await generateContextAwareTerraform(cloud, description, cloudState);
+            setGeneratedConfig(config);
+            
+            // Immediately kick off the plan simulation
+            setIsLoading(p => ({ ...p, plan: true }));
+            const plan = await simulateTerraformPlan(config, cloudState);
+            setSimulatedPlan(plan);
         } finally {
-            setIsLoading(false);
+            setIsLoading({});
         }
-    }, [description, cloud]);
+    }, [description, cloud, cloudState]);
 
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
-            <header className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center"><CpuChipIcon /><span className="ml-3">AI Terraform Generator</span></h1>
-                <p className="text-text-secondary mt-1">Generate infrastructure-as-code from a description, with context from your cloud provider.</p>
+            <header className="mb-4">
+                <h1 className="text-3xl font-bold flex items-center"><CpuChipIcon /><span className="ml-3">Terraform State Oracle & Dry Run Simulator</span></h1>
+                <p className="text-text-secondary mt-1">Generate context-aware IaC and simulate its consequences against live cloud state.</p>
             </header>
-            <div className="flex-grow flex flex-col gap-4 min-h-0">
-                 <div className="flex flex-col flex-1 min-h-0">
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div>
-                            <label className="block text-sm">Cloud Provider</label>
-                            <select value={cloud} onChange={e => setCloud(e.target.value as 'aws' | 'gcp')} className="w-full mt-1 p-2 bg-surface border rounded">
-                                <option value="aws">AWS</option>
-                                <option value="gcp">GCP</option>
-                            </select>
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm">Describe the infrastructure</label>
-                            <input type="text" value={description} onChange={e => setDescription(e.target.value)} className="w-full mt-1 p-2 bg-surface border rounded"/>
+
+            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
+                <div className="flex flex-col gap-3 min-h-0">
+                    <div className="bg-surface border rounded p-3">
+                        <p className="font-bold text-sm">1. Select Provider & Ingest Live State</p>
+                        <div className="flex gap-2 mt-2">
+                             <select value={cloud} onChange={e => setCloud(e.target.value as 'aws' | 'gcp')} className="w-1/3 p-2 bg-background border rounded">
+                                <option value="aws">AWS</option><option value="gcp">GCP</option>
+                             </select>
+                             <button onClick={handleIngest} disabled={isLoading.state} className="btn-primary flex-grow py-2">{isLoading.state ? <LoadingSpinner/> : "Ingest Live State"}</button>
                         </div>
                     </div>
-                     <button onClick={handleGenerate} disabled={isLoading} className="btn-primary w-full max-w-xs mx-auto flex items-center justify-center py-2"><SparklesIcon /> {isLoading ? 'Generating...' : 'Generate Configuration'}</button>
-                </div>
-                 <div className="flex flex-col flex-grow min-h-0">
-                    <label className="text-sm font-medium text-text-secondary mb-2">Generated Terraform (.tf)</label>
-                    <div className="relative flex-grow p-1 bg-background border border-border rounded-md overflow-y-auto">
-                        {isLoading && !config && <div className="flex items-center justify-center h-full"><LoadingSpinner /></div>}
-                        {error && <p className="p-4 text-red-500">{error}</p>}
-                        {config && <MarkdownRenderer content={config} />}
-                         {!isLoading && !config && !error && <div className="text-text-secondary h-full flex items-center justify-center">Generated config will appear here.</div>}
+
+                    <div className="bg-surface border rounded p-3">
+                        <p className="font-bold text-sm">2. Describe Desired Infrastructure</p>
+                        <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full mt-2 h-20 p-2 bg-background border rounded"/>
+                    </div>
+                     <button onClick={handleGenerate} disabled={!cloudState || isLoading.generate || isLoading.plan} className="btn-primary w-full py-3 flex items-center justify-center gap-2">
+                       <SparklesIcon/>{isLoading.generate ? 'Generating HCL...' : isLoading.plan ? 'Simulating Plan...' : 'Generate & Simulate Plan'}
+                     </button>
+                    
+                    <div className="flex-grow bg-surface border rounded-lg p-3 min-h-[150px] overflow-y-auto">
+                        <p className="font-bold text-sm mb-2">Generated Terraform (.tf)</p>
+                         <div className="p-1 bg-background rounded">
+                             <MarkdownRenderer content={'```terraform\n'+generatedConfig+'\n```'}/>
+                         </div>
                     </div>
                 </div>
+
+                 <div className="flex flex-col gap-3 min-h-0">
+                      <h3 className="text-xl font-bold">Simulated `terraform plan`</h3>
+                       <div className="flex-grow border rounded-lg overflow-y-auto">
+                           {isLoading.plan && <div className="h-full flex items-center justify-center"><LoadingSpinner/></div>}
+                           {simulatedPlan && <PlanRenderer plan={simulatedPlan} />}
+                      </div>
+                       <div className="flex-shrink-0 bg-surface border rounded-lg p-3 space-y-2">
+                         <h4 className="font-bold text-sm">Strategic Analysis</h4>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                             <div className="font-mono p-2 bg-background rounded"><strong>Cost Delta:</strong> <span className="font-bold text-green-400">{simulatedPlan?.costDelta || 'N/A'}</span></div>
+                             <div className={`font-mono p-2 rounded ${simulatedPlan?.blastRadius ? 'bg-red-900/80' : 'bg-background'}`}>
+                                 <strong className="flex items-center gap-1">{simulatedPlan?.blastRadius && <ExclamationTriangleIcon />} Blast Radius:</strong> 
+                                 <span className={simulatedPlan?.blastRadius ? "text-red-400 font-bold" : ""}>{simulatedPlan?.blastRadius || 'None detected.'}</span>
+                             </div>
+                          </div>
+                      </div>
+                 </div>
             </div>
         </div>
     );
