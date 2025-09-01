@@ -160,4 +160,4 @@ export async function signOutUser() {
 }
 
 // LEGACY WRAPPERS - KEPT FOR COMPATIBILITY BUT DO NOTHING
-export function getGoogleUserProfile() {}
+// export function getGoogleUserProfile() {} // Removed duplicate declaration

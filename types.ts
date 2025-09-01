@@ -95,11 +95,11 @@ export interface StructuredPrSummary {
 }
 
 export interface AppUser {
-  uid: string;
-  displayName: string | null;
-  email: string | null;
-  photoURL: string | null;
-  tier: 'free' | 'pro';
+    uid: string;
+    displayName: string | null;
+    email: string | null;
+    photoURL: string | null;
+    tier: 'free' | 'pro' | 'archon';
 }
 
 export interface GitHubUser {
@@ -317,7 +317,7 @@ export type ParadoxDescriptor = {
  * An expansion of the user model to include engine-specific metaphysics.
  */
 export interface ExtendedAppUser extends AppUser {
-        tier: 'free' | 'pro';
+    tier: 'free' | 'pro' | 'archon';
     cognitiveSignature: CognitiveSignature;
     maxVolition: number;
     currentEntropyFactor: number; // User's influence on system stability
