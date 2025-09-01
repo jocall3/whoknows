@@ -2,7 +2,7 @@ import * as vaultService from './vaultService.ts';
 import { logError, logEvent } from './telemetryService.ts';
 import { getDecryptedCredential } from './vaultService.ts';
 import { simulationState } from './simulationState.ts';
-import * as plaidService from './live/plaidService.ts';
+import * as plaidService from './live/plaidService.tsx';
 
 // Interface for any action
 export interface WorkspaceAction {

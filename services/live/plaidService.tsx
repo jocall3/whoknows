@@ -1,3 +1,8 @@
+// Stub for workspaceConnectorService compatibility
+export function linkPlaidAccount() {
+    // This should trigger the Plaid Link flow in a real app
+    return Promise.resolve({ message: 'Plaid Link flow not implemented in service stub.' });
+}
 /* Renamed from plaidService.ts to plaidService.tsx to support JSX syntax. */
 /**
  * ==================================================================================
@@ -15,8 +20,9 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useVaultModal } from '../../contexts/VaultModalContext';
 import { saveCredential, getDecryptedCredential } from '../vaultService';
 import { useNotification } from '../../contexts/NotificationContext';
-import { LoadingSpinner } from '../shared';
-import { BanknotesIcon } from '../icons';
+import { LoadingSpinner } from '../../components/shared/LoadingSpinner';
+// TODO: Replace with actual icon. Using ExclamationIcon as placeholder.
+import { ExclamationIcon as BanknotesIcon } from '../../components/icons/ExclamationYTriangle';
 
 // --- SELF-CONTAINED TYPES FROM PLAID DOCUMENTATION ---
 export interface PlaidLinkSuccess { public_token: string; metadata: { institution: { name: string; institution_id: string } | null; accounts: { id: string; name: string; mask: string; subtype: string; type: string }[]; link_session_id: string; };}

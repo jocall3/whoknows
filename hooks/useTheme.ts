@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
-import { generatePsychometricTheme } from '../services/PsychoAestheticAI'; // Invented AI Service
+import { PsychoAestheticAI } from '../services/PsychoAestheticAI'; // Import the class
 import type { ThemeState, ColorTheme, PsychoEmotionalTarget, PsychometricTheme } from '../types';
 
 // Self-contained audio context for multi-sensory feedback
@@ -66,7 +66,7 @@ export const usePsychoAestheticResonance = (): {
         setIsLoading(true);
         try {
             // Here, userCognitiveSignature would be fetched from global state.
-            const newResonance = await generatePsychometricTheme(target, "user_signature_placeholder");
+            const newResonance = await PsychoAestheticAI.generatePsychometricTheme(target, "user_signature_placeholder");
             setTheme(newResonance);
         } catch(error) {
             console.error("Failed to generate new psychometric resonance:", error);

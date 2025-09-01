@@ -6,7 +6,7 @@ import { useNotification } from '../../contexts/NotificationContext';
 import { LoadingSpinner, MarkdownRenderer } from '../shared';
 import { PILLAR_FEATURES } from '../../constants';
 import { ProjectExplorerIcon, MapIcon, MagnifyingGlassIcon, PaperAirplaneIcon, ChartBarIcon } from '../icons';
-import { generateMonetaryPolicy, getLiveEconomicData, getLiveLogisticsData, getResourceScarcityData, synthesizeCityPlan } from '../../services/GeospatialAI';
+import { GeospatialAI } from '../../services/GeospatialAI'; // Import the class
 import { LineChart, ComposedChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line } from 'recharts';
 
 
@@ -43,8 +43,8 @@ const Vessel: React.FC<{data: any}> = ({ data }) => {
 const LogisticsManifold: React.FC = () => {
     const [vessels, setVessels] = useState<any[]>([]);
     useEffect(() => {
-        getLiveLogisticsData().then(setVessels); // Initial load
-        const interval = setInterval(() => getLiveLogisticsData().then(setVessels), 10000); // Refresh every 10s
+        GeospatialAI.getLiveLogisticsData().then(setVessels); // Initial load
+        const interval = setInterval(() => GeospatialAI.getLiveLogisticsData().then(setVessels), 10000); // Refresh every 10s
         return () => clearInterval(interval);
     }, []);
 
@@ -74,8 +74,8 @@ const MonetaryPolicySimulator: React.FC = () => {
 
     const runSimulation = useCallback(async (intervention: string) => {
         setIsLoading(true);
-        const countryData = await getLiveEconomicData(activeCountry);
-        const plan = await generateMonetaryPolicy(`${countryData}. Apply intervention: ${intervention}`);
+        const countryData = await GeospatialAI.getLiveEconomicData(activeCountry); // Call as static method
+        const plan = await GeospatialAI.generateMonetaryPolicy(`${countryData}. Apply intervention: ${intervention}`); // Call as static method
         setSimulations((s:any) => ({ ...s, [intervention]: plan.timeline }));
         setIsLoading(false);
     }, [activeCountry]);

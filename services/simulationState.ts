@@ -19,6 +19,12 @@ interface ChronicleEntry {
 }
 
 // --- MODULE STATE AND CONFIGURATION ---
+export const simulationState = {
+  isSimulationActive: false,
+  simulationSpeed: 1,
+  currentChronon: 0,
+};
+
 const isTelemetryEnabled = true;
 const CHRONICLE_MAX_SIZE = 1000; // Limit in-memory log to prevent memory leaks
 const ANALYSIS_INTERVAL_MS = 15000; // Run analyzer every 15 seconds

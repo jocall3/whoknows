@@ -1,5 +1,5 @@
 // --- PsychometricTheme and PsychoEmotionalTarget types ---
-export type PsychoEmotionalTarget = 'FOCUS' | 'CALM_FOCUS';
+export type PsychoEmotionalTarget = 'FOCUS' | 'CALM_FOCUS' | 'INTENSE_CREATIVITY';
 
 export interface PsychometricTheme {
     mode: 'light' | 'dark';
