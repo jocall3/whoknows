@@ -1,3 +1,4 @@
+/* Renamed from plaidService.ts to plaidService.tsx to support JSX syntax. */
 /**
  * ==================================================================================
  * ==                                                                              ==
@@ -34,7 +35,6 @@ const loadPlaidScript = (): Promise<any> => {
         document.head.appendChild(script);
     });
 };
-
 
 // --- The Live Hook: usePlaidLink ---
 const usePlaidLink = (handler: PlaidHandler) => {
@@ -84,7 +84,6 @@ const usePlaidLink = (handler: PlaidHandler) => {
     return { open, isReady: !!plaid };
 };
 
-
 // --- The Reforged Component ---
 export const PlaidGateway: React.FC = () => {
     const [result, setResult] = useState<any>(null);
@@ -121,25 +120,22 @@ export const PlaidGateway: React.FC = () => {
                 <h1 className="text-3xl font-bold flex items-center"><BanknotesIcon /><span className="ml-3">Plaid Link Gateway</span></h1>
                 <p className="text-text-secondary mt-1">A direct, live interface to the Plaid financial network.</p>
             </header>
-            
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
-                 <div className="flex flex-col gap-4 bg-surface p-6 rounded-lg border">
+                <div className="flex flex-col gap-4 bg-surface p-6 rounded-lg border">
                     <h3 className="font-bold text-lg">1. Configure Credentials (First Time Only)</h3>
-                     <p className="text-xs text-text-secondary">Credentials will be securely encrypted in the Engine's Vault using your master password.</p>
+                    <p className="text-xs text-text-secondary">Credentials will be securely encrypted in the Engine's Vault using your master password.</p>
                     <input value={creds.clientId} onChange={e => setCreds(c=>({...c, clientId: e.target.value}))} placeholder="Plaid Client ID" className="p-2 bg-background border rounded" />
                     <input type="password" value={creds.secret} onChange={e => setCreds(c=>({...c, secret: e.target.value}))} placeholder="Plaid Secret (Sandbox)" className="p-2 bg-background border rounded" />
-                     <button onClick={handleSaveCreds} disabled={isSaving || !creds.clientId || !creds.secret} className="btn-primary py-2">{isSaving ? <LoadingSpinner/> : 'Save to Vault'}</button>
-
+                    <button onClick={handleSaveCreds} disabled={isSaving || !creds.clientId || !creds.secret} className="btn-primary py-2">{isSaving ? <LoadingSpinner/> : 'Save to Vault'}</button>
                     <h3 className="font-bold text-lg mt-4">2. Initiate Link Flow</h3>
-                     <p className="text-xs text-text-secondary">This will connect to Plaid's live sandbox environment using the credentials from the Vault.</p>
-                     <button onClick={open} disabled={!isReady} className="btn-primary py-3 mt-2">{isReady ? 'Link an Account' : 'Initializing...'}</button>
-                 </div>
-
+                    <p className="text-xs text-text-secondary">This will connect to Plaid's live sandbox environment using the credentials from the Vault.</p>
+                    <button onClick={open} disabled={!isReady} className="btn-primary py-3 mt-2">{isReady ? 'Link an Account' : 'Initializing...'}</button>
+                </div>
                 <div className="flex flex-col min-h-0">
-                     <h3 className="font-bold text-lg mb-2">Result Log (`onSuccess` / `onExit`)</h3>
-                     <div className="flex-grow bg-background border rounded overflow-y-auto p-2 font-mono text-xs">
+                    <h3 className="font-bold text-lg mb-2">Result Log (`onSuccess` / `onExit`)</h3>
+                    <div className="flex-grow bg-background border rounded overflow-y-auto p-2 font-mono text-xs">
                         <pre>{result ? JSON.stringify(result, null, 2) : 'Awaiting Link completion...'}</pre>
-                     </div>
+                    </div>
                 </div>
             </div>
         </div>
