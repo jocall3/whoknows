@@ -104,3 +104,9 @@ export const useEvolvingCognitiveEngram = (): EngramAPI => {
         logInteraction
     };
 };
+
+// Compatibility hook used by UI components which expect a tuple [personalities, setPersonalities]
+export const useAiPersonalities = (): [CognitiveEngram[], (v: React.SetStateAction<CognitiveEngram[]>) => void] => {
+    const [engrams, setEngrams] = useLocalStorage<CognitiveEngram[]>('engine_cognitive_engrams', []);
+    return [engrams, setEngrams];
+};

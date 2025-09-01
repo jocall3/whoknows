@@ -21,6 +21,9 @@ import type {
   GeneratedFile, EncryptedData, CustomFeature, FileNode, AppUser, GitHubUser, Repo,
   StructuredPrSummary, StructuredExplanation, SemanticColorTheme, SecurityVulnerability, CodeSmell
 } from '../types';
+import { FEATURE_TAXONOMY } from './taxonomyService';
+export { FEATURE_TAXONOMY };
+export { type CommandResponse } from './aiService';
 
 declare var gapi: any;
 declare var google: any;
@@ -349,13 +352,16 @@ export const liveQueryProductionDB = async (q: string, p: any[]): Promise<any> =
 export const liveMutateProductionDB = async (q: string, p: any[]): Promise<any> => { logEvent('db_mutate_live', {q}); console.warn("LIVE DB not connected"); return { rowCount: 0 }; };
 
 // --- END OF MONOLITH ---
-export const generateNoeticVector = (input: string): NoeticVector => {
-  // Mock implementation: generate a simple vector based on input length
-  const vector = new Float64Array(input.length > 0 ? input.length : 1);
-  for (let i = 0; i < input.length; i++) {
-    vector[i] = input.charCodeAt(i) / 255; // Normalize char code to a float
-  }
-  return vector;
+export const TheSovereignProtocol = {}; // Placeholder for the imported AGI
+
+// Ensure a single export for generateNoeticVector is declared:
+export const generateNoeticVector = () => {
+  // Stub implementation: return a dummy noetic vector
+  return {};
 };
 
-export const TheSovereignProtocol = {}; // Placeholder for the imported AGI
+// Re-exports for compatibility
+export { modelThreatSurface } from './security/staticAnalysisService';
+export { predictiveTrace } from './profiling/performanceService';
+
+// Remove any duplicate definitions of generateNoeticVector

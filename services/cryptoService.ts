@@ -47,6 +47,9 @@ export const decrypt = async (ciphertext: ArrayBuffer, key: CryptoKey, iv: Uint8
     return textDecoder.decode(decrypted);
 };
 
+// Re-export the subtle crypto interface for modules that import the crypto module as a namespace
+export const subtle = crypto.subtle;
+
 
 // ==================================================================================
 // ==       SECTION II: ASYMMETRIC IDENTITY & SIGNATURES                           ==

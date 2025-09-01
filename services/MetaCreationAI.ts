@@ -27,3 +27,9 @@ export class MetaCreationAI {
     return Promise.resolve({ impact: `Mock societal impact: ${JSON.stringify(input)}` });
   }
 }
+
+// Compatibility named exports for existing import sites
+export const refactorLegalCode = MetaCreationAI.refactorLegalCode.bind(MetaCreationAI);
+export const synthesizeHypothesis = MetaCreationAI.synthesizeHypothesis.bind(MetaCreationAI);
+export const generateMemeticCampaign = MetaCreationAI.generateMemeticCampaign.bind(MetaCreationAI);
+export const runSocietalImpactSimulation = MetaCreationAI.runSocietalImpactSimulation.bind(MetaCreationAI);

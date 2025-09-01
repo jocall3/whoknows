@@ -61,3 +61,8 @@ export class PsychoAestheticAI {
     };
   }
 }
+
+export function generatePsychometricTheme() {
+  // Stub implementation: return a dummy psychometric theme
+  return {};
+}

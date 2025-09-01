@@ -6,3 +6,13 @@ export class TheSovereignAI {
     return Promise.resolve({ result: `Sovereign protocol executed for: ${JSON.stringify(input)}` });
   }
 }
+
+export function ai_synthesizeOpenApiSpec() {
+  // Stub implementation: return a dummy OpenAPI spec
+  return {};
+}
+
+export function ai_forgeServiceFilesFromSpec() {
+  // Stub implementation: return dummy service files from an OpenAPI spec
+  return {};
+}

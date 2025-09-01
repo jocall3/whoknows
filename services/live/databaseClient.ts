@@ -67,6 +67,13 @@ export const liveSaveEncryptedToken = async (data: EncryptedData): Promise<void>
 export const liveGetEncryptedToken = async (id: string): Promise<EncryptedData | undefined> => metastableState.encryptedTokens.get(id);
 export const liveGetAllEncryptedTokenIds = async (): Promise<string[]> => Array.from(metastableState.encryptedTokens.keys());
 
+export const liveDeleteEncryptedToken = async (id: string): Promise<void> => {
+    if (metastableState.encryptedTokens.has(id)) {
+        metastableState._changelog.push({ action: 'DELETE', store: 'tokens', key: id });
+        metastableState.encryptedTokens.delete(id);
+    }
+};
+
 export const liveSaveCustomFeature = async (feature: CustomFeature): Promise<void> => {
     metastableState.customFeatures.set(feature.id, feature);
     metastableState._changelog.push({ action: 'PUT', store: 'features', key: feature.id, value: feature });
@@ -78,6 +85,16 @@ export const liveDeleteCustomFeature = async (id: string): Promise<void> => { me
 export const liveClearAllData = async (): Promise<void> => {
     metastableState.reset();
     metastableState._changelog.push({action: 'DELETE', store: 'ALL', key: '*'});
+};
+
+/**
+ * Append a vault access log entry to the vaultData store under the key 'access-logs'.
+ */
+export const liveSaveVaultAccessLog = async (entry: any): Promise<void> => {
+    const existing = metastableState.vaultData.get('access-logs') || [];
+    existing.push(entry);
+    metastableState.vaultData.set('access-logs', existing);
+    metastableState._changelog.push({ action: 'PUT', store: 'vault', key: 'access-logs', value: existing });
 };
 
 // ==================================================================================

@@ -423,3 +423,14 @@ export interface ManifoldViewState {
 // ===================================================================================
 // ==                  END OF REALITY ENGINE ONTOLOGICAL ADDENDUM                   ==
 // ===================================================================================
+
+// Added stub types for missing exports
+export type SystemVitals = {
+  cpu: number;
+  memory: number;
+};
+
+export type ChaosVector = {
+  chaos: number;
+  entropy: number;
+};

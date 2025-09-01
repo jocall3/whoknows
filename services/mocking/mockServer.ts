@@ -26,7 +26,7 @@ let psionicChannel: MessageChannel | null = null;
 
 
 // --- BI-DIRECTIONAL COMMAND PROTOCOL ---
-constsendCommandToAgent = <T>(command: {type: string, payload?: any}): Promise<T> => {
+const sendCommandToAgent = <T>(command: {type: string, payload?: any}): Promise<T> => {
     return new Promise((resolve, reject) => {
         if (!navigator.serviceWorker.controller) {
             return reject(new Error("Psionic Interface Error: Reality Manifold agent is not active."));
@@ -137,4 +137,60 @@ export const hint_prefetchResource = (url: string): void => {
  */
 export const query_getAgentState = (): Promise<AgentState> => {
     return sendCommandToAgent({ type: 'GET_AGENT_STATE' });
+};
+
+// --- COMPATIBILITY LAYER: HIGH-LEVEL MOCK SERVER HELPERS ---
+// Several components import a small set of helpers from `services/mocking/mockServer`.
+// Provide those here as thin wrappers so the rest of the agent code can remain
+// focused on the bi-directional command protocol while UI components get a
+// convenient API for starting/stopping the service worker and configuring routes.
+
+/**
+ * Registers the mock service worker used to intercept and serve mock API routes.
+ */
+export const startMockServer = async (): Promise<void> => {
+    if ('serviceWorker' in navigator) {
+        try {
+            registration = await navigator.serviceWorker.register(SERVICE_WORKER_URL, { scope: '/' });
+            // Wait for the service worker to become active
+            await navigator.serviceWorker.ready;
+        } catch (e) {
+            throw new Error('Could not start mock server.');
+        }
+    } else {
+        throw new Error('Service workers not supported.');
+    }
+};
+
+/**
+ * Unregisters the mock service worker and tears down any open channels.
+ */
+export const stopMockServer = async (): Promise<void> => {
+    if (registration) {
+        await registration.unregister();
+        registration = null;
+    }
+    if (psionicChannel) {
+        try { psionicChannel.port1.close(); } catch (_) { /* ignore */ }
+        psionicChannel = null;
+    }
+};
+
+/**
+ * Returns whether the mock service worker is currently registered and controlling the page.
+ */
+export const isMockServerRunning = (): boolean => {
+    return !!registration && !!navigator.serviceWorker.controller;
+};
+
+/**
+ * Sends a route configuration payload to the mock service worker.
+ * The worker expects a message of type 'SET_ROUTES' with a `routes` array.
+ */
+export const setMockRoutes = (routes: any[]): void => {
+    if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'SET_ROUTES', routes });
+    } else {
+        console.warn('Mock server not active.');
+    }
 };

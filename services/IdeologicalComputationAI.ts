@@ -22,3 +22,8 @@ export class IdeologicalComputationAI {
     return { diff, report };
   }
 }
+
+// Compatibility named export
+export const realignCodeIdeology = async (code: string, ideology: string) => {
+  return IdeologicalComputationAI.realignCodeIdeology(code, ideology);
+};

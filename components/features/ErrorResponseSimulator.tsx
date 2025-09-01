@@ -82,8 +82,6 @@ const chaosEngine = {
             const [obj, funcName] = key.includes('.') ? key.split('.') : ['window', key];
             if ((globalThis as any)[obj]) {
                 (globalThis as any)[obj][funcName] = originalFunc;
-            } else {
-                 (services as any)[key] = originalFunc;
             }
         });
         this.originalFunctions.clear();
