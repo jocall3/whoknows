@@ -5,10 +5,9 @@ import type { DataOntologyModel, SynthesisTarget } from '../../types/DataOntolog
 import { ArrowPathIcon, CodeBracketSquareIcon } from '../icons';
 import { LoadingSpinner, MarkdownRenderer } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 const OntologyVisualizer: React.FC<{ model: DataOntologyModel | null }> = ({ model }) => (
     <div className="bg-background border rounded p-2 h-full overflow-y-auto">

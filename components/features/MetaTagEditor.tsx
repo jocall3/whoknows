@@ -4,10 +4,9 @@ import type { MetadataPayload, SocialPrediction } from '../../types/MemeticWarfa
 import { CodeBracketSquareIcon, SparklesIcon } from '../icons';
 import { LoadingSpinner } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 const SocialCardPreview: React.FC<{ platform: string; meta: MetadataPayload; prediction: SocialPrediction | null }> = ({ platform, meta, prediction }) => (
     <div className="bg-surface border border-border rounded-lg overflow-hidden shadow-lg w-full">

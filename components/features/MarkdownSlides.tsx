@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, Suspense, useRef } from 'react';
-import { Canvas, useFrame } from '@react-three-fiber';
-import { Text, Plane, Image as DreiImage } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Text, Plane, Image as DreiImage, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { marked } from 'marked';
 import { synthesizeNarrative } from '../../services/NarrativeSynthesisAI'; // Invented
@@ -8,14 +8,6 @@ import type { SynthesizedSlide } from '../../types/NarrativeSynthesis'; // Inven
 import { PhotoIcon, SparklesIcon } from '../icons';
 import { LoadingSpinner } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
-
-// --- 3D Presentation Engine ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
-
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
-
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 const SlidePlane: React.FC<{ slide: SynthesizedSlide; index: number; activeIndex: number; }> = ({ slide, index, activeIndex }) => {
     const groupRef = useRef<THREE.Group>(null);

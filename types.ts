@@ -1,3 +1,38 @@
+// --- PsychometricTheme and PsychoEmotionalTarget types ---
+export type PsychoEmotionalTarget = 'FOCUS' | 'CALM_FOCUS';
+
+export interface PsychometricTheme {
+    mode: 'light' | 'dark';
+    targetState: PsychoEmotionalTarget;
+    visuals: {
+        primary: string;
+        background: string;
+        surface: string;
+    };
+    audio: {
+        backgroundDrone: {
+            frequency: number;
+            waveform: 'SINE' | 'SQUARE' | 'TRIANGLE' | 'SAWTOOTH';
+            amplitude: number;
+        };
+        notificationChime: {
+            frequency: number;
+            waveform: 'SINE' | 'SQUARE' | 'TRIANGLE' | 'SAWTOOTH';
+            amplitude: number;
+        };
+    };
+    haptics: {
+        idlePattern: string;
+        confirmationPattern: string;
+    };
+}
+export interface FeatureTaxonomy {
+    id: string;
+    name: string;
+    description: string;
+    category: string;
+    inputs: string;
+}
 import type React from 'react';
 import { CHROME_VIEW_IDS } from './constants.tsx';
 
@@ -169,7 +204,7 @@ export interface SystemPrompt {
 export interface EncryptedData {
     id: string;
     ciphertext: ArrayBuffer;
-    iv: Uint8Array;
+    iv: Uint8Array; // Must be a plain Uint8Array backed by ArrayBuffer
 }
 
 export interface SecurityVulnerability {
@@ -282,7 +317,7 @@ export type ParadoxDescriptor = {
  * An expansion of the user model to include engine-specific metaphysics.
  */
 export interface ExtendedAppUser extends AppUser {
-    tier: 'free' | 'pro' | 'archon';
+        tier: 'free' | 'pro';
     cognitiveSignature: CognitiveSignature;
     maxVolition: number;
     currentEntropyFactor: number; // User's influence on system stability
@@ -291,30 +326,32 @@ export interface ExtendedAppUser extends AppUser {
     guardianEthosAlignment: number; // How closely the user's actions align with the Guardian AI
 }
 
-/**
- * ## THEME ENGINE v2: PSYCHO-EMOTIONAL RESONANCE
- * Dynamically generated UI themes designed to evoke specific mental states.
- */
-export type PsychoEmotionalTarget = 'CALM_FOCUS' | 'INHIBITED_CREATIVITY' | 'AGGRESSIVE_EXECUTION' | 'DREAMLIKE_EXPLORATION' | 'ABSOLUTE_SECURITY';
-export type ChromaticResonance = `hsla(${number}, ${number}%, ${number}%, ${number})`;
-export type SonicResonance = { frequency: number, waveform: 'SINE' | 'SQUARE' | 'SAWTOOTH', amplitude: number };
-export type HapticPattern = `pattern(${number[]})`;
+
+// --- PsychometricTheme and PsychoEmotionalTarget types ---
 
 export interface PsychometricTheme {
+    mode: 'light' | 'dark';
     targetState: PsychoEmotionalTarget;
     visuals: {
-        primary: ChromaticResonance;
-        background: ChromaticResonance;
-        surface: ChromaticResonance;
-        // ...and so on
+        primary: string;
+        background: string;
+        surface: string;
     };
     audio: {
-        backgroundDrone: SonicResonance;
-        notificationChime: SonicResonance;
+        backgroundDrone: {
+            frequency: number;
+            waveform: 'SINE' | 'SQUARE' | 'TRIANGLE' | 'SAWTOOTH';
+            amplitude: number;
+        };
+        notificationChime: {
+            frequency: number;
+            waveform: 'SINE' | 'SQUARE' | 'TRIANGLE' | 'SAWTOOTH';
+            amplitude: number;
+        };
     };
-    haptics: { // For neural-interfaced users
-        idlePattern: HapticPattern;
-        confirmationPattern: HapticPattern;
+    haptics: {
+        idlePattern: string;
+        confirmationPattern: string;
     };
 }
 
@@ -325,21 +362,21 @@ export interface PsychometricTheme {
  */
 export type FileContentType = string | ArrayBuffer | NoeticVector;
 
-export interface NoeticLink extends FileNode {
+export type NoeticLink = FileNode & {
     type: 'noetic-link';
     targetVector: NoeticVector; // A direct pointer to an idea.
     content: undefined; // Links have no content, only a target.
     linkStrength: number; // How strongly this link is established
-}
+};
 
-export interface CausalityTrace extends FileNode {
+export type CausalityTrace = FileNode & {
     type: 'causality-trace';
     content: string; // Human-readable log of events
     eventChain: Action<any, any>[]; // The actual chain of executed actions
     startChronon: ChrononTimestamp;
     endChronon: ChrononTimestamp;
     resultantEntropy: number;
-}
+};
 
 export type GraphNode = FileNode | NoeticLink | CausalityTrace;
 

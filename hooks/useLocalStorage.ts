@@ -23,7 +23,7 @@ const calculateChecksum = (str: string): string => {
     for (let i = 0; i < str.length; i++ ) {
         crc = (crc >>> 8) ^ crc32Table[(crc ^ str.charCodeAt(i)) & 0xFF];
     }
-    return (crc ^ (-1)) >>> 0.toString(16).padStart(8, '0');
+    return ((crc ^ (-1)) >>> 0).toString(16).padStart(8, '0');
 };
 
 

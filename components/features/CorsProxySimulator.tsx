@@ -4,10 +4,9 @@ import type { BridgedResponse, ForgedPolicy } from '../../types/RealityBridge'; 
 import { PaperAirplaneIcon, HammerIcon, ShieldCheckIcon } from '../icons';
 import { LoadingSpinner, MarkdownRenderer } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 const PolicyConflictDisplay: React.FC<{ conflict: { header: string; requested: string; received: string } }> = ({ conflict }) => (
     <div>

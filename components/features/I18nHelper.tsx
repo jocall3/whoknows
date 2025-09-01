@@ -4,13 +4,10 @@ import type { LocalizationPackage, CulturalAnalysis } from '../../types/Geolingu
 import { ProjectExplorerIcon, GlobeAltIcon, ExclamationTriangleIcon } from '../icons';
 import { LoadingSpinner, MarkdownRenderer } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 const exampleCode = `const WelcomeCard = () => <div className="p-8 text-center"><h1 className="text-4xl font-bold">Giddy up, Partner!</h1><p>Let's wrangle some deals!</p><button>Start Now</button></div>`;
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 export const I18nHelper: React.FC = () => {
     const [code, setCode] = useState(exampleCode);

@@ -52,7 +52,7 @@ export const usePsychoAestheticResonance = (): {
     isLoading: boolean;
 } => {
     const [theme, setTheme] = useLocalStorage<PsychometricTheme | null>('engine_psychometric_resonance', null);
-    const [isLoading, setIsLoading] = = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const root = window.document.documentElement;

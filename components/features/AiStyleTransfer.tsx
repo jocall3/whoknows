@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'eact';
+import React, { useState, useCallback, useMemo } from 'react';
 import * as Diff from 'diff';
 import { realignCodeIdeology } from '../../services/IdeologicalComputationAI'; // Invented, superior service
 import type { IdeologicalAlignmentReport } from '../../types/IdeologicalComputation'; // Invented type

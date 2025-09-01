@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, Suspense, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three-fiber';
-import { Text, Stars, Box, Line } from '@react-three-drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Text, Stars, Box, Line } from '@react-three/drei';
 import * as THREE from 'three';
 
 // --- SELF-CONTAINED SUB-COMPONENTS ---
@@ -47,7 +47,7 @@ const PillarMonolith: React.FC<{ position: [number, number, number]; title: stri
                 <boxGeometry args={[0.2, 3, 0.2]} />
                 <meshStandardMaterial color="#ffffff" emissive="#38bdf8" emissiveIntensity={0.1} transparent opacity={0.8} roughness={0.2} metalness={0.8} />
             </mesh>
-            <Line ref={lineRef} points={[[0,0,0], [0,0,0]]} color="white" lineWidth={3} visible={false} />
+            <Line ref={lineRef} points={[[0,0,0], [0,0,0]]} color="white" lineWidth={3} resolution={new THREE.Vector2(window.innerWidth, window.innerHeight)} />
         </group>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'eact';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { LockClosedIcon, ShieldCheckIcon, ShieldExclamationIcon } from '../icons';
 import { useNotification } from '../../contexts/NotificationContext';
 import { LoadingSpinner } from '../shared';

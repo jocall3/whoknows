@@ -1,4 +1,4 @@
-import React, 'useState, useCallback, useEffect, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { performGeoSigintSweep } from '../../services/GeoSigintAI'; // Invented
@@ -7,7 +7,6 @@ import { MagnifyingGlassIcon, ExclamationTriangleIcon } from '../icons';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/LoadingSpinner';
 import { useNotification } from '../../contexts/NotificationContext';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // Simplified 2D Canvas Graph for this implementation
 const ThreatGraph: React.FC<{ nodes: StrategicThreatNode[] }> = ({ nodes }) => {

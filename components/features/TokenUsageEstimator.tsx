@@ -4,10 +4,9 @@ import type { TokenomicAnalysis } from '../../types/TokenomicAI'; // Invented ty
 import { CpuChipIcon, SparklesIcon } from '../icons';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/LoadingSpinner';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- SELF-CONTAINED MODULES & TYPES ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 // --- The Reforged Component ---
 const ModelCostRow: React.FC<{ analysis: TokenomicAnalysis['models'][0] }> = ({ analysis }) => (

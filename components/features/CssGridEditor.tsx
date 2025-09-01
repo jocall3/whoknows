@@ -4,10 +4,9 @@ import type { LayoutAxiom, ContentItem, GridLayoutSolution } from '../../types/L
 import { CodeBracketSquareIcon, SparklesIcon, PlusIcon, TrashIcon } from '../icons';
 import { LoadingSpinner } from '../shared/LoadingSpinner';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 const FluxingContent: React.FC<{ item: ContentItem; isFluxing: boolean }> = ({ item, isFluxing }) => {
     const [textLength, setTextLength] = useState(1);

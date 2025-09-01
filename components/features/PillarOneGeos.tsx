@@ -1,18 +1,16 @@
 import React, { useState, useCallback, Suspense, useMemo, useRef, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three-fiber';
-import { Stars, Text, Line, Plane, Edges, OrbitControls } from '@react-three-drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Stars, Text, Line as DreiLine, Plane, Edges, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { useNotification } from '../../contexts/NotificationContext';
 import { LoadingSpinner, MarkdownRenderer } from '../shared';
 import { PILLAR_FEATURES } from '../../constants';
 import { ProjectExplorerIcon, MapIcon, MagnifyingGlassIcon, PaperAirplaneIcon, ChartBarIcon } from '../icons';
 import { generateMonetaryPolicy, getLiveEconomicData, getLiveLogisticsData, getResourceScarcityData, synthesizeCityPlan } from '../../services/GeospatialAI';
-import { LineChart, ComposedChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, ComposedChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Line } from 'recharts';
 
 
 // --- UTILITY ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // ==================================================================================
 // == PILLAR I-A: LOGISTICS MANIFOLD - GINORMOUS IMPLEMENTATION                     ==

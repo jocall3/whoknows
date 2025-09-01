@@ -26,7 +26,6 @@ export const componentMap: Record<string, React.LazyExoticComponent<React.FC<any
     'the-sovereign': lazyWithRetry(() => import('./TheSovereign.tsx'), 'TheSovereign'),
 
     // --- AI-DRIVEN CODE & DEV TOOLS ---
-    'ai-code-explainer': lazyWithRetry(() => import('./AiCodeExplainer.tsx'), 'AiCodeExplainer'),
     'ai-feature-builder': lazyWithRetry(() => import('./AiFeatureBuilder.tsx'), 'AiFeatureBuilder'),
     'ai-commit-generator': lazyWithRetry(() => import('./AiCommitGenerator.tsx'), 'AiCommitGenerator'),
     'ai-unit-test-generator': lazyWithRetry(() => import('./AiUnitTestGenerator.tsx'), 'AiUnitTestGenerator'),

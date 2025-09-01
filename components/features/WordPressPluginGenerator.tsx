@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, Suspense } from 'react';
-import { Canvas } from '@react-three-fiber';
+import { Canvas } from '@react-three/fiber';
 import { Stars, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { generateDecentralizedAppNode } from '../../services/DecentralizedGenesisAI'; // Invented
@@ -8,9 +8,6 @@ import { WordPressIcon, ServerStackIcon } from '../icons';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/LoadingSpinner';
 import { useNotification } from '../../contexts/NotificationContext';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
-
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- 3D Visualization of the dApp Mesh Network ---
 const MeshNetwork: React.FC<{ nodeCount: number }> = ({ nodeCount }) => {
@@ -91,7 +88,7 @@ export const WordPressPluginGenerator: React.FC = () => {
                              ))}
                            </div>
                            <div className="bg-surface rounded overflow-y-auto">
-                             {activeFile && <MarkdownRenderer content={'```php\n' + activeFile.content + '\n```'} />}
+                             {activeFile && <MarkdownRenderer markdown={'```php\n' + activeFile.content + '\n```'} />}
                            </div>
                          </div>
                     </div>

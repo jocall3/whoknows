@@ -1,6 +1,6 @@
 import React, { useState, useCallback, Suspense, useReducer } from 'react';
-import { Canvas } from '@react-three-fiber';
-import { Stars, Text, OrbitControls, Box, Plane } from '@react-three-drei';
+import { Canvas } from '@react-three/fiber';
+import { Stars, Text, OrbitControls, Box, Plane } from '@react-three/drei';
 import * as THREE from 'three';
 import { useNotification } from '../../contexts/NotificationContext';
 import { LoadingSpinner, MarkdownRenderer } from '../shared';

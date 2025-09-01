@@ -4,10 +4,9 @@ import { forgeTypeface, analyzeReadability } from '../../services/GlyphicSynthes
 import type { ForgedTypeface, ReadabilityReport } from '../../types/GlyphicSynthesis'; // Invented
 import { LoadingSpinner } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 const AxiomSlider: React.FC<{ label:string, left:string, right:string, value:number, onChange:(v:number)=>void }> = ({label, left, right, value, onChange})=>(
     <div>

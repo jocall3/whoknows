@@ -110,4 +110,10 @@ export const CspGenerator: React.FC = () => {
                             </div>
                         ))}
                       </div>
-                     <button onClick={handleSynthesize} disabled={isLoading || !Object.v
+                     <button onClick={handleSynthesize} disabled={isLoading || !Object.values(networkProfile).some(set => set.size > 0)} className="btn-primary mt-2">Synthesize CSP</button>
+                 </div>
+                 {/* Add other UI sections as needed */}
+            </div>
+        </div>
+    );
+}

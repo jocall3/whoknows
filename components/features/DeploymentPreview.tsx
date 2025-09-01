@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Stars, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { getAllFiles } from '../../services/dbService';
@@ -8,13 +8,12 @@ import type { GeneratedFile, EdgeDeployment, DeploymentAnalytics } from '../../t
 import { CloudIcon, GlobeAltIcon, LinkIcon } from '../icons';
 import { LoadingSpinner } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- Live World Map Visualization ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
+// --- Live World Map Visualization ---
 
 const WorldMap: React.FC<{ analytics: DeploymentAnalytics | null }> = ({ analytics }) => {
     const globeRef = useRef<THREE.Mesh>(null);

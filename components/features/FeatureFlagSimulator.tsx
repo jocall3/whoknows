@@ -4,10 +4,9 @@ import type { FeatureFlag, FlagTargetingRule } from '../../types/FeatureFlagging
 import { BeakerIcon, ShieldExclamationIcon } from '../icons';
 import { LoadingSpinner } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 const FlagController: React.FC<{
     flag: FeatureFlag;

@@ -1,4 +1,7 @@
+export const GlobeAltIcon: React.FC = () => <IconWrapper><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" fill="none"/><path strokeLinecap="round" strokeLinejoin="round" d="M2 12h20M12 2v20" /></svg></IconWrapper>;
 import React from 'react';
+export { ShieldExclamationIcon } from './icons/ShieldExclamationIcon';
+export { ExclamationTriangleIcon } from './icons/ExclamationTriangleIcon';
 
 const IconWrapper: React.FC<{children: React.ReactNode; className?: string}> = ({ children, className }) => (
     <div className={className ?? 'w-6 h-6'}>{children}</div>

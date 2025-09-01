@@ -1,19 +1,18 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { decomposeUserFlowAndGeneratePrototype, generateComponentFromHtml } from '../../services/InteractiveFlowAI'; // Invented AI Service
 import type { InteractivePrototype } from '../../types/InteractiveFlow'; // Invented
 import { PhotoIcon, CodeBracketSquareIcon } from '../icons';
 import { LoadingSpinner, MarkdownRenderer } from '../shared';
 import { useNotification } from '../../contexts/NotificationContext';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 const ProgressBar: React.FC<{ progress: number; text: string }> = ({ progress, text }) => (
     <div className="w-full text-center">
         <p className="text-sm font-mono mb-2">{text}</p>
-        <div className="w-full bg-surface rounded-full h-2.5 border"><div className="bg-primary h-2.5 rounded-full" style={{ width: `${progress}%` }}></div></div>
+    <div className="w-full bg-surface rounded-full h-2.5 border"><div className="bg-primary h-2.5 rounded-full" style={{ width: `${progress}%` }}></div></div>
     </div>
 );
 
@@ -99,7 +98,7 @@ export const StoryboardGenerator: React.FC = () => {
                  <div className="flex flex-col min-h-0">
                      <h3 className="text-xl font-bold mb-2">Interactive Prototype</h3>
                       <div className="flex-grow bg-background border rounded-lg p-2">
-                        {isLoading && <div className="h-full flex items-center justify-center"><ProgressBar {...progress} /></div>}
+                        {isLoading && <div className="h-full flex items-center justify-center"><ProgressBar progress={progress.percent} text={progress.text} /></div>}
                         {!isLoading && currentScreen && (
                             <iframe ref={iframeRef} srcDoc={currentScreen.html} title="Prototype Screen" className="w-full h-full bg-white"/>
                         )}

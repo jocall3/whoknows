@@ -18,8 +18,8 @@ import { Octokit } from 'octokit';
 import { configure as configureAxe, run as runAxe, AxeResults, ElementContext } from 'axe-core';
 import { Type, FunctionDeclaration } from "@google/genai";
 import type { 
-    GeneratedFile, EncryptedData, CustomFeature, FileNode, AppUser, GitHubUser, Repo,
-    StructuredPrSummary, StructuredExplanation, SemanticColorTheme, SecurityVulnerability, CodeSmell, FeatureTaxonomy
+  GeneratedFile, EncryptedData, CustomFeature, FileNode, AppUser, GitHubUser, Repo,
+  StructuredPrSummary, StructuredExplanation, SemanticColorTheme, SecurityVulnerability, CodeSmell
 } from '../types';
 
 declare var gapi: any;
@@ -50,12 +50,18 @@ export const deriveKey = async (password: string, salt: ArrayBuffer): Promise<Cr
     return await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 300000, hash: 'SHA-256' }, masterKey, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
 };
 export const encrypt = async (plaintext: string, key: CryptoKey): Promise<{ ciphertext: ArrayBuffer, iv: Uint8Array }> => {
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(plaintext));
-    return { ciphertext, iv };
+  const iv: Uint8Array = crypto.getRandomValues(new Uint8Array(12));
+  // Ensure iv is a plain Uint8Array backed by ArrayBuffer
+  const validIv = iv.buffer instanceof ArrayBuffer ? iv : new Uint8Array(Array.from(iv));
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: validIv }, key, new TextEncoder().encode(plaintext));
+  return { ciphertext, iv };
 };
 export const decrypt = async (ciphertext: ArrayBuffer, key: CryptoKey, iv: Uint8Array): Promise<string> => {
-    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+  // Ensure iv is a plain Uint8Array backed by ArrayBuffer
+    // Convert iv to a standard ArrayBuffer if needed
+    // Ensure iv is a plain Uint8Array backed by ArrayBuffer
+    const validIv = iv.buffer instanceof ArrayBuffer ? iv : new Uint8Array(Array.from(iv));
+    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: validIv }, key, ciphertext);
     return new TextDecoder().decode(decrypted);
 };
 
@@ -154,7 +160,46 @@ configureAxe({reporter:'v2',rules:[{id:'region',enabled:false}]});
 export const runAxeAudit = (context:ElementContext):Promise<AxeResults> => runAxe(context, {resultTypes: ['violations']});
 
 // --- security/staticAnalysisService.ts ---
-export const runStaticScan=(c:string):SecurityVulnerability[]>=>{const issues:any[]=[];const rules=[{name:'Hardcoded Secret',rx:/(key|secret|token|password)['"]?\s*[:=]\s*['"]([a-zA-Z0-9-_.]{16,})['"]/gi,s:'High'},{name:'dangerouslySetInnerHTML',rx:/dangerouslySetInnerHTML/g,s:'Medium'},{name:'eval() usage',rx:/eval\(/g,s:'High'}];c.split('\n').forEach((l,i)=>{rules.forEach(r=>{if(r.rx.test(l)){issues.push({line:i+1,type:r.name,severity:r.s});}});});return issues;};
+export const runStaticScan = (c: string): SecurityVulnerability[] => {
+  const issues: SecurityVulnerability[] = [];
+  const rules = [
+    {
+      name: 'Hardcoded Secret',
+      rx: /(key|secret|token|password)['"]?\s*[:=]\s*['"]([a-zA-Z0-9-_.]{16,})['"]/gi,
+      severity: 'High' as 'High',
+      description: 'Hardcoded secrets found in code.',
+      mitigation: 'Use environment variables or secret management tools.'
+    },
+    {
+      name: 'dangerouslySetInnerHTML',
+      rx: /dangerouslySetInnerHTML/g,
+      severity: 'Medium' as 'Medium',
+      description: 'Usage of dangerouslySetInnerHTML can lead to XSS vulnerabilities.',
+      mitigation: 'Sanitize input or avoid using dangerouslySetInnerHTML.'
+    },
+    {
+      name: 'eval() usage',
+      rx: /eval\(/g,
+      severity: 'High' as 'High',
+      description: 'Use of eval() can lead to code injection vulnerabilities.',
+      mitigation: 'Avoid using eval(); use safer alternatives.'
+    }
+  ];
+  c.split('\n').forEach((l, i) => {
+    rules.forEach(r => {
+      if (r.rx.test(l)) {
+        issues.push({
+          vulnerability: r.name,
+          severity: r.severity,
+          description: r.description,
+          mitigation: r.mitigation,
+          exploitSuggestion: undefined
+        });
+      }
+    });
+  });
+  return issues;
+};
 
 // --- profiling/performanceService.ts ---
 export const startTracing=():void=>{if(isTracing)return;performance.clearMarks();performance.clearMeasures();isTracing=true;};
@@ -172,18 +217,6 @@ export const fetchAccountBalances = async(): Promise<any> => { console.warn('LIV
 // In a real live/databaseClient, you'd have actual DB connection logic. For here, they are empty.
 export const queryProductionDB = async (q: string, p: any[]): Promise<any> => { console.warn("LIVE DB not connected"); return []; }
 export const mutateProductionDB = async (q: string, p: any[]): Promise<any> => { console.warn("LIVE DB not connected"); return { rowCount: 0 }; }
-// --- taxonomyService.ts ---
-export const FEATURE_TAXONOMY: FeatureTaxonomy[] = [
-    {id:"ai-command-center",name:"AI Command Center",description:"The main entry point. Use natural language to navigate and control the entire toolkit. Can call other tools.",category:"Core",inputs:"A natural language prompt describing what the user wants to do. Examples: 'explain this code: ...', 'design a theme with space vibes'."},
-    {id:"workspace-connector-hub",name:"Workspace Connector Hub",description:"A central hub to execute actions on connected third-party services like Jira, Slack, GitHub, Vercel, and more.",category:"Workflow",inputs:"A natural language command describing a sequence of actions."},
-    {id:"ai-code-explainer",name:"AI Code Explainer",description:"Accepts a code snippet and provides a detailed, structured analysis including summary, line-by-line breakdown, complexity, suggestions, and a visual flowchart.",category:"AI Tools",inputs:"A string containing a code snippet."},
-    {id:"theme-designer",name:"AI Theme Designer",description:"Generates a complete UI color theme, including a semantic palette and accessibility scores, from a simple text description or an uploaded image.",category:"AI Tools",inputs:"A string describing the desired aesthetic (e.g., 'a calm, minimalist theme for a blog') or an image file."},
-    {id:"regex-sandbox",name:"RegEx Sandbox",description:"Generates a regular expression from a natural language description. Also allows testing expressions against a string.",category:"Testing",inputs:"A string describing the pattern to match. Example: 'find all email addresses'."},
-    {id:"ai-pull-request-assistant",name:"AI Pull Request Assistant",description:"Takes 'before' and 'after' code snippets, calculates the diff, generates a structured pull request summary (title, description, changes), and populates a full PR template.",category:"AI Tools",inputs:"Two strings: 'beforeCode' and 'afterCode'."},
-    {id:"visual-git-tree",name:"AI Git Log Analyzer",description:"Intelligently parses a raw 'git log' output to create a categorized and well-formatted changelog, separating new features from bug fixes.",category:"Git",inputs:"A string containing the raw output of a 'git log' command."},
-    {id:"cron-job-builder",name:"AI Cron Job Builder",description:"Generates a valid cron expression from a natural language description of a schedule.",category:"Deployment",inputs:"A string describing a schedule. Example: 'every weekday at 5pm'."},
-    {id:"ai-code-migrator",name:"AI Code Migrator",description:"Translate code between languages & frameworks.",category:"AI Tools",inputs:"A string of code to convert, a string for the source language, and a string for the target language."},
-];
 
 // ==================================================================================
 // == SECTION V: WORKSPACE & ACTION REGISTRY                                       ==

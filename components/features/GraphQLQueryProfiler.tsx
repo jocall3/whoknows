@@ -4,14 +4,11 @@ import type { QueryProfile, ResolverTrace, DataLoaderPatch } from '../../types/G
 import { MagnifyingGlassIcon, BeakerIcon } from '../icons';
 import { LoadingSpinner, MarkdownRenderer } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 // --- Reforged Component ---
 const WaterfallTrace: React.FC<{ traces: ResolverTrace[] }> = ({ traces }) => {

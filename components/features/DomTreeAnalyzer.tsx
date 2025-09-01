@@ -6,10 +6,9 @@ import type { DomMetrics, ReflowReport } from '../../types/DomCognition'; // Inv
 import { ChartBarIcon, ExclamationTriangleIcon } from '../icons';
 import { LoadingSpinner } from '../shared';
 
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
 
 // --- COMPONENTS ---
-const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+// --- COMPONENTS ---
 
 const StatCard: React.FC<{ value: number; label: string }> = ({ value, label }) => (
     <div className="bg-background border p-3 rounded-lg text-center">
