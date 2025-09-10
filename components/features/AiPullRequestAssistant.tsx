@@ -1,10 +1,13 @@
 
 
+
 import React, { useState, useMemo, useCallback } from 'react';
 import * as Diff from 'diff';
+// FIX: Corrected import path for ai services.
 import { generatePrSummaryStructured, generateTechnicalSpecFromDiff, downloadFile, createDocument, insertText } from '../../services/index.ts';
 import type { StructuredPrSummary } from '../../types.ts';
-import { AiPullRequestAssistantIcon, DocumentIcon } from '../icons.tsx';
+// FIX: Corrected import path for icons.
+import { AiPullRequestAssistantIcon, DocumentIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';

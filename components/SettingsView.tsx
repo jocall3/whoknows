@@ -4,7 +4,7 @@ import { clearAllFiles } from '../services/index.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
 import { useTheme } from '../hooks/useTheme.ts';
 import { ALL_FEATURES } from './features/index.ts';
-import { TrashIcon, SunIcon, MoonIcon } from './icons.tsx';
+import { TrashIcon, SunIcon, MoonIcon } from './icons/index.ts';
 
 const ToggleSwitch: React.FC<{ checked: boolean, onChange: () => void }> = ({ checked, onChange }) => {
     return (

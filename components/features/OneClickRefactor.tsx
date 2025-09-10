@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import * as Diff from 'diff';
-import { refactorForPerformance, refactorForReadability, generateJsDoc, convertToFunctionalComponent } from '../../services/aiService.ts';
-import { SparklesIcon } from '../icons.tsx';
+// FIX: Corrected import path for ai services.
+import { refactorForPerformance, refactorForReadability, generateJsDoc, convertToFunctionalComponent } from '../../services/index.ts';
+// FIX: Corrected import path for icons.
+import { SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 type RefactorAction = 'readability' | 'performance' | 'jsdoc' | 'functional' | 'custom';
@@ -69,43 +71,4 @@ export const OneClickRefactor: React.FC = () => {
             let fullResponse = '';
             for await (const chunk of stream) {
                 fullResponse += chunk;
-                setRefactoredCode(fullResponse.replace(/^```(?:\w+\n)?/, '').replace(/```$/, ''));
-            }
-        } catch (e) {
-            console.error(e);
-            setRefactoredCode(`// Error during refactoring: ${e instanceof Error ? e.message : 'Unknown error'}`);
-        } finally {
-            setLoadingAction(null);
-        }
-    }, [code]);
-
-    return (
-        <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
-            <header className="mb-6">
-                <h1 className="text-3xl font-bold flex items-center">
-                    <SparklesIcon />
-                    <span className="ml-3">One-Click Refactor</span>
-                </h1>
-                <p className="text-text-secondary mt-1">Apply common refactoring patterns to your code with a single click.</p>
-            </header>
-            <div className="flex items-center justify-center flex-wrap gap-2 mb-4 p-4 bg-surface rounded-lg border border-border">
-                <button onClick={() => handleRefactor('readability')} disabled={!!loadingAction} className="btn-primary px-3 py-1.5 text-sm">{loadingAction === 'readability' ? <LoadingSpinner/> : 'Improve Readability'}</button>
-                <button onClick={() => handleRefactor('performance')} disabled={!!loadingAction} className="btn-primary px-3 py-1.5 text-sm">{loadingAction === 'performance' ? <LoadingSpinner/> : 'Boost Performance'}</button>
-                <button onClick={() => handleRefactor('jsdoc')} disabled={!!loadingAction} className="btn-primary px-3 py-1.5 text-sm">{loadingAction === 'jsdoc' ? <LoadingSpinner/> : 'Add JSDoc'}</button>
-                <button onClick={() => handleRefactor('functional')} disabled={!!loadingAction} className="btn-primary px-3 py-1.5 text-sm">{loadingAction === 'functional' ? <LoadingSpinner/> : 'To Functional Component'}</button>
-            </div>
-            <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
-                <div className="flex flex-col">
-                    <label className="text-sm font-medium mb-2">Original Code</label>
-                    <textarea value={code} onChange={e => setCode(e.target.value)} className="flex-grow p-2 bg-surface border rounded font-mono text-xs"/>
-                </div>
-                 <div className="flex flex-col">
-                    <label className="text-sm font-medium mb-2">Refactored Code</label>
-                    <div className="flex-grow p-2 bg-background border rounded overflow-auto">
-                        {loadingAction ? <div className="flex justify-center items-center h-full"><LoadingSpinner/></div> : <DiffViewer oldCode={code} newCode={refactoredCode} />}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+                setRefactoredCode(

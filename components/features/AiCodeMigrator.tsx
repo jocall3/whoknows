@@ -1,8 +1,6 @@
-
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { migrateCodeStream } from '../../services/index.ts';
-import { ArrowPathIcon } from '../icons.tsx';
+import { ArrowPathIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { MarkdownRenderer } from '../shared/index.tsx';
 

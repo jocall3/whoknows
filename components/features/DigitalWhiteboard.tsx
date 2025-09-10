@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { SparklesIcon, DigitalWhiteboardIcon } from '../icons.tsx';
+import { SparklesIcon, DigitalWhiteboardIcon } from '../icons/index.ts';
 import { useLocalStorage } from '../../hooks/useLocalStorage.ts';
 import { summarizeNotesStream } from '../../services/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';

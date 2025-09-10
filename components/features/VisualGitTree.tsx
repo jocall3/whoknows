@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { GitBranchIcon, ArrowDownTrayIcon } from '../icons.tsx';
-import { generateChangelogFromLogStream } from '../../services/aiService.ts';
+import { GitBranchIcon, ArrowDownTrayIcon } from '../icons/index.ts';
+// FIX: Corrected import path for ai services.
+import { generateChangelogFromLogStream } from '../../services/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { downloadFile } from '../../services/fileUtils.ts';
 

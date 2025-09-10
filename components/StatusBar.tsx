@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GitBranchIcon, BellIcon } from './icons.tsx';
+import { GitBranchIcon, BellIcon } from './icons/index.ts';
 import { RealityToggle } from './RealityToggle.tsx';
 
 type BgImageStatus = 'loading' | 'loaded' | 'error';

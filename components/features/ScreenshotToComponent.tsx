@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useRef } from 'react';
+// FIX: Corrected import path for ai services.
 import { generateComponentFromImageStream } from '../../services/index.ts';
-import { PhotoIcon, ArrowDownTrayIcon } from '../icons.tsx';
+// FIX: Corrected import path for icons.
+import { PhotoIcon, ArrowDownTrayIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { fileToBase64, blobToDataURL, downloadFile } from '../../services/fileUtils.ts';
 

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { CodeBracketSquareIcon, ArrowDownTrayIcon } from '../icons.tsx';
+import { CodeBracketSquareIcon, ArrowDownTrayIcon } from '../icons/index.ts';
 import { downloadFile } from '../../services/fileUtils.ts';
 
 interface ManifestData {

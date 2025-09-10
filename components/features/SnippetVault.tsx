@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { LockClosedIcon, SparklesIcon, TrashIcon, ClipboardDocumentIcon, ArrowDownTrayIcon } from '../icons.tsx';
+import { LockClosedIcon, SparklesIcon, TrashIcon, ClipboardDocumentIcon, ArrowDownTrayIcon } from '../icons/index.ts';
 import { useLocalStorage } from '../../hooks/useLocalStorage.ts';
-import { enhanceSnippetStream, generateTagsForCode } from '../../services/aiService.ts';
+// FIX: Corrected import path for ai services.
+import { enhanceSnippetStream, generateTagsForCode } from '../../services/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { downloadFile } from '../../services/fileUtils.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
@@ -63,79 +64,83 @@ export const SnippetVault: React.FC = () => {
     };
     
     const handleAiTagging = async (snippet: Snippet) => {
-        if (!snippet.code.trim()) return;
         try {
-            const suggestedTags = await generateTagsForCode(snippet.code);
-            const newTags = [...new Set([...(snippet.tags || []), ...suggestedTags])];
-            updateSnippet({...snippet, tags: newTags});
-            addNotification('AI tags added!', 'success');
-        } catch(e) {
-            console.error("AI tagging failed:", e);
-            addNotification('AI tagging failed.', 'error');
+            const { tags } = await generateTagsForCode(snippet.code);
+            updateSnippet({ ...snippet, tags });
+            addNotification("Tags generated!", 'success');
+        } catch (e) {
+            addNotification("Could not generate tags.", 'error');
         }
     };
 
     const handleAddNew = () => {
-        const newSnippet: Snippet = { id: Date.now(), name: 'New Snippet', language: 'plaintext', code: '', tags: [] };
-        setSnippets([...snippets, newSnippet]);
+        const newSnippet: Snippet = {
+            id: Date.now(),
+            name: 'New Snippet',
+            code: '// Your code here',
+            language: 'javascript',
+            tags: [],
+        };
+        setSnippets([newSnippet, ...snippets]);
         setActiveSnippet(newSnippet);
     };
-    
+
     const handleDelete = (id: number) => {
-        setSnippets(snippets.filter((s: Snippet) => s.id !== id));
-        if(activeSnippet?.id === id) setActiveSnippet(filteredSnippets.length > 1 ? filteredSnippets[0] : null);
+        setSnippets(snippets.filter(s => s.id !== id));
+        if (activeSnippet?.id === id) {
+            setActiveSnippet(null);
+        }
     };
     
     const handleDownload = () => {
-        if(!activeSnippet) return;
-        const extension = langToExt[activeSnippet.language] || 'txt';
-        const filename = `${activeSnippet.name.replace(/\s/g, '_')}.${extension}`;
-        downloadFile(activeSnippet.code, filename);
-    }
-
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (activeSnippet) updateSnippet({...activeSnippet, name: e.target.value});
-    };
-    
-    const handleTagsChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && activeSnippet) {
-            const newTag = e.currentTarget.value.trim();
-            if (newTag && !activeSnippet.tags.includes(newTag)) {
-                updateSnippet({...activeSnippet, tags: [...(activeSnippet.tags ?? []), newTag]});
-            }
-            e.currentTarget.value = '';
-        }
+        if (!activeSnippet) return;
+        const ext = langToExt[activeSnippet.language] || 'txt';
+        downloadFile(activeSnippet.code, `${activeSnippet.name}.${ext}`);
     };
 
     return (
-        <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
-            <header className="mb-6"><h1 className="text-3xl font-bold flex items-center"><LockClosedIcon /><span className="ml-3">Snippet Vault</span></h1><p className="text-text-secondary mt-1">Store, search, tag, and enhance your reusable code snippets with AI.</p></header>
-            <div className="flex-grow flex gap-6 min-h-0">
-                <aside className="w-1/3 bg-surface border border-border p-4 rounded-lg flex flex-col">
-                    <input type="text" placeholder="Search snippets..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-3 py-1.5 mb-3 rounded-md bg-background border border-border text-sm"/>
-                    <ul className="space-y-2 flex-grow overflow-y-auto pr-2">{filteredSnippets.map((s: Snippet) => (<li key={s.id} className="group flex items-center justify-between"><button onClick={() => setActiveSnippet(s)} className={`w-full text-left px-3 py-2 rounded-md ${activeSnippet?.id === s.id ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 dark:hover:bg-slate-700'}`}>{s.name}</button><div className="flex opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => {navigator.clipboard.writeText(s.code); addNotification("Copied snippet!", "success")}} className="ml-2 p-1 text-text-secondary hover:text-primary" title="Copy"><ClipboardDocumentIcon /></button><button onClick={() => handleDelete(s.id)} className="ml-2 p-1 text-text-secondary hover:text-red-500" title="Delete"><TrashIcon/></button></div></li>))}</ul>
-                    <div className="mt-4 pt-4 border-t border-border"><button onClick={handleAddNew} className="btn-primary w-full text-sm py-2">Add New Snippet</button></div>
-                </aside>
-                <main className="w-2/3 flex flex-col">
-                    {activeSnippet ? (<>
-                        <div className="flex justify-between items-center mb-2">
-                            {isEditingName ? <input type="text" value={activeSnippet.name} onChange={handleNameChange} onBlur={() => setIsEditingName(false)} autoFocus className="text-lg font-bold bg-gray-100 dark:bg-slate-700 rounded px-2"/> : <h3 onDoubleClick={() => setIsEditingName(true)} className="text-lg font-bold cursor-pointer">{activeSnippet.name}</h3>}
-                            <div className="flex gap-2">
-                                <button onClick={() => handleAiTagging(activeSnippet)} className="flex items-center gap-2 px-3 py-1 bg-teal-500/80 text-white font-bold text-xs rounded-md"><SparklesIcon /> AI Tag</button>
-                                <button onClick={handleEnhance} disabled={isEnhancing} className="flex items-center gap-2 px-3 py-1 bg-purple-500/80 text-white font-bold text-xs rounded-md disabled:bg-gray-400"><SparklesIcon /> AI Enhance</button>
-                                <button onClick={handleDownload} className="flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-slate-700 text-xs rounded-md"><ArrowDownTrayIcon className="w-4 h-4"/> Download</button>
+        <div className="h-full flex text-text-primary">
+            <aside className="w-80 bg-surface border-r border-border flex flex-col">
+                <div className="p-4 border-b border-border">
+                    <input type="text" placeholder="Search snippets..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full p-2 bg-background border rounded-md"/>
+                </div>
+                <div className="flex-grow overflow-y-auto">
+                    {filteredSnippets.map(snippet => (
+                        <div key={snippet.id} onClick={() => setActiveSnippet(snippet)} className={`p-3 cursor-pointer ${activeSnippet?.id === snippet.id ? 'bg-primary/10' : 'hover:bg-gray-100 dark:hover:bg-slate-700'}`}>
+                            <p className={`font-semibold ${activeSnippet?.id === snippet.id ? 'text-primary' : 'text-text-primary'}`}>{snippet.name}</p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                                {snippet.tags.map(tag => <span key={tag} className="text-xs bg-gray-200 dark:bg-slate-600 px-2 py-0.5 rounded-full">{tag}</span>)}
                             </div>
                         </div>
-                        <textarea value={activeSnippet.code} onChange={e => updateSnippet({...activeSnippet, code: e.target.value})} className="flex-grow p-4 bg-surface border border-border rounded-md resize-none font-mono text-sm focus:ring-2 focus:ring-primary focus:outline-none"/>
-                        <div className="mt-2 text-xs text-text-secondary">
-                           <div className="flex items-center gap-2 flex-wrap">
-                             <span className="font-bold">Tags:</span> {(activeSnippet.tags ?? []).map(t => <span key={t} className="bg-gray-200 dark:bg-slate-700 px-2 py-0.5 rounded-full">{t}</span>)}
-                             <input type="text" placeholder="+ Add tag" onKeyDown={handleTagsChange} className="bg-transparent border-b border-border focus:outline-none focus:border-primary w-24 text-xs px-1"/>
-                           </div>
-                        </div>
-                    </>) : (<div className="flex-grow flex items-center justify-center bg-background border border-border rounded-lg text-text-secondary">Select a snippet or create a new one.</div>)}
-                </main>
-            </div>
+                    ))}
+                </div>
+                <div className="p-4 border-t border-border">
+                    <button onClick={handleAddNew} className="btn-primary w-full py-2">Add New Snippet</button>
+                </div>
+            </aside>
+            <main className="flex-1 flex flex-col min-w-0">
+                {activeSnippet ? (
+                    <>
+                        <header className="flex justify-between items-center p-4 border-b border-border bg-surface">
+                            <input value={activeSnippet.name} onChange={e => updateSnippet({ ...activeSnippet, name: e.target.value })} className="bg-transparent text-xl font-bold focus:outline-none"/>
+                            <div className="flex items-center gap-2">
+                                {/* FIX: Corrected prop passing for SparklesIcon */}
+                                <button onClick={handleEnhance} disabled={isEnhancing} className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-xs rounded-md hover:bg-gray-200">{isEnhancing ? <LoadingSpinner/> : <SparklesIcon className="w-4 h-4"/>} Enhance</button>
+                                <button onClick={() => handleAiTagging(activeSnippet)} className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-xs rounded-md hover:bg-gray-200"><SparklesIcon className="w-4 h-4"/> AI Tags</button>
+                                <button onClick={handleDownload} className="p-2 hover:bg-gray-100 rounded-md"><ArrowDownTrayIcon/></button>
+                                <button onClick={() => handleDelete(activeSnippet.id)} className="p-2 text-red-500 hover:bg-red-100 rounded-md"><TrashIcon/></button>
+                            </div>
+                        </header>
+                        <textarea
+                            value={activeSnippet.code}
+                            onChange={e => updateSnippet({ ...activeSnippet, code: e.target.value })}
+                            className="flex-grow p-4 font-mono text-sm bg-background focus:outline-none resize-none"
+                        />
+                    </>
+                ) : (
+                    <div className="flex-grow flex items-center justify-center text-text-secondary">Select a snippet or create a new one.</div>
+                )}
+            </main>
         </div>
-    );
+    )
 };

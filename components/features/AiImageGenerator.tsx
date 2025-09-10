@@ -1,7 +1,9 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { generateImage, generateImageFromImageAndText } from '../../services/aiService.ts';
+// FIX: Corrected import path for ai services.
+import { generateImage, generateImageFromImageAndText } from '../../services/index.ts';
 import { fileToBase64, blobToDataURL } from '../../services/fileUtils.ts';
-import { ImageGeneratorIcon, SparklesIcon, ArrowDownTrayIcon, XMarkIcon } from '../icons.tsx';
+// FIX: Corrected import path for icons.
+import { ImageGeneratorIcon, SparklesIcon, ArrowDownTrayIcon, XMarkIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 const surprisePrompts = [

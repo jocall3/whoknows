@@ -1,119 +1,72 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNotification } from '../../contexts/NotificationContext';
-import { synthesizeCspFromProfile } from '../../services/SecurityOntologyAI'; // Invented AI Service
-import { ShieldCheckIcon } from '../icons';
-import { LoadingSpinner, MarkdownRenderer } from '../shared';
-
-// --- SELF-CONTAINED MODULE LOGIC ---
-
-type CspDirective = 'script-src' | 'style-src' | 'img-src' | 'connect-src' | 'font-src';
-type NetworkProfile = Record<CspDirective, Set<string>>;
-
-const useNetworkProfiler = (isMonitoring: boolean): NetworkProfile => {
-    const [profile, setProfile] = useState<NetworkProfile>({ 'script-src': new Set(), 'style-src': new Set(), 'img-src': new Set(), 'connect-src': new Set(), 'font-src': new Set()});
-
-    useEffect(() => {
-        if (!isMonitoring) return;
-        
-        const observer = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-                mutation.addedNodes.forEach(node => {
-                    const el = node as HTMLElement;
-                    if(el.tagName === 'SCRIPT' && el.src) profile['script-src'].add(new URL(el.src).origin);
-                    if(el.tagName === 'LINK' && el.rel === 'stylesheet' && el.href) profile['style-src'].add(new URL(el.href).origin);
-                });
-            });
-            setProfile({...profile});
-        });
-        
-        const originalFetch = window.fetch;
-        window.fetch = async (...args) => {
-             if (typeof args[0] === 'string') profile['connect-src'].add(new URL(args[0]).origin);
-             setProfile({...profile});
-             return originalFetch(...args);
-        }
-        
-        observer.observe(document.body, { childList: true, subtree: true });
-        
-        return () => {
-            observer.disconnect();
-            window.fetch = originalFetch;
-        };
-    }, [isMonitoring]); // Rerunning this effect is tricky, simple implementation here
-
-    return profile;
-};
-
+import React, { useState, useCallback } from 'react';
+import { ShieldCheckIcon } from '../icons.tsx';
+import { useNotification } from '../../contexts/NotificationContext.tsx';
+import { generateCspFromDescription } from '../../services/index.ts';
+import { LoadingSpinner } from '../shared/index.tsx';
 
 export const CspGenerator: React.FC = () => {
-    const [isMonitoring, setIsMonitoring] = useState(false);
+    const [description, setDescription] = useState("A standard policy for a React app using Google Fonts and fetching data from its own API subdomain (api.example.com).");
     const [policy, setPolicy] = useState('');
-    const [violations, setViolations] = useState<SecurityPolicyViolationEvent[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const { addNotification } = useNotification();
-    const networkProfile = useNetworkProfiler(isMonitoring);
     
-    const handleSynthesize = useCallback(async () => {
-        setIsLoading(true); setPolicy('');
+    const handleGenerate = useCallback(async () => {
+        if (!description.trim()) {
+            addNotification('Please enter a description for the policy.', 'error');
+            return;
+        }
+        setIsLoading(true);
+        setPolicy('');
         try {
-            const result = await synthesizeCspFromProfile(networkProfile);
-            setPolicy(result);
-            addNotification('CSP Synthesized from Live Profile!', 'success');
+            const stream = generateCspFromDescription(description);
+            let fullResponse = '';
+            for await (const chunk of stream) {
+                fullResponse += chunk;
+                setPolicy(fullResponse);
+            }
+            addNotification('CSP generated!', 'success');
+        } catch (e) {
+             addNotification('Failed to generate CSP.', 'error');
         } finally {
             setIsLoading(false);
         }
-    }, [networkProfile, addNotification]);
+    }, [description, addNotification]);
 
-    useEffect(() => {
-        const handleViolation = (e: SecurityPolicyViolationEvent) => {
-            setViolations(v => [e, ...v].slice(0, 50));
-        };
-        document.addEventListener('securitypolicyviolation', handleViolation);
-        return () => document.removeEventListener('securitypolicyviolation', handleViolation);
-    }, []);
-    
-    const applyPolicy = () => {
-        let meta = document.getElementById('csp-shield') as HTMLMetaElement;
-        if(!meta) {
-            meta = document.createElement('meta');
-            meta.id = 'csp-shield';
-            meta.httpEquiv = "Content-Security-Policy";
-            document.head.appendChild(meta);
-        }
-        meta.content = policy;
-        addNotification('Active Shield Enabled!', 'info');
+    const handleCopy = () => {
+        navigator.clipboard.writeText(policy);
+        addNotification('CSP copied to clipboard!', 'success');
     };
-    
+
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
-            <header className="mb-4">
-                <h1 className="text-3xl font-bold flex items-center"><ShieldCheckIcon /><span className="ml-3">Live CSP Auditor & Active Threat Surface Shield</span></h1>
-                <p className="text-text-secondary mt-1">Discover, synthesize, and enforce a maximally restrictive Content Security Policy based on live application behavior.</p>
+            <header className="mb-6">
+                <h1 className="text-3xl font-bold flex items-center">
+                    <ShieldCheckIcon />
+                    <span className="ml-3">CSP Generator</span>
+                </h1>
+                <p className="text-text-secondary mt-1">Generate a Content Security Policy for your web application using AI.</p>
             </header>
-            
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
-                 <div className="flex flex-col gap-3 min-h-0">
-                    <h3 className="text-xl font-bold">1. Network Egress Profiler</h3>
-                     <div className="bg-surface border rounded-lg p-4 space-y-3">
-                         <button onClick={() => setIsMonitoring(!isMonitoring)} className={`w-full py-2 font-bold rounded ${isMonitoring ? 'bg-red-500 text-white animate-pulse' : 'btn-primary'}`}>
-                             {isMonitoring ? 'STOP MONITORING' : 'START LIVE MONITORING'}
-                         </button>
-                         <p className="text-xs text-text-secondary text-center">Activate monitoring and interact with the application to build a profile of all external network requests.</p>
-                     </div>
-                      <div className="flex-grow bg-background border rounded-lg p-3 overflow-y-auto">
-                        {Object.entries(networkProfile).map(([directive, origins]) => (
-                            <div key={directive}>
-                                <p className="text-xs font-bold font-mono">{directive}:</p>
-                                <div className="pl-4">
-                                {Array.from(origins).map(o => <p key={o} className="text-xs text-primary font-mono truncate">{o}</p>)}
-                                </div>
-                            </div>
-                        ))}
-                      </div>
-                     <button onClick={handleSynthesize} disabled={isLoading || !Object.values(networkProfile).some(set => set.size > 0)} className="btn-primary mt-2">Synthesize CSP</button>
-                 </div>
-                 {/* Add other UI sections as needed */}
+            <div className="flex-grow flex flex-col gap-4">
+                <div className="flex flex-col">
+                    <label className="text-sm font-medium mb-2">Describe your requirements</label>
+                    <textarea
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
+                        className="w-full p-2 bg-surface border rounded h-24"
+                    />
+                </div>
+                <button onClick={handleGenerate} disabled={isLoading} className="btn-primary w-full max-w-sm mx-auto py-2">
+                    {isLoading ? <LoadingSpinner /> : 'Generate Policy'}
+                </button>
+                <div className="flex flex-col flex-grow min-h-0">
+                    <label className="text-sm font-medium mb-2">Generated Policy</label>
+                    <pre className="relative flex-grow p-4 bg-background border rounded-lg text-primary font-mono text-sm overflow-auto">
+                        {isLoading && !policy && <div className="absolute inset-0 flex items-center justify-center"><LoadingSpinner /></div>}
+                        {policy}
+                    </pre>
+                    {policy && <button onClick={handleCopy} className="btn-primary mt-2 px-4 py-2 self-start">Copy Policy</button>}
+                </div>
             </div>
         </div>
     );
-}
+};

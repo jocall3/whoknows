@@ -153,11 +153,6 @@ export const saveCustomFeature = async (feature: CustomFeature): Promise<void> =
     }
 };
 
-// Compatibility alias used by some components that import using the
-// `db_` prefix (e.g., `db_saveCustomFeature`). Keep this thin wrapper to
-// avoid changing many import sites across the codebase.
-export const db_saveCustomFeature = saveCustomFeature;
-
 export const getAllCustomFeatures = async (): Promise<CustomFeature[]> => {
     if (simulationState.isSimulationMode) {
         const db = await dbPromise;
@@ -182,37 +177,6 @@ export const deleteCustomFeature = async (id: string): Promise<void> => {
         await db.delete(CUSTOM_FEATURES_STORE_NAME, id);
     } else {
         await liveDB.liveDeleteCustomFeature(id);
-    }
-};
-
-// --- Encrypted Token Helpers (compatibility) ---
-export const deleteEncryptedToken = async (id: string): Promise<void> => {
-    if (simulationState.isSimulationMode) {
-        const db = await dbPromise;
-        await db.delete(ENCRYPTED_TOKENS_STORE_NAME, id);
-    } else {
-        if ((liveDB as any).liveDeleteEncryptedToken) {
-            await (liveDB as any).liveDeleteEncryptedToken(id);
-        } else {
-            console.warn('liveDeleteEncryptedToken not implemented in liveDB');
-        }
-    }
-};
-
-export const saveVaultAccessLog = async (entry: any): Promise<void> => {
-    // For now, persist vault access logs to the VAULT_STORE_NAME under a special key.
-    // This is intentionally simple to avoid schema migrations in this exercise.
-    if (simulationState.isSimulationMode) {
-        const db = await dbPromise;
-        const logs = (await db.get(VAULT_STORE_NAME, 'access-logs')) || [];
-        logs.push(entry);
-        await db.put(VAULT_STORE_NAME, logs, 'access-logs');
-    } else {
-        if ((liveDB as any).liveSaveVaultAccessLog) {
-            await (liveDB as any).liveSaveVaultAccessLog(entry);
-        } else {
-            console.warn('saveVaultAccessLog not implemented in liveDB');
-        }
     }
 };
 

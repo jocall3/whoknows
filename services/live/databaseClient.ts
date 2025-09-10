@@ -2,146 +2,88 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import { generateSqlTransaction, analyzeTransactionRisk } from '../TransactionalOntologyAI'; // Invented AI Service
-import type { GeneratedFile, EncryptedData, CustomFeature, SQLTransactionPlan } from '../../types'; // Assume SQLTransactionPlan is a rich type
+import type { GeneratedFile, EncryptedData, CustomFeature } from '../../types.ts';
 
-// ==================================================================================
-// ==                 SECTION I: METASTABLE IN-MEMORY STATE CACHE                  ==
-// ==================================================================================
-
-const metastableState = {
-    files: new Map<string, GeneratedFile>(),
-    vaultData: new Map<string, any>(),
-    encryptedTokens: new Map<string, EncryptedData>(),
-    customFeatures: new Map<string, CustomFeature>(),
-    _changelog: [] as { action: 'PUT'|'DELETE', store: string, key: string, value?: any }[],
-
-    reset: () => {
-        metastableState.files.clear();
-        metastableState.vaultData.clear();
-        metastableState.encryptedTokens.clear();
-        metastableState.customFeatures.clear();
-        metastableState._changelog = [];
-    }
-};
-
-// ==================================================================================
-// ==      SECTION II: BASELINE REALITY INTERFACE (PRODUCTION DATABASE)            ==
-// ==================================================================================
+// LIVE MODE IMPLEMENTATION: Connect to production-grade database (e.g., PostgreSQL, AlloyDB) here.
 
 export const queryProductionDB = async (query: string, params: any[]): Promise<any> => {
-    // THIS IS THE ONLY FUNCTION THAT WOULD EVER TOUCH A REAL PRODUCTION DATABASE
-    console.error('REALITY INFLECTION POINT: Production Read Attempted.', { query, params });
-    // In a true implementation, this would use pg, node-postgres, etc.
-    throw new Error('PRODUCTION DATABASE IS CURRENTLY OFFLINE. Cannot directly query BASELINE REALITY.');
+    console.warn('LIVE MODE: queryProductionDB not implemented.');
+    return Promise.resolve([]);
 };
 
 export const mutateProductionDB = async (query: string, params: any[]): Promise<any> => {
-    // THIS IS THE ONLY FUNCTION THAT WOULD EVER TOUCH A REAL PRODUCTION DATABASE
-    console.error('REALITY INFLECTION POINT: Production Write Attempted.', { query, params });
-    throw new Error('PRODUCTION DATABASE IS CURRENTLY OFFLINE. Cannot directly mutate BASELINE REALITY.');
+    console.warn('LIVE MODE: mutateProductionDB not implemented.');
+    return Promise.resolve({ rowCount: 0 });
 };
 
-// ==================================================================================
-// ==         SECTION III: LIVE SERVICE STUBS (NOW OPERATE ON METASTABLE STATE)    ==
-// ==================================================================================
+// --- Stubs for dbService functions ---
 
 export const liveSaveFile = async (file: GeneratedFile): Promise<void> => {
-    metastableState.files.set(file.filePath, file);
-    metastableState._changelog.push({ action: 'PUT', store: 'files', key: file.filePath, value: file });
+    console.warn('LIVE MODE: liveSaveFile not implemented.', file);
+    return Promise.resolve();
 };
-export const liveGetAllFiles = async (): Promise<GeneratedFile[]> => Array.from(metastableState.files.values());
-export const liveGetFileByPath = async (filePath: string): Promise<GeneratedFile | undefined> => metastableState.files.get(filePath);
-export const liveClearAllFiles = async (): Promise<void> => { metastableState.files.forEach(f => metastableState._changelog.push({action:'DELETE', store:'files', key:f.filePath})); metastableState.files.clear(); };
+
+export const liveGetAllFiles = async (): Promise<GeneratedFile[]> => {
+    console.warn('LIVE MODE: liveGetAllFiles not implemented.');
+    return Promise.resolve([]);
+};
+
+export const liveGetFileByPath = async (filePath: string): Promise<GeneratedFile | undefined> => {
+    console.warn('LIVE MODE: liveGetFileByPath not implemented.', filePath);
+    return Promise.resolve(undefined);
+};
+
+export const liveClearAllFiles = async (): Promise<void> => {
+    console.warn('LIVE MODE: liveClearAllFiles not implemented.');
+    return Promise.resolve();
+};
 
 export const liveSaveVaultData = async (key: string, value: any): Promise<void> => {
-    metastableState.vaultData.set(key, value);
-    metastableState._changelog.push({ action: 'PUT', store: 'vault', key, value });
+    console.warn('LIVE MODE: liveSaveVaultData not implemented.', key, value);
+    return Promise.resolve();
 };
-export const liveGetVaultData = async (key: string): Promise<any | undefined> => metastableState.vaultData.get(key);
+
+export const liveGetVaultData = async (key: string): Promise<any | undefined> => {
+    console.warn('LIVE MODE: liveGetVaultData not implemented.', key);
+    return Promise.resolve(undefined);
+};
 
 export const liveSaveEncryptedToken = async (data: EncryptedData): Promise<void> => {
-    metastableState.encryptedTokens.set(data.id, data);
-    metastableState._changelog.push({ action: 'PUT', store: 'tokens', key: data.id, value: data });
+    console.warn('LIVE MODE: liveSaveEncryptedToken not implemented.', data);
+    return Promise.resolve();
 };
-export const liveGetEncryptedToken = async (id: string): Promise<EncryptedData | undefined> => metastableState.encryptedTokens.get(id);
-export const liveGetAllEncryptedTokenIds = async (): Promise<string[]> => Array.from(metastableState.encryptedTokens.keys());
 
-export const liveDeleteEncryptedToken = async (id: string): Promise<void> => {
-    if (metastableState.encryptedTokens.has(id)) {
-        metastableState._changelog.push({ action: 'DELETE', store: 'tokens', key: id });
-        metastableState.encryptedTokens.delete(id);
-    }
+export const liveGetEncryptedToken = async (id: string): Promise<EncryptedData | undefined> => {
+    console.warn('LIVE MODE: liveGetEncryptedToken not implemented.', id);
+    return Promise.resolve(undefined);
+};
+
+export const liveGetAllEncryptedTokenIds = async (): Promise<string[]> => {
+    console.warn('LIVE MODE: liveGetAllEncryptedTokenIds not implemented.');
+    return Promise.resolve([]);
 };
 
 export const liveSaveCustomFeature = async (feature: CustomFeature): Promise<void> => {
-    metastableState.customFeatures.set(feature.id, feature);
-    metastableState._changelog.push({ action: 'PUT', store: 'features', key: feature.id, value: feature });
+    console.warn('LIVE MODE: liveSaveCustomFeature not implemented.', feature);
+    return Promise.resolve();
 };
-export const liveGetAllCustomFeatures = async (): Promise<CustomFeature[]> => Array.from(metastableState.customFeatures.values());
-export const liveGetCustomFeature = async (id: string): Promise<CustomFeature | undefined> => metastableState.customFeatures.get(id);
-export const liveDeleteCustomFeature = async (id: string): Promise<void> => { metastableState._changelog.push({action:'DELETE', store:'features', key: id}); metastableState.customFeatures.delete(id); };
+
+export const liveGetAllCustomFeatures = async (): Promise<CustomFeature[]> => {
+    console.warn('LIVE MODE: liveGetAllCustomFeatures not implemented.');
+    return Promise.resolve([]);
+};
+
+export const liveGetCustomFeature = async (id: string): Promise<CustomFeature | undefined> => {
+    console.warn('LIVE MODE: liveGetCustomFeature not implemented.', id);
+    return Promise.resolve(undefined);
+};
+
+export const liveDeleteCustomFeature = async (id: string): Promise<void> => {
+    console.warn('LIVE MODE: liveDeleteCustomFeature not implemented.', id);
+    return Promise.resolve();
+};
 
 export const liveClearAllData = async (): Promise<void> => {
-    metastableState.reset();
-    metastableState._changelog.push({action: 'DELETE', store: 'ALL', key: '*'});
-};
-
-/**
- * Append a vault access log entry to the vaultData store under the key 'access-logs'.
- */
-export const liveSaveVaultAccessLog = async (entry: any): Promise<void> => {
-    const existing = metastableState.vaultData.get('access-logs') || [];
-    existing.push(entry);
-    metastableState.vaultData.set('access-logs', existing);
-    metastableState._changelog.push({ action: 'PUT', store: 'vault', key: 'access-logs', value: existing });
-};
-
-// ==================================================================================
-// ==                  SECTION IV: REALITY INFLECTION DRIVER                       ==
-// ==================================================================================
-
-/**
- * Takes the current in-memory (metastable) state and generates a plan to commit it
- * to the BASELINE REALITY (production). This is a dry run and analysis function.
- * @returns {SQLTransactionPlan} An object containing the generated SQL and a risk analysis.
- */
-export const planCommitToBaselineReality = async (): Promise<SQLTransactionPlan> => {
-    if (metastableState._changelog.length === 0) {
-        return {
-            generatedSql: '-- No changes in metastable state to commit.',
-            riskAnalysis: 'No-Op. The metastable and baseline realities are in sync.',
-            riskHash: '00000000',
-            estimatedExecutionMs: 0
-        };
-    }
-    
-    // The AI generates the full SQL transaction script
-    const generatedSql = await generateSqlTransaction(metastableState._changelog);
-    
-    // The AI analyzes its own generated script for risks
-    const { analysis, riskHash, estimatedMs } = await analyzeTransactionRisk(generatedSql);
-    
-    return {
-        generatedSql,
-        riskAnalysis: analysis,
-        riskHash,
-        estimatedExecutionMs: estimatedMs,
-    };
-};
-
-/**
- * EXECUTES the Reality Inflection. Takes a transaction plan and attempts to apply it
- * to the BASELINE REALITY via mutateProductionDB.
- * @param {SQLTransactionPlan} plan The plan generated by planCommitToBaselineReality.
- * @returns A promise resolving with the mutation result, or rejecting on failure.
- */
-export const executeCommitToBaselineReality = async (plan: SQLTransactionPlan): Promise<any> => {
-    console.warn(`EXECUTING REALITY INFLECTION. HASH: ${plan.riskHash}. THIS ACTION IS IRREVERSIBLE.`);
-    const result = await mutateProductionDB(plan.generatedSql, []);
-    
-    // If successful, clear the metastable state as it's now in sync with baseline
-    metastableState.reset();
-    
-    return result;
+    console.warn('LIVE MODE: liveClearAllData not implemented.');
+    return Promise.resolve();
 };

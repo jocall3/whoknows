@@ -2,7 +2,7 @@ import React from 'react';
 import type { ViewType, SidebarItem } from '../types.ts';
 import { useGlobalState } from '../contexts/GlobalStateContext.tsx';
 import { signOutUser } from '../services/index.ts';
-import { ArrowLeftOnRectangleIcon } from './icons.tsx';
+import { ArrowLeftOnRectangleIcon } from './icons/index.ts';
 
 interface LeftSidebarProps {
   items: SidebarItem[];

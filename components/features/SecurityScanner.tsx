@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { analyzeCodeForVulnerabilities } from '../../services/aiService.ts';
+// FIX: Corrected import path for ai services.
+import { analyzeCodeForVulnerabilities } from '../../services/index.ts';
 import { runStaticScan, SecurityIssue } from '../../services/security/staticAnalysisService.ts';
 import type { SecurityVulnerability } from '../../types.ts';
-import { ShieldCheckIcon, SparklesIcon } from '../icons.tsx';
+// FIX: Corrected import path for icons.
+import { ShieldCheckIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 const exampleCode = `function UserProfile({ user }) {

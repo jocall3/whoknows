@@ -1,6 +1,6 @@
 import React from 'react';
 import { logError, debugErrorStream } from '../services/index.ts';
-import { SparklesIcon } from './icons.tsx';
+import { SparklesIcon } from './icons/index.ts';
 import { MarkdownRenderer, LoadingSpinner } from './shared/index.tsx';
 
 interface Props {

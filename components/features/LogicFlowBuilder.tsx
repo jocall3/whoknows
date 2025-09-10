@@ -1,9 +1,9 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { ALL_FEATURES } from './index.ts';
 import { FEATURE_TAXONOMY } from '../../services/taxonomyService.ts';
-import { generatePipelineCode } from '../../services/aiService.ts';
+import { generatePipelineCode } from '../../services/index.ts';
 import type { Feature } from '../../types.ts';
-import { MapIcon, SparklesIcon, XMarkIcon } from '../icons.tsx';
+import { MapIcon, SparklesIcon, XMarkIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 interface Node {

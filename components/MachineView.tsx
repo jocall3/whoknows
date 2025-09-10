@@ -1,10 +1,10 @@
 
 
 
-
 import React, { useState, useCallback } from 'react';
-import type { Feature } from '../types.ts';
-import { SLOTS, type SlotCategory } from '../constants.tsx';
+// FIX: Changed SlotCategory to the correct type FeatureCategory.
+import type { Feature, FeatureCategory } from '../types.ts';
+import { SLOTS } from '../constants/index.ts';
 import { FEATURES_MAP } from './features/index.ts';
 
 interface InstalledFeatures {
@@ -29,10 +29,10 @@ const MachineSVG: React.FC = () => (
 );
 
 const DropZone: React.FC<{
-    category: SlotCategory;
+    category: FeatureCategory;
     feature: Feature | null;
-    onDrop: (category: SlotCategory, feature: Feature) => void;
-    onClear: (category: SlotCategory) => void;
+    onDrop: (category: FeatureCategory, feature: Feature) => void;
+    onClear: (category: FeatureCategory) => void;
 }> = ({ category, feature, onDrop, onClear }) => {
     const [isOver, setIsOver] = useState(false);
     const [isInvalidDrop, setIsInvalidDrop] = useState(false);
@@ -113,11 +113,11 @@ const DropZone: React.FC<{
 export const MachineView: React.FC = () => {
     const [installed, setInstalled] = useState<InstalledFeatures>({});
 
-    const handleDropFeature = useCallback((category: SlotCategory, feature: Feature) => {
+    const handleDropFeature = useCallback((category: FeatureCategory, feature: Feature) => {
         setInstalled(prev => ({ ...prev, [category]: feature }));
     }, []);
     
-    const handleClearSlot = useCallback((category: SlotCategory) => {
+    const handleClearSlot = useCallback((category: FeatureCategory) => {
         setInstalled(prev => ({ ...prev, [category]: null }));
     }, []);
 

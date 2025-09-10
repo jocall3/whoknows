@@ -2,9 +2,9 @@ import React, { useState, useCallback } from 'react';
 import { Type, FunctionDeclaration } from "@google/genai";
 import { logError, getInferenceFunction, CommandResponse, FEATURE_TAXONOMY, executeWorkspaceAction, ACTION_REGISTRY } from '../../services/index.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
-import { CommandLineIcon } from '../icons.tsx';
+import { CommandLineIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
-import { ALL_FEATURE_IDS } from '../../constants.tsx';
+import { ALL_FEATURE_IDS } from '../../constants/index.ts';
 
 const baseFunctionDeclarations: FunctionDeclaration[] = [
     {

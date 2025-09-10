@@ -1,98 +1,91 @@
 import React, { useState, useCallback } from 'react';
-import { validateAndTranspileFinancialJson } from '../../services/GeosIngestionAI'; // Invented, advanced service
-import type { FinancialIngestionReport } from '../../types/GeosIngestion'; // Invented, structured type
-import { XbrlConverterIcon } from '../icons';
-import { LoadingSpinner, MarkdownRenderer } from '../shared/LoadingSpinner';
+// FIX: Corrected import path for ai services.
+import { convertJsonToXbrlStream } from '../../services/index.ts';
+// FIX: Corrected import path for icons.
+import { XbrlConverterIcon } from '../icons/index.ts';
+import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 const exampleJson = `{
   "company": "ExampleCorp",
-  "cik": "0001234567",
-  "reporting_date": "2024-06-30",
-  "quarterly_revenue": 1500000,
-  "net_income": 250000,
-  "currency": "USD"
+  "year": 2024,
+  "quarter": 2,
+  "revenue": {
+    "amount": 1500000,
+    "currency": "USD"
+  },
+  "profit": {
+    "amount": 250000,
+    "currency": "USD"
+  }
 }`;
 
-const AnomalyReport: React.FC<{ anomalies: string[] }> = ({ anomalies }) => (
-    <div>
-        <h4 className="font-bold text-sm text-yellow-400">Compliance Anomalies Detected:</h4>
-        <ul className="list-disc list-inside text-xs mt-1 space-y-1">
-            {anomalies.map((a, i) => <li key={i}>{a}</li>)}
-        </ul>
-    </div>
-);
-
-export const XbrlConverter: React.FC = () => {
-    const [jsonInput, setJsonInput] = useState<string>(exampleJson);
-    const [jurisdiction, setJurisdiction] = useState<'us-sec' | 'eu-esma'>('us-sec');
-    const [report, setReport] = useState<FinancialIngestionReport | null>(null);
+export const XbrlConverter: React.FC<{ jsonInput?: string }> = ({ jsonInput: initialJsonInput }) => {
+    const [jsonInput, setJsonInput] = useState<string>(initialJsonInput || exampleJson);
+    const [xbrlOutput, setXbrlOutput] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    
-    const handleIngest = useCallback(async () => {
+    const [error, setError] = useState<string>('');
+
+    const handleConvert = useCallback(async (jsonToConvert: string) => {
+        if (!jsonToConvert.trim()) {
+            setError('Please enter valid JSON to convert.');
+            return;
+        }
         setIsLoading(true);
-        setReport(null);
+        setError('');
+        setXbrlOutput('');
         try {
-            const result = await validateAndTranspileFinancialJson(jsonInput, jurisdiction);
-            setReport(result);
+            const stream = convertJsonToXbrlStream(jsonToConvert);
+            let fullResponse = '';
+            for await (const chunk of stream) {
+                fullResponse += chunk;
+                setXbrlOutput(fullResponse);
+            }
         } catch (err) {
-            console.error(err);
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+            setError(`Failed to convert: ${errorMessage}`);
         } finally {
             setIsLoading(false);
         }
-    }, [jsonInput, jurisdiction]);
+    }, []);
 
     return (
         <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
-            <header className="mb-4">
+            <header className="mb-6">
                 <h1 className="text-3xl font-bold flex items-center">
                     <XbrlConverterIcon />
-                    <span className="ml-3">GEOS Ingestion & Compliance Validator</span>
+                    <span className="ml-3">JSON to XBRL Converter</span>
                 </h1>
-                <p className="text-text-secondary mt-1">Ingest, validate, and transpile economic data against global financial ontologies.</p>
+                <p className="text-text-secondary mt-1">Convert JSON data into a simplified XBRL-like XML format using AI.</p>
             </header>
-            
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
-                <div className="flex flex-col gap-3 min-h-0">
-                    <h3 className="text-xl font-bold">Data Ingestion</h3>
-                    <div>
-                        <label className="text-sm font-medium">Reporting Jurisdiction</label>
-                         <select value={jurisdiction} onChange={e => setJurisdiction(e.target.value as any)} className="w-full mt-1 p-2 bg-surface border rounded text-sm">
-                            <option value="us-sec">USA - SEC (US-GAAP)</option>
-                            <option value="eu-esma">EU - ESMA (IFRS)</option>
-                         </select>
-                    </div>
-                    <div className="flex-grow flex flex-col min-h-0">
-                        <label htmlFor="json-input" className="text-sm font-medium mb-1">Source Financial Data (JSON)</label>
-                        <textarea id="json-input" value={jsonInput} onChange={(e) => setJsonInput(e.target.value)}
-                                  className="flex-grow p-2 bg-surface border rounded font-mono text-xs"/>
-                    </div>
-                    <button onClick={handleIngest} disabled={isLoading} className="btn-primary w-full py-2">
-                        {isLoading ? <LoadingSpinner/> : 'Validate & Ingest'}
+            <div className="flex-grow flex flex-col gap-4 min-h-0">
+                <div className="flex flex-col flex-1 min-h-0">
+                    <label htmlFor="json-input" className="text-sm font-medium text-text-secondary mb-2">JSON Input</label>
+                    <textarea
+                        id="json-input"
+                        value={jsonInput}
+                        onChange={(e) => setJsonInput(e.target.value)}
+                        placeholder="Paste your JSON here..."
+                        className="flex-grow p-4 bg-surface border border-border rounded-md resize-none font-mono text-sm"
+                    />
+                </div>
+                 <div className="flex-shrink-0">
+                    <button
+                        onClick={() => handleConvert(jsonInput)}
+                        disabled={isLoading}
+                        className="btn-primary w-full max-w-xs mx-auto flex items-center justify-center px-6 py-3"
+                    >
+                        {isLoading ? <LoadingSpinner /> : 'Convert to XBRL'}
                     </button>
                 </div>
-                
-                <div className="flex flex-col gap-3 min-h-0">
-                    <h3 className="text-xl font-bold">Transpiled Output & Compliance Report</h3>
-                    {isLoading ? <div className="h-full w-full flex items-center justify-center bg-background border rounded"><LoadingSpinner/></div> :
-                     !report ? <div className="h-full w-full flex items-center justify-center bg-background border rounded text-text-secondary">Awaiting ingestion...</div> :
-                     (
-                        <>
-                             <div className="flex-grow p-1 bg-background border rounded overflow-y-auto">
-                                <MarkdownRenderer content={'```xml\n' + report.transpiledXbrl + '\n```'} />
-                             </div>
-                             <div className="flex-shrink-0 h-40 bg-surface border rounded p-3 overflow-y-auto">
-                                {report.anomalies.length > 0 ? (
-                                    <AnomalyReport anomalies={report.anomalies} />
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center">
-                                        <p className="font-bold text-green-400">Compliance Check Passed</p>
-                                        <p className="text-xs text-text-secondary">No semantic or statistical anomalies detected.</p>
-                                    </div>
-                                )}
-                             </div>
-                        </>
-                     )
-                    }
+                <div className="flex flex-col flex-1 min-h-0">
+                    <label className="text-sm font-medium text-text-secondary mb-2">XBRL-like XML Output</label>
+                    <div className="relative flex-grow p-1 bg-background border border-border rounded-md overflow-y-auto">
+                        {isLoading && !xbrlOutput && <div className="flex items-center justify-center h-full"><LoadingSpinner /></div>}
+                        {error && <p className="p-4 text-red-500">{error}</p>}
+                        {xbrlOutput && <MarkdownRenderer content={'```xml\n' + xbrlOutput.replace(/```xml\n|```/g, '') + '\n```'} />}
+                        {!isLoading && xbrlOutput && <button onClick={() => navigator.clipboard.writeText(xbrlOutput)} className="absolute top-2 right-2 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-xs">Copy XML</button>}
+                        {!isLoading && !xbrlOutput && !error && <div className="text-text-secondary h-full flex items-center justify-center">Output will appear here.</div>}
+                    </div>
                 </div>
             </div>
         </div>

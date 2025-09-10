@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { CodeBracketSquareIcon, ArrowDownTrayIcon } from '../icons.tsx';
+import { CodeBracketSquareIcon, ArrowDownTrayIcon } from '../icons/index.ts';
 import { downloadFile } from '../../services/fileUtils.ts';
 
 const initialPath = "M 20 80 Q 100 20 180 80 T 340 80";

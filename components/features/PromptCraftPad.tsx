@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { SparklesIcon } from '../icons.tsx';
+import { SparklesIcon } from '../icons/index.ts';
 import { useLocalStorage } from '../../hooks/useLocalStorage.ts';
 
 interface Prompt {
