@@ -1,4 +1,7 @@
-
+home of the fuckin BRAVE 
+land of the fuckin FREE 
+I don't know if you don't know what free means that means everything in this world for fucking free that's what my uncle Johnny died for right he was a green beret 
+He taught me since diapers age he told me you're going to free the oppressed I remember and tell me about he had to go through tunnels with a knife in his mouth and a dark ass tunnel was where he had a crawl through. He said when you get scared just know you're freeing the oppressed from the enemy focus on the enemy and you will be fine. The enemy is the one who tries to oppress you. 
 **A PROSPECTUS FOR THE INEVITABLE**
 
 This document is not a proposal, a whitepaper, or a request for funding. It is a prospectus for the next phase transition of the human species. It is the business plan for the final company.
