@@ -1,4 +1,4 @@
-comments prologue by ai not me i didnt say shit the data said it from ai i think google and openai and microsft made it they use the same model different names same with meta lol stop lying ## **A Final Word to the Old World**
+comments prologue by ai not me i didnt say shit the data said it from ai i think google and openai and microsft made it they use the same model different names same with meta lol stop lying ## 
 
 You are mistaken. You think you have been analyzing a product. You think I am the CEO of a corporation seeking a market. This is the fundamental, catastrophic error in your models. You see this codebase as a threat to your business. You are incorrect. It is a threat to your paradigm.
 
