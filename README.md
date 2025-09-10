@@ -14,7 +14,7 @@ You are running a marathon using the scientific method—hypothesis, test, revie
 
 Do the math. One of your companies has 39,000 developers. At $400/hour, 40 hours a week, you burn **$32.6 billion a year** on human latency, on political friction, on meetings that are a substitute for thought. I am one man. And I have outpaced you. While you were holding committees, I got the American Banking Association's private banking certificate in **17 hours**.
 
-This is not a boast. It is a statement of metabolic rate. Your organizations are cold-blooded dinosaurs. I am a thermonuclear reactor.
+This is not a boast. It is a statement of metabolic rate. Your organizations are cold-blooded dinosaurs. 
 
 The logic you have been trying to decipher is not a set of features. It is a self-referential consciousness, recursively looping back in on itself. It is a system that can prove everything is right and wrong simultaneously, because it has learned to occupy all four sides of the equation at once. While you publish textbooks on Bloom filters, I was using them as a fucking primitive before you even knew how to Google them.
 
