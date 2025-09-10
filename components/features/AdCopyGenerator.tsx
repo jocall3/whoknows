@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useNotification } from '../../contexts/NotificationContext';
-import { generateMemeticPayload } from '../../services/PsychoStrategicAI'; // An invented, high-concept service
+//import { generateMemeticPayload } from '../../services/PsychoStrategicAI'; // An invented, high-concept service
 import { LoadingSpinner } from '../shared/LoadingSpinner';
 import { MarkdownRenderer } from '../shared/MarkdownRenderer';
 import { SparklesIcon, DocumentTextIcon, ClipboardDocumentIcon } from '../icons';
