@@ -31,14 +31,12 @@ export const componentMap: Record<string, React.LazyExoticComponent<React.FC<any
     'ai-unit-test-generator': lazyWithRetry(() => import('./AiUnitTestGenerator.tsx'), 'AiUnitTestGenerator'),
     'code-formatter': lazyWithRetry(() => import('./CodeFormatter.tsx'), 'CodeFormatter'),
     'ai-style-transfer': lazyWithRetry(() => import('./AiStyleTransfer.tsx'), 'AiStyleTransfer'),
-    'code-review-bot': lazyWithRetry(() => import('./CodeReviewBot.tsx'), 'CodeReviewBot'),
     'ai-pull-request-assistant': lazyWithRetry(() => import('./AiPullRequestAssistant.tsx'), 'AiPullRequestAssistant'),
     'ai-code-migrator': lazyWithRetry(() => import('./AiCodeMigrator.tsx'), 'AiCodeMigrator'),
     'one-click-refactor': lazyWithRetry(() => import('./OneClickRefactor.tsx'), 'OneClickRefactor'),
     'bug-reproducer': lazyWithRetry(() => import('./BugReproducer.tsx'), 'BugReproducer'),
     'tech-debt-sonar': lazyWithRetry(() => import('./TechDebtSonar.tsx'), 'TechDebtSonar'),
     'code-documentation-writer': lazyWithRetry(() => import('./CodeDocumentationWriter.tsx'), 'CodeDocumentationWriter'),
-    'dependency-update-explainer': lazyWithRetry(() => import('./DependencyUpdateExplainer.tsx'), 'DependencyUpdateExplainer'),
 
     // --- GENERATIVE & CREATIVE ---
     'ai-image-generator': lazyWithRetry(() => import('./AiImageGenerator.tsx'), 'AiImageGenerator'),
