@@ -59,7 +59,8 @@ export const RegexSandbox: React.FC<{ initialPrompt?: string }> = ({ initialProm
 
     useEffect(() => { if (initialPrompt) handleGenerateRegex(initialPrompt); }, [initialPrompt, handleGenerateRegex]);
 
-    const highlightedString = useMemo(() => {
+    // FIX: Explicitly set the return type of useMemo to React.ReactNode to fix a type inference issue.
+    const highlightedString = useMemo<React.ReactNode>(() => {
         if (!matches || matches.length === 0 || error) return testString;
         let lastIndex = 0;
         const parts: React.ReactNode[] = [];
@@ -80,4 +81,60 @@ export const RegexSandbox: React.FC<{ initialPrompt?: string }> = ({ initialProm
                 <div className="lg:col-span-2 flex flex-col gap-4">
                     <div className="flex gap-2"><input type="text" value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} placeholder="Describe the pattern to find..." className="flex-grow px-3 py-1.5 rounded-md bg-surface border border-border text-sm focus:ring-2 focus:ring-primary" /><button onClick={() => handleGenerateRegex(aiPrompt)} disabled={isAiLoading} className="btn-primary px-4 py-1.5 flex items-center">{isAiLoading ? <LoadingSpinner/> : 'Generate'}</button></div>
                     <div><label htmlFor="regex-pattern" className="text-sm font-medium text-text-secondary">Regular Expression</label><input id="regex-pattern" type="text" value={pattern} onChange={(e) => setPattern(e.target.value)} className={`w-full mt-1 px-3 py-2 rounded-md bg-surface border ${error ? 'border-red-500' : 'border-border'} font-mono text-sm focus:ring-2 focus:ring-primary`} />{error && <p className="text-red-500 text-xs mt-1">{error}</p>}</div>
-                    <div className="flex flex-col flex-grow min-h-0"><label htmlFor="test-string" className="text-sm font-medium
+                    <div className="flex flex-col flex-grow min-h-0">
+                        <label htmlFor="test-string" className="text-sm font-medium text-text-secondary mb-1">Test String</label>
+                        <div className="relative flex-grow bg-surface border border-border rounded-md overflow-hidden">
+                            <textarea
+                                id="test-string"
+                                value={testString}
+                                onChange={(e) => setTestString(e.target.value)}
+                                className="absolute inset-0 w-full h-full p-2 bg-transparent resize-none font-mono text-sm leading-relaxed text-transparent caret-text-primary outline-none z-10"
+                                spellCheck="false"
+                            />
+                            <div
+                                aria-hidden="true"
+                                className="absolute inset-0 w-full h-full p-2 font-mono text-sm leading-relaxed pointer-events-none z-0 whitespace-pre-wrap overflow-auto"
+                            >
+                                {highlightedString}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="lg:col-span-1 flex flex-col gap-4">
+                    <div className="bg-surface border border-border p-4 rounded-lg">
+                        <h3 className="text-lg font-bold mb-2">Matches ({matches?.length || 0})</h3>
+                        <div className="max-h-48 overflow-y-auto text-xs font-mono">
+                            {matches && matches.length > 0 ? (
+                                matches.map((match, i) => (
+                                    <div key={i} className="p-1 border-b border-border/50">
+                                        <p><span className="font-bold text-primary">Match {i}:</span> {match[0]}</p>
+                                        {match.length > 1 && (
+                                            <ul className="pl-4">
+                                                {Array.from(match).slice(1).map((group, j) => (
+                                                    <li key={j}><span className="text-text-secondary">Group {j + 1}:</span> {group}</li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-text-secondary">No matches found.</p>
+                            )}
+                        </div>
+                    </div>
+                    <div className="bg-surface border border-border p-4 rounded-lg">
+                        <h3 className="text-lg font-bold mb-2">Common Patterns</h3>
+                        <div className="space-y-1">
+                            {commonPatterns.map(p => (
+                                <button key={p.name} onClick={() => setPattern(p.pattern)} className="w-full text-left text-xs p-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
+                                    {p.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <CheatSheet />
+                </div>
+            </div>
+        </div>
+    );
+};
