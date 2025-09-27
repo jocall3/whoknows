@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BeakerIcon } from '../icons.tsx';
+import { BeakerIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { analyzeForMemoryLeaksStream } from '../../services/index.ts';
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { decomposeUserFlow, generateImage } from '../../services/aiService.ts';
-import { VideoCameraIcon } from '../icons.tsx';
+import { decomposeUserFlow, generateImage } from '../../services/index.ts';
+import { VideoCameraIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

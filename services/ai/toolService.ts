@@ -6,7 +6,7 @@ import { Type, FunctionDeclaration } from "@google/genai";
 import { streamContent, generateJson, generateContent, fetchFromProxy, openApiParseSchema, CommandResponse, CronParts } from './core.ts';
 import type { SemanticColorTheme, FileNode, CustomFeature } from '../../types.ts';
 
-const fileTreeToString = (node: FileNode, indent = 0): string => {
+export const fileTreeToString = (node: FileNode, indent = 0): string => {
     let str = ' '.repeat(indent) + (node.type === 'folder' ? `/${node.name}` : node.name) + '\n';
     if (node.children) {
         node.children.forEach(child => {
@@ -210,3 +210,10 @@ export const generateCronFromDescription = (description: string): Promise<CronPa
     };
     return generateJson(prompt, "You are an expert at converting natural language to cron expressions. You respond only with a JSON object of the cron parts.", schema);
 };
+
+// Fix: Add missing function generateRegExStream
+export const generateRegExStream = (description: string) => streamContent(
+    `Generate a JavaScript regex literal that matches the following description: "${description}". Respond with only the regex literal itself, without any explanation or markdown backticks.`,
+    "You are an expert at writing regular expressions. You only respond with the regex literal.",
+    0.3
+);

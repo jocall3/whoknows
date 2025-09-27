@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CodeBracketSquareIcon } from '../icons.tsx';
+import { CodeBracketSquareIcon } from '../icons/index.ts';
 
 export const Base64EncoderDecoder: React.FC = () => {
     const [plain, setPlain] = useState('Hello World!');

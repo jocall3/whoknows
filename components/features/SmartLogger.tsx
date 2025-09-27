@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as Diff from 'diff';
-import { insertSmartLogging } from '../../services/aiService.ts';
-import { TerminalIcon } from '../icons.tsx';
+import { insertSmartLogging } from '../../services/index.ts';
+import { TerminalIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 const exampleCode = `function processData(data) {

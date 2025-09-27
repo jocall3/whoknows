@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { generatePostmortem } from '../../services/aiService.ts';
-import { DocumentTextIcon } from '../icons.tsx';
+import { generatePostmortem } from '../../services/index.ts';
+import { DocumentTextIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 interface ActionItem {

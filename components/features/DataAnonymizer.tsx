@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { anonymizeData } from '../../services/aiService.ts';
-import { ShieldCheckIcon } from '../icons.tsx';
+import { anonymizeData } from '../../services/index.ts';
+import { ShieldCheckIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

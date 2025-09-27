@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowPathIcon } from '../icons.tsx';
+import { ArrowPathIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
 const exampleData = `[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}]`;

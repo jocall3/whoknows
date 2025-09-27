@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { estimateCloudCost } from '../../services/aiService.ts';
-import { GcpIcon } from '../icons.tsx';
+import { estimateCloudCost } from '../../services/index.ts';
+import { GcpIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

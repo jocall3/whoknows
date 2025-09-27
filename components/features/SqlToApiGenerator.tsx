@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { sqlToApiEndpoints } from '../../services/aiService.ts';
+import { sqlToApiEndpoints } from '../../services/index.ts';
 import type { GeneratedFile } from '../../types.ts';
-import { ServerStackIcon } from '../icons.tsx';
+import { ServerStackIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

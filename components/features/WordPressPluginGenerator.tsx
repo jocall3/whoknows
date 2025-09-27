@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import JSZip from 'jszip';
-import { generateWordPressPlugin } from '../../services/aiService.ts';
+import { generateWordPressPlugin } from '../../services/index.ts';
 import type { GeneratedFile } from '../../types.ts';
-import { WordPressIcon } from '../icons.tsx';
+import { WordPressIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { downloadFile } from '../../services/fileUtils.ts';

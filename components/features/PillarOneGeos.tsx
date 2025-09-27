@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { ProjectExplorerIcon } from '../icons.tsx';
+import { ProjectExplorerIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { generateMonetaryPolicy } from '../../services/index.ts';
-import { PILLAR_FEATURES } from '../../constants.tsx';
+import { PILLAR_FEATURES } from '../../constants/features.ts';
 
 const features = PILLAR_FEATURES['pillar-one-geos'];
 

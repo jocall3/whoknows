@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { ShieldCheckIcon } from '../icons.tsx';
+import { ShieldCheckIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { generateCspFromDescription } from '../../services/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';

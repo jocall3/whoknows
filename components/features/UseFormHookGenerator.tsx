@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CodeBracketSquareIcon } from '../icons.tsx';
+import { CodeBracketSquareIcon } from '../icons/index.ts';
 import { MarkdownRenderer } from '../shared/index.tsx';
 
 const hookCode = `

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as Diff from 'diff';
-import { explainDependencyChanges } from '../../services/aiService.ts';
-import { GitBranchIcon } from '../icons.tsx';
+import { explainDependencyChanges } from '../../services/index.ts';
+import { GitBranchIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

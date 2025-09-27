@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ServerStackIcon } from '../icons.tsx';
+import { ServerStackIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
 export const ErrorResponseSimulator: React.FC = () => {

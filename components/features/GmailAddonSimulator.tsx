@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { streamContent } from '../../services/aiService.ts';
-import { MailIcon, SparklesIcon, XMarkIcon } from '../icons.tsx';
+import { streamContent } from '../../services/index.ts';
+import { MailIcon, SparklesIcon, XMarkIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 const mockEmail = {

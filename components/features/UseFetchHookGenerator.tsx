@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CodeBracketSquareIcon } from '../icons.tsx';
+import { CodeBracketSquareIcon } from '../icons/index.ts';
 import { MarkdownRenderer } from '../shared/index.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';
 

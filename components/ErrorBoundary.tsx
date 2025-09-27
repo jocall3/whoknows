@@ -15,13 +15,8 @@ interface State {
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false, error: null, aiHelp: '', isAiLoading: false };
-    // Fix: Bind class methods to ensure 'this' context is correct.
-    this.handleRevert = this.handleRevert.bind(this);
-    this.handleAskAi = this.handleAskAi.bind(this);
-  }
+  // Fix: Initialize state as a class property to ensure `this` context and types are correct.
+  state: State = { hasError: false, error: null, aiHelp: '', isAiLoading: false };
 
   static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };
@@ -31,11 +26,12 @@ export class ErrorBoundary extends React.Component<Props, State> {
     logError(error, { componentStack: errorInfo.componentStack });
   }
   
-  handleRevert() {
+  // Fix: Use arrow functions for methods to automatically bind `this`.
+  handleRevert = () => {
     window.location.reload();
   }
 
-  async handleAskAi() {
+  handleAskAi = async () => {
     if (!this.state.error) return;
 
     this.setState({ isAiLoading: true, aiHelp: '' });

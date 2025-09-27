@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BugAntIcon } from '../icons.tsx';
+import { BugAntIcon } from '../icons/index.ts';
 import { analyzeRegexForRedosStream } from '../../services/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChartBarIcon } from '../icons.tsx';
+import { ChartBarIcon } from '../icons/index.ts';
 import { analyzeUrlDom } from '../../services/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PaperAirplaneIcon } from '../icons.tsx';
+import { PaperAirplaneIcon } from '../icons/index.ts';
 import { explainCorsError } from '../../services/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

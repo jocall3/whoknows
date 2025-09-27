@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as Diff from 'diff';
-import { addAriaAttributes } from '../../services/aiService.ts';
-import { EyeIcon } from '../icons.tsx';
+import { addAriaAttributes } from '../../services/index.ts';
+import { EyeIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 const exampleHtml = `<div class="menu">

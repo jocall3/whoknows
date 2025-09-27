@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PaperAirplaneIcon } from '../icons.tsx';
+import { PaperAirplaneIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

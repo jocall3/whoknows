@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { DocumentTextIcon, SparklesIcon } from '../icons.tsx';
-import { generateMockData } from '../../services/aiService.ts';
+import { DocumentTextIcon, SparklesIcon } from '../icons/index.ts';
+import { generateMockData } from '../../services/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

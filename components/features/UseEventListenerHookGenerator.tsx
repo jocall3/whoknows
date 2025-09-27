@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CodeBracketSquareIcon } from '../icons.tsx';
+import { CodeBracketSquareIcon } from '../icons/index.ts';
 import { MarkdownRenderer } from '../shared/index.tsx';
 
 const useEventListener = (eventName: string, handler: (event: any) => void, element = window) => {

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { LinkIcon } from '../icons.tsx';
+import { LinkIcon } from '../icons/index.ts';
 
 export const UrlInspector: React.FC = () => {
     const [url, setUrl] = useState('https://example.com:8080/path/to/page?param1=value1&param2=value2#section');

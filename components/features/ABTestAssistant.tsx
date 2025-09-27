@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { generateABTestWrapper } from '../../services/aiService.ts';
-import { BeakerIcon } from '../icons.tsx';
+import { generateABTestWrapper } from '../../services/index.ts';
+import { BeakerIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 const variantA_example = `<button className="bg-blue-500 text-white p-2 rounded">Sign Up</button>`;

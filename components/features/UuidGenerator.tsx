@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { TerminalIcon } from '../icons.tsx';
+import { TerminalIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
 // A simple nanoid implementation for the demo

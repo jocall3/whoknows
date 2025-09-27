@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { extractStringsForI18n } from '../../services/aiService.ts';
-import { ProjectExplorerIcon } from '../icons.tsx';
+import { extractStringsForI18n } from '../../services/index.ts';
+import { ProjectExplorerIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

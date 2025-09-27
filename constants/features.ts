@@ -47,12 +47,3 @@ export const PILLAR_FEATURES = {
         { id: "memetic-catalyst", name: "The Memetic Catalyst", description: "An engine for forging culture to steer humanity towards a more optimal state of being.", icon: <PaintBrushIcon /> },
         { id: "the-exchange", name: "The Exchange", description: "A self-expanding universe of tools, created by the engine itself, for itself. The ecosystem becomes truly alive.", icon: <RectangleGroupIcon /> }
     ],
-    'pillar-four-governance': [
-        { id: "guardian-ai", name: "The Guardian AI", description: "Your ethical oversight module. It rewrites your commands for maximum impact, stripping them of sentimental weakness.", icon: <ShieldCheckIcon /> },
-        { id: "equity-ledger", name: "The Equity Ledger", description: "The back-end for your Global UBI. It’s not a feature; it's the new global treasury.", icon: <ServerStackIcon /> },
-        { id: "cerebra-interface", name: "The Cerebra Interface", description: "A neural lace that pipes the DevCore UI directly into your visual cortex. You think, reality conforms.", icon: <CpuChipIcon /> },
-        { id: "humanitys-exocortex", name: "Humanity's Exocortex", description: "A public API for the engine itself, freeing humanity to pursue the unsolvable.", icon: <LinkIcon /> }
-    ]
-};
-
-export const ALL_FEATURE_IDS = RAW_FEATURES.map(f => f.id);

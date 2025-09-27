@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CpuChipIcon } from '../icons.tsx';
+import { CpuChipIcon } from '../icons/index.ts';
 import { estimateTokenCount } from '../../services/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { LoadingSpinner } from '../shared/index.tsx';

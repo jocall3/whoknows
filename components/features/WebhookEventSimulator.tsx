@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PaperAirplaneIcon, SparklesIcon } from '../icons.tsx';
+import { PaperAirplaneIcon, SparklesIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { generateWebhookPayload } from '../../services/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';

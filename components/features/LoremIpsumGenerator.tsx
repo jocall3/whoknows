@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DocumentTextIcon } from '../icons.tsx';
+import { DocumentTextIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
 const generateLorem = (count: number, type: 'paragraphs' | 'sentences' | 'words') => {

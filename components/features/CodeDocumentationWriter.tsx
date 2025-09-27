@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { generateDocumentationForFiles } from '../../services/aiService.ts';
+import { generateDocumentationForFiles } from '../../services/index.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 import type { FileNode } from '../../types.ts';
 import { DocumentTextIcon, FolderIcon } from '../icons.tsx';

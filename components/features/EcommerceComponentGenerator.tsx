@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { generateEcommerceComponent } from '../../services/aiService.ts';
-import { ArchiveBoxIcon } from '../icons.tsx';
+import { generateEcommerceComponent } from '../../services/index.ts';
+import { ArchiveBoxIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

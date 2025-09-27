@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BeakerIcon } from '../icons.tsx';
+import { BeakerIcon } from '../icons/index.ts';
 
 export const FeatureFlagSimulator: React.FC = () => {
     const [flags, setFlags] = useState({

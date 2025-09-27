@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { generateChartComponent } from '../../services/aiService.ts';
-import { ChartBarIcon } from '../icons.tsx';
+import { generateChartComponent } from '../../services/index.ts';
+import { ChartBarIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

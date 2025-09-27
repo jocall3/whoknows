@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { generateUserPersona, generateImage } from '../../services/aiService.ts';
-import { DocumentTextIcon } from '../icons.tsx';
+import { generateUserPersona, generateImage } from '../../services/index.ts';
+import { DocumentTextIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MagnifyingGlassIcon } from '../icons.tsx';
+import { MagnifyingGlassIcon } from '../icons/index.ts';
 import { analyzeGraphqlQueryStream } from '../../services/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

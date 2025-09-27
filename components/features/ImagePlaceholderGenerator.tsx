@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { PhotoIcon } from '../icons.tsx';
+import { PhotoIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 
 export const ImagePlaceholderGenerator: React.FC = () => {

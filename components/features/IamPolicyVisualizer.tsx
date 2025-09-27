@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { testIamPermissions } from '../../services/gcpService.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
-import { GcpIcon, SparklesIcon, XMarkIcon } from '../icons.tsx';
+import { GcpIcon, SparklesIcon, XMarkIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 type SimulationStatus = 'idle' | 'running' | 'completed' | 'error';

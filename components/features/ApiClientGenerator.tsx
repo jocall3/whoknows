@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import JSZip from 'jszip';
-import { generateClientFromApiSchema } from '../../services/aiService.ts';
-import { CodeBracketSquareIcon, SparklesIcon } from '../icons.tsx';
+import { generateClientFromApiSchema } from '../../services/index.ts';
+import { CodeBracketSquareIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import type { GeneratedFile } from '../../types.ts';

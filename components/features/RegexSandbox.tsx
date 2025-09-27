@@ -63,8 +63,8 @@ export const RegexSandbox: React.FC<{ initialPrompt?: string }> = ({ initialProm
     const highlightedString = useMemo(() => {
         if (!matches || matches.length === 0 || error) return testString;
         let lastIndex = 0;
-        // Fix: Explicitly type `parts` array to allow JSX elements.
-        const parts: (string | JSX.Element)[] = [];
+        // Fix: Explicitly type `parts` array to allow JSX elements by using React.ReactNode.
+        const parts: React.ReactNode[] = [];
         matches.forEach((match, i) => {
             if (match.index === undefined) return;
             parts.push(testString.substring(lastIndex, match.index));

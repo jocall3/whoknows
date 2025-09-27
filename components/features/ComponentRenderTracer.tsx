@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EyeIcon } from '../icons.tsx';
+import { EyeIcon } from '../icons/index.ts';
 import { analyzeReactComponentRendersStream } from '../../services/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

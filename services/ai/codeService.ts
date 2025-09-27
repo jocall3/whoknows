@@ -6,6 +6,7 @@ import { Type } from "@google/genai";
 import { streamContent, generateJson, generateContent } from './core.ts';
 import { filesSchema } from './core.ts';
 import type { GeneratedFile, StructuredPrSummary, StructuredExplanation, StructuredReview, SecurityVulnerability, CodeSmell, FileNode, CustomFeature } from '../../types.ts';
+import { fileTreeToString } from './toolService.ts';
 
 // --- Code Analysis & Explanation ---
 export const explainCodeStream = (code: string) => streamContent(
@@ -302,4 +303,17 @@ export const generateFullStackFeature = (prompt: string, framework: string, styl
 export const generateDockerfile = (framework: string) => streamContent(
     `Generate a production-ready, multi-stage Dockerfile for a ${framework} application.`,
     "You are a DevOps expert who writes optimized Dockerfiles. Respond with only the Dockerfile content in a markdown block."
+);
+
+// Fix: Add missing function convertJsonToXbrlStream
+export const convertJsonToXbrlStream = (json: string) => streamContent(
+    `Convert the following JSON object into a simplified, XBRL-like XML format. The root element should be <Report>. Each key in the JSON should become an XML tag. If a value is an object, its keys should become nested tags.\n\nJSON:\n${json}`,
+    "You are an expert at converting JSON to XBRL-like XML. You only respond with the raw XML content, without any markdown formatting or xml declaration.",
+    0.2
+);
+
+// Fix: Add missing function generateIamPolicyStream
+export const generateIamPolicyStream = (description: string, platform: 'aws' | 'gcp') => streamContent(
+    `Generate a ${platform.toUpperCase()} IAM policy in JSON format based on this description: "${description}". Respond with only the JSON policy in a markdown block.`,
+    `You are a cloud security expert specializing in ${platform.toUpperCase()} IAM policies.`
 );
