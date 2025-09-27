@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { EyeIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { EyeIcon } from '../icons/index.ts';
 
 const initialOldCode = `function UserProfile({ user }) {
   return (

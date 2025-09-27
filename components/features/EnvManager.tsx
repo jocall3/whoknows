@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { downloadEnvFile } from '../../services/fileUtils.ts';
-import { DocumentTextIcon, PlusIcon, TrashIcon, ArrowDownTrayIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { DocumentTextIcon, PlusIcon, TrashIcon, ArrowDownTrayIcon } from '../icons/index.ts';
 
 interface EnvVar {
     id: number;

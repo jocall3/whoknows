@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { generateTerraformConfig } from '../../services/index.ts';
-import { CpuChipIcon, SparklesIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { CpuChipIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 export const TerraformGenerator: React.FC = () => {

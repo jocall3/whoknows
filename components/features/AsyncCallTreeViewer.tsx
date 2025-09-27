@@ -1,7 +1,6 @@
-
-
 import React, { useState, useMemo } from 'react';
-import { ChartBarIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { ChartBarIcon } from '../icons/index.ts';
 
 interface CallNode {
     name: string;

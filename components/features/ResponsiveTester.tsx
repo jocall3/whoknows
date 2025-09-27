@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { EyeIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { EyeIcon } from '../icons/index.ts';
 
 const devices = {
     'iPhone 12': { width: 390, height: 844 },

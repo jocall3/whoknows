@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getAllFiles, getFileByPath } from '../../services/dbService.ts';
 import type { GeneratedFile } from '../../types.ts';
-import { CloudIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { CloudIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 export const DeploymentPreview: React.FC = () => {

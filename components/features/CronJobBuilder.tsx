@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { CommandLineIcon, SparklesIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { CommandLineIcon, SparklesIcon } from '../icons/index.ts';
 import { generateCronFromDescription, CronParts } from '../../services/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 

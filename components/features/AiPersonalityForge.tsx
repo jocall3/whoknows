@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SparklesIcon, PlusIcon, TrashIcon, ArrowDownTrayIcon, ArrowUpOnSquareIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { SparklesIcon, PlusIcon, TrashIcon, ArrowDownTrayIcon, ArrowUpOnSquareIcon } from '../icons/index.ts';
 import { useAiPersonalities } from '../../hooks/useAiPersonalities.ts';
 import { formatSystemPromptToString } from '../../utils/promptUtils.ts';
 import { streamContent } from '../../services/index.ts';

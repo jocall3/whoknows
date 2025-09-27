@@ -2,7 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { reviewCodeStream } from '../../services/index.ts';
 import { useAiPersonalities } from '../../hooks/useAiPersonalities.ts';
 import { formatSystemPromptToString } from '../../utils/promptUtils.ts';
-import { CpuChipIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { CpuChipIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { MarkdownRenderer } from '../shared/index.tsx';
 

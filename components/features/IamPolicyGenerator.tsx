@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import { generateIamPolicyStream } from '../../services/aiService.ts';
-import { ShieldCheckIcon } from '../icons.tsx';
+// Fix: Corrected import path for ai services.
+import { generateIamPolicyStream } from '../../services/index.ts';
+// Fix: Corrected import path for icons.
+import { ShieldCheckIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 export const IamPolicyGenerator: React.FC = () => {

@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { detectCodeSmells } from '../../services/aiService.ts';
+// Fix: Corrected import path for ai services.
+import { detectCodeSmells } from '../../services/index.ts';
 import type { CodeSmell } from '../../types.ts';
-import { MagnifyingGlassIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { MagnifyingGlassIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 const exampleCode = `class DataProcessor {

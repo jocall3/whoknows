@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { generateMockData, parseOpenApiForMocking } from '../../services/aiService.ts';
+// Fix: Corrected import path for ai services.
+import { generateMockData, parseOpenApiForMocking } from '../../services/index.ts';
 import { startMockServer, stopMockServer, setMockRoutes, isMockServerRunning } from '../../services/mocking/mockServer.ts';
 import { saveMockCollection, getAllMockCollections, deleteMockCollection } from '../../services/mocking/db.ts';
-import { ServerStackIcon, SparklesIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { ServerStackIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 

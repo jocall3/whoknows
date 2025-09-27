@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { transferCodeStyleStream } from '../../services/index.ts';
-import { SparklesIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { MarkdownRenderer } from '../shared/index.tsx';
 

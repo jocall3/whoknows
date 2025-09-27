@@ -1,4 +1,4 @@
-import { Octokit } from 'octokit';
+import { Octokit } from '@octokit/rest';
 import type { GitHubUser as User } from '../types.ts';
 import { logEvent } from './telemetryService.ts';
 

@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { formatCodeStream } from '../../services/index.ts';
-import { CodeBracketSquareIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { CodeBracketSquareIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { MarkdownRenderer } from '../shared/index.tsx';
 

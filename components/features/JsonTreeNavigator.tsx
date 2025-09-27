@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FileCodeIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { FileCodeIcon } from '../icons/index.ts';
 
 interface JsonNodeProps {
     data: any;

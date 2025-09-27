@@ -1,4 +1,4 @@
-import type { Octokit } from 'octokit';
+import type { Octokit } from '@octokit/rest';
 import type { Repo, FileNode } from '../types.ts';
 import { logEvent, logError, measurePerformance } from './telemetryService.ts';
 

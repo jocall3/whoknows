@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import { generateBugReproductionTestStream } from '../../services/aiService.ts';
-import { BugAntIcon } from '../icons.tsx';
+// Fix: Corrected import path for ai services.
+import { generateBugReproductionTestStream } from '../../services/index.ts';
+// Fix: Corrected import path for icons.
+import { BugAntIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 const exampleStackTrace = `TypeError: Cannot read properties of undefined (reading 'name')

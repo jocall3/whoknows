@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { generateWeeklyDigest } from '../../services/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
-import { MailIcon, SparklesIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { MailIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
 // Dummy data for demonstration purposes

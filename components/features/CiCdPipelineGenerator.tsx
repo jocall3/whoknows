@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { generateCiCdConfig } from '../../services/index.ts';
-import { PaperAirplaneIcon, SparklesIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { PaperAirplaneIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 
 const platforms = ['GitHub Actions', 'GitLab CI', 'CircleCI', 'Jenkins'];

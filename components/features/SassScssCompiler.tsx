@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { CodeBracketSquareIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { CodeBracketSquareIcon } from '../icons/index.ts';
 
 const initialScss = `$primary-color: #0047AB;
 $font-size: 16px;

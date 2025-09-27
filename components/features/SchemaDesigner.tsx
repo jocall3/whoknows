@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react';
-import { MapIcon, ArrowDownTrayIcon, PlusIcon, TrashIcon, PencilIcon, LinkIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { MapIcon, ArrowDownTrayIcon, PlusIcon, TrashIcon, PencilIcon, LinkIcon } from '../icons/index.ts';
 import { downloadFile } from '../../services/fileUtils.ts';
 
 // --- TYPES ---
@@ -85,7 +86,8 @@ const exportToSQL = (tables: Table[]) => {
     let sql = '';
     const foreignKeys: string[] = [];
 
-    tables.forEach(table => {
+    // Fix: Add explicit type to `table` to ensure properties are accessible.
+    tables.forEach((table: Table) => {
         const columnsSQL = table.columns.map(col => {
             let line = `  "${col.name}" ${col.type}`;
             if (col.constraints.includes('PK')) line += ' PRIMARY KEY';

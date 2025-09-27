@@ -1,8 +1,7 @@
-
-
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { marked } from 'marked';
-import { PhotoIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { PhotoIcon } from '../icons/index.ts';
 
 const exampleMarkdown = `# Slide 1: Welcome
 
@@ -31,7 +30,8 @@ Easy to create and present.
 export const MarkdownSlides: React.FC = () => {
     const [markdown, setMarkdown] = useState(exampleMarkdown);
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [slideHtml, setSlideHtml] = useState<string | TrustedHTML>('');
+    // Fix: Changed TrustedHTML to string, as it's not a standard type.
+    const [slideHtml, setSlideHtml] = useState<string>('');
     const presentationRef = useRef<HTMLDivElement>(null);
 
     const slides = useMemo(() => markdown.split(/^-{3,}\s*$/m), [markdown]);

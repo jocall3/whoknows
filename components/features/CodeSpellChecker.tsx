@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { BeakerIcon } from '../icons.tsx';
+// Fix: Corrected import path for icons.
+import { BeakerIcon } from '../icons/index.ts';
 
 const commonTypos = [
     'funtion', 'functoin', 'funciton', 'contructor', 'cosntructor',

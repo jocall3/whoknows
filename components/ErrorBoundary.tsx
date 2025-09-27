@@ -18,6 +18,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null, aiHelp: '', isAiLoading: false };
+    // Fix: Bind class methods to ensure 'this' context is correct.
+    this.handleRevert = this.handleRevert.bind(this);
+    this.handleAskAi = this.handleAskAi.bind(this);
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
@@ -28,11 +31,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
     logError(error, { componentStack: errorInfo.componentStack });
   }
   
-  handleRevert = () => {
+  handleRevert() {
     window.location.reload();
-  };
+  }
 
-  handleAskAi = async () => {
+  async handleAskAi() {
     if (!this.state.error) return;
 
     this.setState({ isAiLoading: true, aiHelp: '' });
@@ -49,7 +52,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     } finally {
         this.setState({ isAiLoading: false });
     }
-};
+  }
 
   render() {
     if (this.state.hasError) {

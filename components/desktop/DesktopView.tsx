@@ -38,7 +38,8 @@ export const DesktopView: React.FC<{ openFeatureId?: string; customFeatures: Cus
                 };
             }
 
-            const openWindowsCount = Object.values(prev).filter(w => !w.isMinimized).length;
+            // Fix: Add explicit type to `w` to ensure properties are accessible.
+            const openWindowsCount = Object.values(prev).filter((w: WindowState) => !w.isMinimized).length;
             const newWindow: WindowState = {
                 id: featureId,
                 position: { x: 50 + openWindowsCount * 30, y: 50 + openWindowsCount * 30 },
@@ -90,8 +91,10 @@ export const DesktopView: React.FC<{ openFeatureId?: string; customFeatures: Cus
         }));
     }
 
-    const openWindows = Object.values(windows).filter(w => !w.isMinimized);
-    const minimizedWindows = Object.values(windows).filter(w => w.isMinimized);
+    // Fix: Add explicit type to `w` to ensure properties are accessible.
+    const openWindows = Object.values(windows).filter((w: WindowState) => !w.isMinimized);
+    // Fix: Add explicit type to `w` to ensure properties are accessible.
+    const minimizedWindows = Object.values(windows).filter((w: WindowState) => w.isMinimized);
     const featuresMap = new Map(ALL_FEATURES.map(f => [f.id, f]));
 
     return (

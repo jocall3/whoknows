@@ -1,4 +1,3 @@
-
 import React, { Suspense, useCallback, useMemo, useState, useEffect } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import { useGlobalState } from './contexts/GlobalStateContext.tsx';
@@ -125,7 +124,8 @@ const DesktopExperience: React.FC = () => {
                 };
             }
 
-            const openWindowsCount = Object.values(prev).filter(w => !w.isMinimized).length;
+            // Fix: Add explicit type annotation for `w`
+            const openWindowsCount = Object.values(prev).filter((w: WindowState) => !w.isMinimized).length;
             const newWindow: WindowState = {
                 id: featureId,
                 position: { x: 50 + openWindowsCount * 30, y: 50 + openWindowsCount * 30 },
@@ -196,8 +196,10 @@ const DesktopExperience: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    const openWindowsList = Object.values(windows).filter(w => !w.isMinimized);
-    const minimizedWindowsList = Object.values(windows).filter(w => w.isMinimized);
+    // Fix: Add explicit type annotation for `w`
+    const openWindowsList = Object.values(windows).filter((w: WindowState) => !w.isMinimized);
+    // Fix: Add explicit type annotation for `w`
+    const minimizedWindowsList = Object.values(windows).filter((w: WindowState) => w.isMinimized);
 
     return (
         <div className="h-full w-full flex flex-col bg-transparent overflow-hidden">
@@ -267,6 +269,7 @@ function App() {
   }
 
   return (
+    // Fix: Pass children to ErrorBoundary to satisfy its Props interface.
     <ErrorBoundary>
         <NotificationProvider>
             <VaultProvider>
