@@ -1,6 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { transcribeAudioToCodeStream, blobToBase64 } from '../../services/index.ts';
-// Fix: Corrected import path for icons.
 import { MicrophoneIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { MarkdownRenderer } from '../shared/index.tsx';

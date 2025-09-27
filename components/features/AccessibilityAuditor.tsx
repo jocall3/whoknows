@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { suggestA11yFix } from '../../services/index.ts';
 import { runAxeAudit, AxeResult } from '../../services/auditing/accessibilityService.ts';
-// Fix: Corrected import path for icons.
 import { EyeIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

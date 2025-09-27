@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-// Fix: Corrected import path for ai services.
 import { generateRegExStream } from '../../services/index.ts';
 import { BeakerIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
@@ -63,7 +62,6 @@ export const RegexSandbox: React.FC<{ initialPrompt?: string }> = ({ initialProm
     const highlightedString = useMemo(() => {
         if (!matches || matches.length === 0 || error) return testString;
         let lastIndex = 0;
-        // Fix: Explicitly type `parts` array to allow JSX elements by using React.ReactNode.
         const parts: React.ReactNode[] = [];
         matches.forEach((match, i) => {
             if (match.index === undefined) return;
@@ -82,23 +80,4 @@ export const RegexSandbox: React.FC<{ initialPrompt?: string }> = ({ initialProm
                 <div className="lg:col-span-2 flex flex-col gap-4">
                     <div className="flex gap-2"><input type="text" value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} placeholder="Describe the pattern to find..." className="flex-grow px-3 py-1.5 rounded-md bg-surface border border-border text-sm focus:ring-2 focus:ring-primary" /><button onClick={() => handleGenerateRegex(aiPrompt)} disabled={isAiLoading} className="btn-primary px-4 py-1.5 flex items-center">{isAiLoading ? <LoadingSpinner/> : 'Generate'}</button></div>
                     <div><label htmlFor="regex-pattern" className="text-sm font-medium text-text-secondary">Regular Expression</label><input id="regex-pattern" type="text" value={pattern} onChange={(e) => setPattern(e.target.value)} className={`w-full mt-1 px-3 py-2 rounded-md bg-surface border ${error ? 'border-red-500' : 'border-border'} font-mono text-sm focus:ring-2 focus:ring-primary`} />{error && <p className="text-red-500 text-xs mt-1">{error}</p>}</div>
-                    <div className="flex flex-col flex-grow min-h-0"><label htmlFor="test-string" className="text-sm font-medium text-text-secondary">Test String</label><textarea id="test-string" value={testString} onChange={(e) => setTestString(e.target.value)} className="w-full mt-1 p-3 rounded-md bg-surface border border-border font-mono text-sm resize-y h-32" /><div className="mt-2 p-3 bg-background rounded-md border border-border min-h-[50px] whitespace-pre-wrap">{highlightedString}</div></div>
-                </div>
-                <div className="lg:col-span-1 flex flex-col gap-4">
-                    <CheatSheet />
-                    <div>
-                        <h3 className="text-lg font-bold mb-2">Matches ({matches?.length || 0})</h3>
-                        <div className="bg-surface border border-border p-2 rounded-lg h-48 overflow-y-auto">
-                            {matches && matches.map((match, i) => (
-                                <div key={i} className="p-2 border-b border-border-light text-xs font-mono">
-                                    <p><strong>Match {i + 1}:</strong> <span className="text-primary">{match[0]}</span></p>
-                                    {match.length > 1 && <p><strong>Groups:</strong> {match.slice(1).map((g, gi) => `(${gi+1}) ${g}`).join(', ')}</p>}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+                    <div className="flex flex-col flex-grow min-h-0"><label htmlFor="test-string" className="text-sm font-medium

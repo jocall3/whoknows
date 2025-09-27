@@ -4,10 +4,8 @@ import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { initializeOctokit } from '../../services/authService.ts';
 import { getDecryptedCredential } from '../../services/vaultService.ts';
 import { getRepos, getRepoTree, getFileContent, commitFiles } from '../../services/githubService.ts';
-// FIX: Corrected import path for ai services.
 import { generateCommitMessageStream, answerProjectQuestion, generateNewFilesForProject } from '../../services/index.ts';
 import type { Repo, FileNode, GeneratedFile } from '../../types.ts';
-// FIX: Corrected import path for icons.
 import { FolderIcon, DocumentIcon, SparklesIcon, XMarkIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import * as Diff from 'diff';

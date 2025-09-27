@@ -10,7 +10,7 @@ export const componentMap: Record<string, React.LazyExoticComponent<React.FC<any
     'pillar-four-governance': lazyWithRetry(() => import('./PillarFourGovernance.tsx'), 'PillarFourGovernance'),
     'ai-command-center': lazyWithRetry(() => import('./AiCommandCenter.tsx'), 'AiCommandCenter'),
     'project-explorer': lazyWithRetry(() => import('./ProjectExplorer.tsx'), 'ProjectExplorer'),
-    'workspace-connector-hub': lazyWithRetry(() => import('./WorkspaceConnectorHub.tsx'), 'WorkspaceConnectorHub'),
+    'workspace-connector-hub': lazyWithRetry(() => import('./Connections.tsx'), 'WorkspaceConnectorHub'),
     'ai-code-explainer': lazyWithRetry(() => import('./AiCodeExplainer.tsx'), 'AiCodeExplainer'),
     'ai-feature-builder': lazyWithRetry(() => import('./AiFeatureBuilder.tsx'), 'AiFeatureBuilder'),
     'regex-sandbox': lazyWithRetry(() => import('./RegexSandbox.tsx'), 'RegexSandbox'),

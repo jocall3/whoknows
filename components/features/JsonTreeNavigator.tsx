@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// Fix: Corrected import path for icons.
 import { FileCodeIcon } from '../icons/index.ts';
 
 interface JsonNodeProps {

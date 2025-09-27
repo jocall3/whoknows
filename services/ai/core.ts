@@ -57,7 +57,6 @@ export const openApiParseSchema = {
 
 
 // --- Unified AI Proxy Helpers ---
-// FIX: Export fetchFromProxy so it can be used by other services.
 export async function fetchFromProxy(endpoint: string, body: object): Promise<any> {
     try {
         const response = await fetch(`/api/proxy${endpoint}`, {

@@ -13,45 +13,44 @@ interface RawFeature {
   category: FeatureCategory;
 }
 
-// FIX: Added 'category' property to each feature object to satisfy the RawFeature interface.
 export const RAW_FEATURES: RawFeature[] = [
     // --- Pillar I: The Global Economic Operating System (GEOS) ---
-    { id: "pillar-one-geos", name: "The GEOS Console", description: "Orchestrate the planet's financial and logistical backbone from a single interface.", icon: <ChartBarIcon />, category: "Global Economic Operating System" },
+    { id: "pillar-one-geos", name: "The GEOS Console", description: "Orchestrate the planet's financial and logistical backbone from a single interface.", icon: React.createElement(ChartBarIcon), category: "Global Economic Operating System" },
 
     // --- Pillar II: Computational Compassion at Scale ---
-    { id: "pillar-two-compassion", name: "Computational Compassion Console", description: "Apply planetary-scale optimization to humanity's most intractable problems.", icon: <BeakerIcon />, category: "Computational Compassion at Scale" },
+    { id: "pillar-two-compassion", name: "Computational Compassion Console", description: "Apply planetary-scale optimization to humanity's most intractable problems.", icon: React.createElement(BeakerIcon), category: "Computational Compassion at Scale" },
 
     // --- Pillar III: The Meta-Creation Platform ---
-    { id: "pillar-three-meta-creation", name: "The Meta-Creation Console", description: "Accelerate the very pace of discovery, creation, and cultural evolution.", icon: <SparklesIcon />, category: "The Meta-Creation Platform" },
+    { id: "pillar-three-meta-creation", name: "The Meta-Creation Console", description: "Accelerate the very pace of discovery, creation, and cultural evolution.", icon: React.createElement(SparklesIcon), category: "The Meta-Creation Platform" },
 
     // --- Pillar IV: The Governance Layer ---
-    { id: "pillar-four-governance", name: "The Governance Console", description: "Wield absolute power with a new form of ruthlessly efficient, AI-driven control.", icon: <ShieldCheckIcon />, category: "The Governance Layer" },
+    { id: "pillar-four-governance", name: "The Governance Console", description: "Wield absolute power with a new form of ruthlessly efficient, AI-driven control.", icon: React.createElement(ShieldCheckIcon), category: "The Governance Layer" },
 ];
 
 export const PILLAR_FEATURES: Record<string, RawFeature[]> = {
     'pillar-one-geos': [
-        { id: "logistics-manifold", name: "The Logistics Manifold", description: "A real-time, global 3D command console for all commercial transport.", icon: <PaperAirplaneIcon />, category: "Global Economic Operating System" },
-        { id: "monetary-policy-simulator", name: "The Monetary Policy Simulator", description: "A what-if machine for civilizations. Simulate a century of economic evolution in seconds.", icon: <ChartBarIcon />, category: "Global Economic Operating System" },
-        { id: "scarcity-oracle", name: "The Scarcity Oracle", description: "Identifies impending resource scarcities and forges the infrastructure to acquire them.", icon: <MagnifyingGlassIcon />, category: "Global Economic Operating System" },
-        { id: "urbanism-synthesizer", name: "The Urbanism Synthesizer", description: "Generates perfectly optimized, AI-designed cities and outputs the full build plan.", icon: <MapIcon />, category: "Global Economic Operating System" }
+        { id: "logistics-manifold", name: "The Logistics Manifold", description: "A real-time, global 3D command console for all commercial transport.", icon: React.createElement(PaperAirplaneIcon), category: "Global Economic Operating System" },
+        { id: "monetary-policy-simulator", name: "The Monetary Policy Simulator", description: "A what-if machine for civilizations. Simulate a century of economic evolution in seconds.", icon: React.createElement(ChartBarIcon), category: "Global Economic Operating System" },
+        { id: "scarcity-oracle", name: "The Scarcity Oracle", description: "Identifies impending resource scarcities and forges the infrastructure to acquire them.", icon: React.createElement(MagnifyingGlassIcon), category: "Global Economic Operating System" },
+        { id: "urbanism-synthesizer", name: "The Urbanism Synthesizer", description: "Generates perfectly optimized, AI-designed cities and outputs the full build plan.", icon: React.createElement(MapIcon), category: "Global Economic Operating System" }
     ],
     'pillar-two-compassion': [
-        { id: "gaias-crucible", name: "Gaia's Crucible", description: "A planetary climate simulation and intervention engine. You don't ask for permission. You save the planet.", icon: <BeakerIcon />, category: "Computational Compassion at Scale" },
-        { id: "genome-weaver", name: "The Genome Weaver", description: "Anonymously forge and distribute personalized, mass-producible mRNA cures. You don't build hospitals. You email cures.", icon: <CodeBracketSquareIcon />, category: "Computational Compassion at Scale" },
-        { id: "aptitude-engine", name: "The Aptitude Engine", description: "Generates a perfect, lifelong curriculum to maximize an individual's potential for the system. Free will was inefficient.", icon: <DocumentTextIcon />, category: "Computational Compassion at Scale" },
-        { id: "first-responder-ai", name: "First Responder AI", description: "Acts before disaster strikes, dispatching autonomous aid. The benevolent hand of God, arriving before the prayer.", icon: <ShieldCheckIcon />, category: "Computational Compassion at Scale" }
+        { id: "gaias-crucible", name: "Gaia's Crucible", description: "A planetary climate simulation and intervention engine. You don't ask for permission. You save the planet.", icon: React.createElement(BeakerIcon), category: "Computational Compassion at Scale" },
+        { id: "genome-weaver", name: "The Genome Weaver", description: "Anonymously forge and distribute personalized, mass-producible mRNA cures. You don't build hospitals. You email cures.", icon: React.createElement(CodeBracketSquareIcon), category: "Computational Compassion at Scale" },
+        { id: "aptitude-engine", name: "The Aptitude Engine", description: "Generates a perfect, lifelong curriculum to maximize an individual's potential for the system. Free will was inefficient.", icon: React.createElement(DocumentTextIcon), category: "Computational Compassion at Scale" },
+        { id: "first-responder-ai", name: "First Responder AI", description: "Acts before disaster strikes, dispatching autonomous aid. The benevolent hand of God, arriving before the prayer.", icon: React.createElement(ShieldCheckIcon), category: "Computational Compassion at Scale" }
     ],
     'pillar-three-meta-creation': [
-        { id: "hypothesis-forge", name: "The Hypothesis Forge", description: "Collapses the entirety of the scientific method into a single button click.", icon: <SparklesIcon />, category: "The Meta-Creation Platform" },
-        { id: "themis-engine", name: "The Themis Engine", description: "A legal code refactor. Outputs a new, perfectly logical and ruthlessly efficient legal framework.", icon: <HammerIcon />, category: "The Meta-Creation Platform" },
-        { id: "memetic-catalyst", name: "The Memetic Catalyst", description: "An engine for forging culture to steer humanity towards a more optimal state of being.", icon: <PaintBrushIcon />, category: "The Meta-Creation Platform" },
-        { id: "the-exchange", name: "The Exchange", description: "A self-expanding universe of tools, created by the engine itself, for itself. The ecosystem becomes truly alive.", icon: <RectangleGroupIcon />, category: "The Meta-Creation Platform" }
+        { id: "hypothesis-forge", name: "The Hypothesis Forge", description: "Collapses the entirety of the scientific method into a single button click.", icon: React.createElement(SparklesIcon), category: "The Meta-Creation Platform" },
+        { id: "themis-engine", name: "The Themis Engine", description: "A legal code refactor. Outputs a new, perfectly logical and ruthlessly efficient legal framework.", icon: React.createElement(HammerIcon), category: "The Meta-Creation Platform" },
+        { id: "memetic-catalyst", name: "The Memetic Catalyst", description: "An engine for forging culture to steer humanity towards a more optimal state of being.", icon: React.createElement(PaintBrushIcon), category: "The Meta-Creation Platform" },
+        { id: "the-exchange", name: "The Exchange", description: "A self-expanding universe of tools, created by the engine itself, for itself. The ecosystem becomes truly alive.", icon: React.createElement(RectangleGroupIcon), category: "The Meta-Creation Platform" }
     ],
     'pillar-four-governance': [
-        { id: "guardian-ai", name: "The Guardian AI", description: "A real-time Ethical Oversight module. Your conscience, codified and scaled.", icon: <ShieldCheckIcon />, category: "The Governance Layer" },
-        { id: "equity-ledger", name: "The Equity Ledger", description: "A global UBI, drawn from the surplus of a perfectly optimized system. From each according to their ability, to each according to their need.", icon: <ServerStackIcon />, category: "The Governance Layer" },
-        { id: "cerebra-interface", name: "The Cerebra Interface (Simulation)", description: "Simulate a direct neural connection to the Integrated Reality Engine. The DevCore Reality Shell.", icon: <CpuChipIcon />, category: "The Governance Layer" },
-        { id: "humanitys-exocortex", name: "Humanity's Exocortex", description: "A shared, queryable knowledge graph of all human information, powering and powered by The Engine.", icon: <LinkIcon />, category: "The Governance Layer" }
+        { id: "guardian-ai", name: "The Guardian AI", description: "A real-time Ethical Oversight module. Your conscience, codified and scaled.", icon: React.createElement(ShieldCheckIcon), category: "The Governance Layer" },
+        { id: "equity-ledger", name: "The Equity Ledger", description: "A global UBI, drawn from the surplus of a perfectly optimized system. From each according to their ability, to each according to their need.", icon: React.createElement(ServerStackIcon), category: "The Governance Layer" },
+        { id: "cerebra-interface", name: "The Cerebra Interface (Simulation)", description: "Simulate a direct neural connection to the Integrated Reality Engine. The DevCore Reality Shell.", icon: React.createElement(CpuChipIcon), category: "The Governance Layer" },
+        { id: "humanitys-exocortex", name: "Humanity's Exocortex", description: "A shared, queryable knowledge graph of all human information, powering and powered by The Engine.", icon: React.createElement(LinkIcon), category: "The Governance Layer" }
     ],
 };
 

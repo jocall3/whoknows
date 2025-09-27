@@ -2,7 +2,6 @@
 
 
 import React, { useState, useCallback } from 'react';
-// FIX: Changed SlotCategory to the correct type FeatureCategory.
 import type { Feature, FeatureCategory } from '../types.ts';
 import { SLOTS } from '../constants/index.ts';
 import { FEATURES_MAP } from './features/index.ts';

@@ -15,7 +15,6 @@ interface State {
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
-  // Fix: Initialize state as a class property to ensure `this` context and types are correct.
   state: State = { hasError: false, error: null, aiHelp: '', isAiLoading: false };
 
   static getDerivedStateFromError(error: Error): Partial<State> {
@@ -26,12 +25,10 @@ export class ErrorBoundary extends React.Component<Props, State> {
     logError(error, { componentStack: errorInfo.componentStack });
   }
   
-  // Fix: Use arrow functions for methods to automatically bind `this`.
   handleRevert = () => {
     window.location.reload();
   }
 
-  // Fix: Use arrow functions for methods to automatically bind `this`.
   handleAskAi = async () => {
     if (!this.state.error) return;
 

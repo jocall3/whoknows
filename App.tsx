@@ -124,7 +124,6 @@ const DesktopExperience: React.FC = () => {
                 };
             }
 
-            // Fix: Add explicit type annotation for `w`
             const openWindowsCount = (Object.values(prev) as WindowState[]).filter((w: WindowState) => !w.isMinimized).length;
             const newWindow: WindowState = {
                 id: featureId,
@@ -196,9 +195,7 @@ const DesktopExperience: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    // Fix: Add explicit type annotation for `w` and cast Object.values to fix type inference issues.
     const openWindowsList = (Object.values(windows) as WindowState[]).filter((w: WindowState) => !w.isMinimized);
-    // Fix: Add explicit type annotation for `w` and cast Object.values to fix type inference issues.
     const minimizedWindowsList = (Object.values(windows) as WindowState[]).filter((w: WindowState) => w.isMinimized);
 
     return (
@@ -269,7 +266,6 @@ function App() {
   }
 
   return (
-    // Fix: Pass children to ErrorBoundary to satisfy its Props interface.
     <ErrorBoundary>
         <NotificationProvider>
             <VaultProvider>

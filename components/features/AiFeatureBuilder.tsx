@@ -1,10 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import type { GeneratedFile } from '../../types.ts';
-// FIX: Corrected import path for ai services.
 import { generateFeature, generateFullStackFeature, generateUnitTestsStream, generateCommitMessageStream, generateDockerfile } from '../../services/index.ts';
 import { saveFile, getAllFiles, clearAllFiles } from '../../services/dbService.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
-// FIX: Corrected import path for icons.
 import { CpuChipIcon, DocumentTextIcon, BeakerIcon, GitBranchIcon, CloudIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

@@ -4,7 +4,6 @@ import * as vaultService from '../../services/vaultService.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';
 import { validateToken } from '../../services/authService.ts';
 import { ACTION_REGISTRY, executeWorkspaceAction } from '../../services/workspaceConnectorService.ts';
-// Fix: Corrected import path for icons.
 import { RectangleGroupIcon, GithubIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 import { signInWithGoogle } from '../../services/googleAuthService.ts';

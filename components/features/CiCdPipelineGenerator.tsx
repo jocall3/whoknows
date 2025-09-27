@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { generateCiCdConfig } from '../../services/index.ts';
-// Fix: Corrected import path for icons.
 import { PaperAirplaneIcon, SparklesIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 

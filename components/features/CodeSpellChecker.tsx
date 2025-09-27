@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-// Fix: Corrected import path for icons.
 import { BeakerIcon } from '../icons/index.ts';
 
 const commonTypos = [

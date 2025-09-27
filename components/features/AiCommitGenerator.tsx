@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from 'react';
-// FIX: Corrected import path for ai services.
 import { generateCommitMessageStream } from '../../services/index.ts';
 import { GitBranchIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';

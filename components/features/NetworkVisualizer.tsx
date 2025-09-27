@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-// Fix: Corrected import path for icons.
 import { ChartBarIcon } from '../icons/index.ts';
 
 type SortKey = 'name' | 'initiatorType' | 'transferSize' | 'duration';

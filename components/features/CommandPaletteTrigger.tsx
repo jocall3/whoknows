@@ -1,5 +1,4 @@
 import React from 'react';
-// Fix: Corrected import path for icons.
 import { CommandLineIcon } from '../icons/index.ts';
 
 export const CommandPaletteTrigger: React.FC = () => {

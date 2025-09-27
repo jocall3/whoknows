@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { generateDocumentationForFiles } from '../../services/index.ts';
 import { useGlobalState } from '../../contexts/GlobalStateContext.tsx';
 import type { FileNode } from '../../types.ts';
-// Fix: Corrected import path for icons.
 import { DocumentTextIcon, FolderIcon } from '../icons/index.ts';
 import { LoadingSpinner, MarkdownRenderer } from '../shared/index.tsx';
 import { useNotification } from '../../contexts/NotificationContext.tsx';

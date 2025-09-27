@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { generateColorPalette, downloadFile } from '../../services/index.ts';
-// Fix: Corrected import path for icons.
 import { SparklesIcon, ArrowDownTrayIcon } from '../icons/index.ts';
 import { LoadingSpinner } from '../shared/index.tsx';
 
