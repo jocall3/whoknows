@@ -35,4 +35,59 @@ export const AiUnitTestGenerator: React.FC = () => {
                 setTests(fullResponse);
             }
         } catch (err) {
-            const errorMessage = err
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+            setError(`Failed to generate tests: ${errorMessage}`);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [code]);
+
+    return (
+        <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
+            <header className="mb-6">
+                <h1 className="text-3xl font-bold flex items-center">
+                    <BeakerIcon />
+                    <span className="ml-3">AI Unit Test Generator</span>
+                </h1>
+                <p className="text-text-secondary mt-1">Generate Vitest/RTL unit tests from your component code.</p>
+            </header>
+            <div className="flex-grow flex flex-col gap-4 min-h-0">
+                <div className="flex flex-col flex-1 min-h-0">
+                    <label htmlFor="code-input" className="text-sm font-medium text-text-secondary mb-2">Component Code</label>
+                    <textarea
+                        id="code-input"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        placeholder="Paste your component code here..."
+                        className="flex-grow p-4 bg-surface border border-border rounded-md resize-none font-mono text-sm"
+                    />
+                </div>
+                 <div className="flex-shrink-0">
+                    <button
+                        onClick={handleGenerate}
+                        disabled={isLoading}
+                        className="btn-primary w-full max-w-xs mx-auto flex items-center justify-center px-6 py-3"
+                    >
+                        {isLoading ? <LoadingSpinner /> : 'Generate Tests'}
+                    </button>
+                </div>
+                <div className="flex flex-col flex-1 min-h-0">
+                     <div className="flex justify-between items-center mb-2">
+                        <label className="text-sm font-medium text-text-secondary">Generated Tests</label>
+                        {tests && !isLoading && (
+                            <button onClick={() => downloadFile(tests, 'tests.test.tsx', 'text/typescript')} className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-xs rounded-md hover:bg-gray-200">
+                                <ArrowDownTrayIcon className="w-4 h-4"/> Download
+                            </button>
+                        )}
+                    </div>
+                    <div className="relative flex-grow p-1 bg-background border border-border rounded-md overflow-y-auto">
+                        {isLoading && !tests && <div className="flex items-center justify-center h-full"><LoadingSpinner /></div>}
+                        {error && <p className="p-4 text-red-500">{error}</p>}
+                        {tests && <MarkdownRenderer content={tests} />}
+                         {!isLoading && !tests && !error && <div className="text-text-secondary h-full flex items-center justify-center">Tests will appear here.</div>}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};

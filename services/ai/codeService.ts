@@ -317,3 +317,63 @@ export const generateIamPolicyStream = (description: string, platform: 'aws' | '
     `Generate a ${platform.toUpperCase()} IAM policy in JSON format based on this description: "${description}". Respond with only the JSON policy in a markdown block.`,
     `You are a cloud security expert specializing in ${platform.toUpperCase()} IAM policies.`
 );
+
+// Fix: Add missing function generateChartComponent
+export const generateChartComponent = (dataInfo: { headers: string[], samples: string[][] }, chartType: 'line' | 'bar'): Promise<string> => {
+    const prompt = `Generate a React component using the 'recharts' library to create a ${chartType} chart. The data has headers: ${dataInfo.headers.join(', ')}. Here are some sample data rows: ${dataInfo.samples.map(r => `[${r.join(', ')}]`).join(', ')}. The component should expect data as a prop named 'data'.`;
+    return generateContent(prompt, "You are a data visualization expert who writes React components using the recharts library. Respond with only the code in a markdown block.", 0.3);
+};
+
+// Fix: Add missing function generateComplianceReport
+export const generateComplianceReport = (code: string, standard: string): Promise<string> => {
+    const prompt = `Analyze the following code for potential compliance issues with the ${standard} standard. Provide a markdown report detailing any findings and suggested remediations.\n\nCode:\n\`\`\`javascript\n${code}\n\`\`\``;
+    return generateContent(prompt, "You are a compliance and security expert specializing in software development standards.");
+};
+
+// Fix: Add missing function generateEcommerceComponent
+export const generateEcommerceComponent = (description: string): Promise<string> => {
+    const prompt = `Generate a React component with Tailwind CSS and schema.org microdata for the following e-commerce product: "${description}". The component should be visually appealing and include placeholder images from unsplash or a similar service.`;
+    return generateContent(prompt, "You are an expert frontend developer specializing in e-commerce and SEO. Respond with only the component code in a markdown block.");
+};
+
+// Fix: Add missing function generateDocumentationForFiles
+export const generateDocumentationForFiles = (files: { path: string, content: string }[]): Promise<string> => {
+    const fileContents = files.map(f => `--- File: ${f.path} ---\n${f.content}`).join('\n\n');
+    const prompt = `Generate comprehensive markdown documentation for the following files. Create a section for each file.\n\n${fileContents}`;
+    const systemInstruction = "You are a technical writer who creates high-quality documentation for codebases.";
+    return generateContent(prompt, systemInstruction);
+};
+
+// Fix: Add missing function explainDependencyChanges
+export const explainDependencyChanges = (diff: string): Promise<string> => {
+    const prompt = `Analyze the following package lock file diff and explain the key changes, potential risks, and benefits in a markdown format.\n\nDiff:\n\`\`\`diff\n${diff}\n\`\`\``;
+    const systemInstruction = "You are an expert software engineer who analyzes dependency updates for potential issues.";
+    return generateContent(prompt, systemInstruction);
+};
+
+// Fix: Add missing function generateWordPressPlugin
+export const generateWordPressPlugin = (prompt: string): Promise<GeneratedFile[]> => {
+    const fullPrompt = `Generate a complete, functional WordPress plugin from the following description. The plugin should be well-structured with a main PHP file and any other necessary files (like JS or CSS). The main plugin file must have a valid plugin header.\n\nDescription: "${prompt}"`;
+    const systemInstruction = "You are an expert WordPress plugin developer. You generate all necessary files for a new plugin. You respond with a JSON array of file objects.";
+    return generateJson(fullPrompt, systemInstruction, filesSchema);
+};
+
+// Fix: Add missing function generateAppFeatureComponent
+export const generateAppFeatureComponent = (prompt: string): Promise<Omit<CustomFeature, 'id'>> => {
+    const betterPrompt = `Generate a self-contained React component for a new feature in an application based on this description: "${prompt}".
+The component should be a single file, using React hooks and Tailwind CSS.
+It should not rely on any external props unless absolutely necessary.
+Also provide a name, a one-sentence description, and the name of a suitable icon from this list: [SparklesIcon, BeakerIcon, CodeBracketSquareIcon, DocumentTextIcon, ShieldCheckIcon, HammerIcon, PaintBrushIcon, RectangleGroupIcon, ServerStackIcon, CpuChipIcon, LinkIcon].`;
+    const systemInstruction = `You are an expert at creating self-contained React components with Tailwind CSS. You respond with a single JSON object.`;
+    const schema = {
+        type: Type.OBJECT,
+        properties: {
+            name: { type: Type.STRING },
+            description: { type: Type.STRING },
+            icon: { type: Type.STRING },
+            code: { type: Type.STRING, description: "The full React component code as a string." }
+        },
+        required: ["name", "description", "icon", "code"]
+    };
+    return generateJson(betterPrompt, systemInstruction, schema);
+};

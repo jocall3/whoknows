@@ -125,7 +125,7 @@ const DesktopExperience: React.FC = () => {
             }
 
             // Fix: Add explicit type annotation for `w`
-            const openWindowsCount = (Object.values(prev) as WindowState[]).filter(w => !w.isMinimized).length;
+            const openWindowsCount = (Object.values(prev) as WindowState[]).filter((w: WindowState) => !w.isMinimized).length;
             const newWindow: WindowState = {
                 id: featureId,
                 position: { x: 50 + openWindowsCount * 30, y: 50 + openWindowsCount * 30 },
@@ -197,9 +197,9 @@ const DesktopExperience: React.FC = () => {
     }, []);
 
     // Fix: Add explicit type annotation for `w` and cast Object.values to fix type inference issues.
-    const openWindowsList = (Object.values(windows) as WindowState[]).filter(w => !w.isMinimized);
+    const openWindowsList = (Object.values(windows) as WindowState[]).filter((w: WindowState) => !w.isMinimized);
     // Fix: Add explicit type annotation for `w` and cast Object.values to fix type inference issues.
-    const minimizedWindowsList = (Object.values(windows) as WindowState[]).filter(w => w.isMinimized);
+    const minimizedWindowsList = (Object.values(windows) as WindowState[]).filter((w: WindowState) => w.isMinimized);
 
     return (
         <div className="h-full w-full flex flex-col bg-transparent overflow-hidden">

@@ -113,4 +113,180 @@ export const WorkspaceConnectorHub: React.FC = () => {
         checkConnections();
     }, [checkConnections]);
     
-    const withVault = useCallback(async (callback
+    const withVault = useCallback(async (callback: () => Promise<void>) => {
+        if (!vaultState.isInitialized) {
+            const created = await requestCreation();
+            if (!created) { addNotification('Vault setup is required.', 'error'); return; }
+        }
+        if (!vaultState.isUnlocked) {
+            const unlocked = await requestUnlock();
+            if (!unlocked) { addNotification('Vault must be unlocked to manage connections.', 'error'); return; }
+        }
+        await callback();
+    }, [vaultState, requestCreation, requestUnlock, addNotification]);
+
+
+    const handleConnect = async (serviceName: string, credentials: Record<string, string>) => {
+        await withVault(async () => {
+            setLoadingStates(s => ({ ...s, [serviceName]: true }));
+            try {
+                for (const [key, value] of Object.entries(credentials)) {
+                    if (value) await vaultService.saveCredential(key, value);
+                }
+                if (serviceName === 'GitHub' && credentials.github_pat) {
+                     const githubProfile = await validateToken(credentials.github_pat);
+                     dispatch({ type: 'SET_GITHUB_USER', payload: githubProfile });
+                     await vaultService.saveCredential('github_user', JSON.stringify(githubProfile));
+                }
+                addNotification(`${serviceName} connected successfully!`, 'success');
+                checkConnections();
+            } catch (e) {
+                addNotification(`Failed to connect ${serviceName}: ${e instanceof Error ? e.message : 'Unknown error'}`, 'error');
+            } finally {
+                setLoadingStates(s => ({ ...s, [serviceName]: false }));
+            }
+        });
+    };
+    
+    const handleDisconnect = async (serviceName: string, credIds: string[]) => {
+       await withVault(async () => {
+            setLoadingStates(s => ({ ...s, [serviceName]: true }));
+            try {
+                for (const id of credIds) {
+                     await vaultService.saveCredential(id, ''); // Overwrite with empty string
+                }
+                 if (serviceName === 'GitHub') {
+                     dispatch({ type: 'SET_GITHUB_USER', payload: null });
+                     await vaultService.saveCredential('github_user', '');
+                }
+                addNotification(`${serviceName} disconnected.`, 'info');
+                checkConnections();
+            } catch(e) {
+                addNotification(`Failed to disconnect ${serviceName}.`, 'error');
+            } finally {
+                 setLoadingStates(s => ({ ...s, [serviceName]: false }));
+            }
+       });
+    };
+    
+    const handleExecuteAction = async () => {
+        await withVault(async () => {
+            setIsExecuting(true);
+            setActionResult('');
+            try {
+                const result = await executeWorkspaceAction(selectedActionId, actionParams);
+                setActionResult(JSON.stringify(result, null, 2));
+                addNotification('Action executed successfully!', 'success');
+            } catch(e) {
+                setActionResult(`Error: ${e instanceof Error ? e.message : 'Unknown Error'}`);
+                addNotification('Action failed.', 'error');
+            } finally {
+                setIsExecuting(false);
+            }
+        });
+    };
+
+    const handleSignIn = () => {
+        signInWithGoogle();
+        // The result is handled by the global callback set in App.tsx
+    };
+
+    const selectedAction = ACTION_REGISTRY.get(selectedActionId);
+    const actionParameters = selectedAction ? selectedAction.getParameters() : {};
+
+    if (!user) {
+        return (
+            <div className="h-full flex items-center justify-center">
+                <div className="text-center bg-surface p-8 rounded-lg border border-border max-w-md">
+                    <h2 className="text-xl font-bold">Sign In Required</h2>
+                    <p className="text-text-secondary my-4">Please sign in with your Google account to manage workspace connections.</p>
+                    <button onClick={handleSignIn} disabled={loadingStates.google} className="btn-primary px-6 py-3 flex items-center justify-center gap-2 mx-auto">
+                        {loadingStates.google ? <LoadingSpinner/> : 'Sign in with Google'}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    
+    return (
+        <div className="h-full flex flex-col p-4 sm:p-6 lg:p-8 text-text-primary">
+             <header className="mb-8">
+                <h1 className="text-4xl font-extrabold tracking-tight flex items-center"><RectangleGroupIcon /><span className="ml-3">Workspace Connector Hub</span></h1>
+                <p className="mt-2 text-lg text-text-secondary">Connect to your development services to unlock cross-platform AI actions.</p>
+            </header>
+            <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-0">
+                <div className="flex flex-col gap-6 overflow-y-auto pr-4">
+                    <h2 className="text-2xl font-bold">Service Connections</h2>
+                    <ServiceConnectionCard 
+                        serviceName="GitHub"
+                        icon={<GithubIcon />}
+                        fields={[{ id: 'github_pat', label: 'Personal Access Token', placeholder: 'ghp_...' }]}
+                        onConnect={(creds) => handleConnect('GitHub', creds)}
+                        onDisconnect={() => handleDisconnect('GitHub', ['github_pat'])}
+                        status={connectionStatuses.GitHub || 'Checking...'}
+                        isLoading={loadingStates.GitHub}
+                    />
+                     {/* Placeholder cards for Jira and Slack */}
+                    <ServiceConnectionCard 
+                        serviceName="Jira"
+                        icon={<div className="w-10 h-10 bg-[#0052CC] rounded flex items-center justify-center text-white font-bold text-xl">J</div>}
+                        fields={[
+                            { id: 'jira_domain', label: 'Jira Domain', placeholder: 'your-company.atlassian.net' },
+                            { id: 'jira_email', label: 'Your Jira Email', placeholder: 'you@example.com' },
+                            { id: 'jira_pat', label: 'API Token', placeholder: 'Your API Token' },
+                        ]}
+                        onConnect={(creds) => handleConnect('Jira', creds)}
+                        onDisconnect={() => handleDisconnect('Jira', ['jira_domain', 'jira_email', 'jira_pat'])}
+                        status={connectionStatuses.Jira || 'Checking...'}
+                        isLoading={loadingStates.Jira}
+                    />
+                    <ServiceConnectionCard 
+                        serviceName="Slack"
+                        icon={<div className="w-10 h-10 bg-[#4A154B] rounded flex items-center justify-center text-white font-bold text-2xl">#</div>}
+                        fields={[{ id: 'slack_bot_token', label: 'Bot User OAuth Token', placeholder: 'xoxb-...' }]}
+                        onConnect={(creds) => handleConnect('Slack', creds)}
+                        onDisconnect={() => handleDisconnect('Slack', ['slack_bot_token'])}
+                        status={connectionStatuses.Slack || 'Checking...'}
+                        isLoading={loadingStates.Slack}
+                    />
+                </div>
+                <div className="flex flex-col gap-6 bg-surface p-6 border border-border rounded-lg">
+                    <h2 className="text-2xl font-bold">Manual Action Runner</h2>
+                    <div className="space-y-4">
+                         <div>
+                            <label className="text-sm font-medium">Action</label>
+                            <select value={selectedActionId} onChange={e => setSelectedActionId(e.target.value)} className="w-full mt-1 p-2 bg-background border rounded">
+                                {services.map(service => (
+                                    <optgroup label={service.name} key={service.name}>
+                                        {service.actions.map((action: any) => (
+                                            <option key={action.id} value={action.id}>{action.description}</option>
+                                        ))}
+                                    </optgroup>
+                                ))}
+                            </select>
+                        </div>
+                        {Object.entries(actionParameters).map(([key, param]: [string, any]) => (
+                            <div key={key}>
+                                <label className="text-sm font-medium">{key} {param.required && '*'}</label>
+                                <input 
+                                    type={param.type}
+                                    value={actionParams[key] || ''}
+                                    onChange={e => setActionParams(p => ({...p, [key]: e.target.value}))}
+                                    placeholder={param.default || ''}
+                                    className="w-full mt-1 p-2 bg-background border rounded"
+                                />
+                            </div>
+                        ))}
+                        <button onClick={handleExecuteAction} disabled={isExecuting} className="btn-primary w-full py-2 flex items-center justify-center gap-2">
+                           {isExecuting ? <LoadingSpinner/> : <><SparklesIcon /> Execute Action</>}
+                        </button>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium">Result</label>
+                        <pre className="w-full h-48 mt-1 p-2 bg-background border rounded overflow-auto text-xs">{actionResult || 'Action results will appear here.'}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};

@@ -217,3 +217,16 @@ export const generateRegExStream = (description: string) => streamContent(
     "You are an expert at writing regular expressions. You only respond with the regex literal.",
     0.3
 );
+
+// Fix: Add missing function generatePostmortem
+export const generatePostmortem = (details: any): Promise<string> => {
+    const prompt = `Generate a blameless post-mortem document in markdown format based on the following details:\n\n${JSON.stringify(details, null, 2)}`;
+    return generateContent(prompt, "You are a senior site reliability engineer who writes clear, blameless post-mortems.");
+};
+
+// Fix: Add missing function anonymizeData
+export const anonymizeData = (data: string, fields: string[]): Promise<{ anonymizedData: string }> => {
+    const prompt = `Anonymize the following data by replacing the values in the specified fields with realistic-looking fake data. Maintain the original format (JSON or CSV). Fields to anonymize: ${fields.join(', ')}.\n\nData:\n${data}`;
+    const schema = { type: Type.OBJECT, properties: { anonymizedData: { type: Type.STRING } }, required: ["anonymizedData"] };
+    return generateJson(prompt, "You are a data anonymization expert. You only respond with a JSON object containing the anonymized data string.", schema);
+};

@@ -31,6 +31,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     window.location.reload();
   }
 
+  // Fix: Use arrow functions for methods to automatically bind `this`.
   handleAskAi = async () => {
     if (!this.state.error) return;
 
