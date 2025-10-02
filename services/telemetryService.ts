@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 
 
 const isTelemetryEnabled = true; // Could be controlled by a setting

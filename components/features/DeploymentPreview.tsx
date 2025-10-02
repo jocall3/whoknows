@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import React, { useState, useEffect, useRef } from 'react';
 import { getAllFiles, getFileByPath } from '../../services/dbService.ts';
 import type { GeneratedFile } from '../../types.ts';

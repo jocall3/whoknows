@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import { useLocalStorage } from './useLocalStorage.ts';
 import type { SystemPrompt } from '../types.ts';
 

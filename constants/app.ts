@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import type { FeatureCategory } from '../types.ts';
 
 export const CHROME_VIEW_IDS = ['features-list'] as const;

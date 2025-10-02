@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import type { AppUser } from '../types.ts';
 import { logError } from './telemetryService.ts';
 

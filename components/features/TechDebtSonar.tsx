@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import React, { useState, useCallback } from 'react';
 // Fix: Corrected import path for ai services.
 import { detectCodeSmells } from '../../services/index.ts';

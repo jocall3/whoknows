@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import React, { useState, useCallback } from 'react';
 import { generateTerraformConfig } from '../../services/index.ts';
 // Fix: Corrected import path for icons.

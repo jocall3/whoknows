@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import React, { useState } from 'react';
 import { DocumentTextIcon } from '../icons/index.ts';
 import { useNotification } from '../../contexts/NotificationContext.tsx';

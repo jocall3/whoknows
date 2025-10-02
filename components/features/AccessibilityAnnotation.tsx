@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import React, { useState } from 'react';
 import * as Diff from 'diff';
 import { addAriaAttributes } from '../../services/index.ts';

@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import React, { useState, useCallback, useRef } from 'react';
 // FIX: Corrected import path for ai services.
 import { generateComponentFromImageStream } from '../../services/index.ts';

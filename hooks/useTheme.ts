@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import { useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage.ts';
 import type { ThemeState, ColorTheme, Theme } from '../types.ts';

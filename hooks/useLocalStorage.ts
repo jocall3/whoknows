@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import { useState } from 'react';
 
 export const useLocalStorage = <T,>(key: string, initialValue: T) => {

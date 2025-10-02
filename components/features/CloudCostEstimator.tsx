@@ -1,3 +1,6 @@
+// Copyright James Burvel O’Callaghan III
+// President Citibank Demo Business Inc.
+
 import React, { useState } from 'react';
 import { estimateCloudCost } from '../../services/index.ts';
 import { GcpIcon } from '../icons/index.ts';
